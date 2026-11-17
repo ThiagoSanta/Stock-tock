@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Boxes,
   Plus,
   ShoppingBag,
   TrendingUp,
-  AlertCircle,
   Clock,
   ArrowUpRight,
   ShieldCheck,
@@ -15,8 +14,15 @@ import {
   PackageCheck,
   Database,
 } from 'lucide-react';
+import Link from 'next/link';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { createClient } from '@/utils/supabase/client';
+import { PosModal } from '@/presentation/modules/pos/PosModal';
+import { SupabaseProductRepository } from '@/core/infrastructure/repositories/SupabaseProductRepository';
+import { SupabaseSaleRepository } from '@/core/infrastructure/repositories/SupabaseSaleRepository';
+import { ProcessDirectSaleUseCase } from '@/core/application/use-cases/sales/ProcessDirectSaleUseCase';
+import { ProductWithStock } from '@/core/application/ports/IProductRepository';
+import { Sale } from '@/core/domain/sales/types';
 
 interface CompanyData {
   id: string;
@@ -24,28 +30,70 @@ interface CompanyData {
   primary_currency: string;
 }
 
-interface ProductItem {
+interface StockMovementRow {
   id: string;
-  name: string;
-  sku: string;
-  sale_price: number;
-  cost_price: number;
-  min_stock_alert: number;
-}
-
-interface StockItem {
-  product_id: string;
-  physical_stock: number;
-  reserved_stock: number;
-  available_stock: number;
+  movement_type: string;
+  quantity: number;
+  balance_physical_after: number;
+  created_at: string;
+  notes?: string;
+  product?: { name: string };
 }
 
 export default function DashboardPage() {
   const [currentDate, setCurrentDate] = useState<string>('');
   const [company, setCompany] = useState<CompanyData | null>(null);
-  const [products, setProducts] = useState<ProductItem[]>([]);
-  const [stockList, setStockList] = useState<StockItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [defaultWarehouseId, setDefaultWarehouseId] = useState<string>('');
+  const [products, setProducts] = useState<ProductWithStock[]>([]);
+  const [recentSales, setRecentSales] = useState<Sale[]>([]);
+  const [recentMovements, setRecentMovements] = useState<StockMovementRow[]>([]);
+  const [isPosOpen, setIsPosOpen] = useState(false);
+
+  const productRepo = useMemo(() => new SupabaseProductRepository(), []);
+  const saleRepo = useMemo(() => new SupabaseSaleRepository(), []);
+  const processSaleUseCase = useMemo(() => new ProcessDirectSaleUseCase(saleRepo), [saleRepo]);
+
+  const loadData = async () => {
+    try {
+      const supabase = createClient();
+
+      // Cargar empresa
+      const { data: companies } = await supabase.from('companies').select('*').limit(1);
+      if (companies && companies.length > 0) {
+        const c = companies[0];
+        setCompany(c);
+
+        // Cargar depósito por defecto
+        const { data: wh } = await supabase
+          .from('warehouses')
+          .select('id')
+          .eq('company_id', c.id)
+          .eq('is_default', true)
+          .single();
+        if (wh) setDefaultWarehouseId(wh.id);
+
+        // Cargar productos con stock
+        const prodsWithStock = await productRepo.findAllWithStock(c.id);
+        setProducts(prodsWithStock);
+
+        // Cargar ventas recientes
+        const sales = await saleRepo.findRecentSales(c.id, 5);
+        setRecentSales(sales);
+
+        // Cargar movimientos de Kardex
+        const { data: movs } = await supabase
+          .from('stock_movements')
+          .select('id, movement_type, quantity, balance_physical_after, created_at, notes, product:products(name)')
+          .eq('company_id', c.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (movs) setRecentMovements(movs as any);
+      }
+    } catch (err) {
+      console.error('Error cargando datos del dashboard:', err);
+    }
+  };
 
   useEffect(() => {
     setCurrentDate(
@@ -53,43 +101,32 @@ export default function DashboardPage() {
         dateStyle: 'full',
       }).format(new Date())
     );
+    loadData();
+  }, [productRepo, saleRepo]);
 
-    const loadRealData = async () => {
-      try {
-        const supabase = createClient();
-        
-        // Cargar empresa
-        const { data: companies } = await supabase.from('companies').select('*').limit(1);
-        if (companies && companies.length > 0) {
-          setCompany(companies[0]);
-        }
+  // Manejador para completar la venta desde el POS
+  const handleCompleteSale = async (data: Parameters<typeof processSaleUseCase.execute>[0]) => {
+    if (!company?.id || !defaultWarehouseId) {
+      throw new Error('Empresa o depósito no configurado.');
+    }
 
-        // Cargar productos
-        const { data: prods } = await supabase.from('products').select('*');
-        if (prods) setProducts(prods);
+    const sale = await processSaleUseCase.execute({
+      ...data,
+      companyId: company.id,
+      warehouseId: defaultWarehouseId,
+    });
 
-        // Cargar stock
-        const { data: stocks } = await supabase.from('inventory_stock').select('*');
-        if (stocks) setStockList(stocks);
-      } catch (err) {
-        console.error('Error cargando datos de Supabase:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Recargar métricas y movimientos en tiempo real
+    await loadData();
+    return sale;
+  };
 
-    loadRealData();
-  }, []);
-
-  // Métricas calculadas en tiempo real desde Supabase
-  const totalPhysicalStock = stockList.reduce((acc, curr) => acc + Number(curr.physical_stock), 0);
-  const totalReservedStock = stockList.reduce((acc, curr) => acc + Number(curr.reserved_stock), 0);
-  const totalAvailableStock = stockList.reduce((acc, curr) => acc + Number(curr.available_stock), 0);
-  const stockValuation = products.reduce((acc, prod) => {
-    const itemStock = stockList.find((s) => s.product_id === prod.id);
-    const qty = itemStock ? Number(itemStock.physical_stock) : 0;
-    return acc + qty * Number(prod.cost_price);
-  }, 0);
+  // Cálculos en tiempo real
+  const totalPhysicalStock = products.reduce((acc, curr) => acc + curr.physicalStock, 0);
+  const totalAvailableStock = products.reduce((acc, curr) => acc + curr.availableStock, 0);
+  const totalReservedStock = products.reduce((acc, curr) => acc + curr.reservedStock, 0);
+  const totalSalesAmount = recentSales.reduce((acc, curr) => acc + curr.totalAmount, 0);
+  const stockValuation = products.reduce((acc, p) => acc + p.physicalStock * p.costPrice, 0);
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
@@ -115,11 +152,10 @@ export default function DashboardPage() {
             <Database className="w-3.5 h-3.5 text-[#84cc16]" />
             <span>Supabase Cloud Conectado</span>
           </div>
-          <button className="h-9 px-3.5 rounded-lg bg-[#18181b] hover:bg-[#222226] border border-[#27272a] text-xs font-medium text-zinc-300 transition-colors flex items-center gap-1.5">
-            <ShoppingBag className="w-3.5 h-3.5" />
-            <span>Nuevo Pedido</span>
-          </button>
-          <button className="h-9 px-4 rounded-lg bg-[#84cc16] hover:bg-[#74b412] text-black text-xs font-semibold shadow-[0_0_20px_rgba(132,204,22,0.25)] transition-all flex items-center gap-1.5">
+          <button
+            onClick={() => setIsPosOpen(true)}
+            className="h-9 px-4 rounded-lg bg-[#84cc16] hover:bg-[#74b412] text-black text-xs font-semibold shadow-[0_0_20px_rgba(132,204,22,0.25)] transition-all flex items-center gap-1.5"
+          >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>Venta Rápida (POS)</span>
           </button>
@@ -137,7 +173,7 @@ export default function DashboardPage() {
               Políticas de Integridad V1 Activas en Base de Datos
             </h4>
             <p className="text-[11px] text-zinc-400">
-              Restricción CHECK de stock negativo activa • Costo promedio a nivel empresa • Trazabilidad Kardex
+              Bloqueo automático de stock negativo • Costos históricos inmutables • Kardex auditado
             </p>
           </div>
         </div>
@@ -146,22 +182,30 @@ export default function DashboardPage() {
         </span>
       </div>
 
-      {/* Metric Cards Grid (Datos Reales de Supabase) */}
+      {/* Metric Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard
+          title="Ventas Registradas"
+          value={`$${totalSalesAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`}
+          trend={`${recentSales.length} op.`}
+          isPositive={true}
+          subtitle="Total cobrado en mostrador"
+          icon={TrendingUp}
+        />
         <MetricCard
           title="Stock Físico Real"
           value={`${totalPhysicalStock} un.`}
           trend={`Valuado $${stockValuation.toLocaleString('es-AR')}`}
           isPositive={true}
-          subtitle={`En depósito central de la empresa`}
+          subtitle="En depósito central"
           icon={Boxes}
         />
         <MetricCard
           title="Stock Disponible"
           value={`${totalAvailableStock} un.`}
-          trend="100% libre"
+          trend="Disponible"
           isPositive={true}
-          subtitle="Listo para vender o reservar"
+          subtitle="Libre para nuevas ventas"
           icon={PackageCheck}
         />
         <MetricCard
@@ -172,14 +216,6 @@ export default function DashboardPage() {
           subtitle="Comprometido sin despachar"
           icon={Clock}
         />
-        <MetricCard
-          title="Productos en Catálogo"
-          value={`${products.length} ítems`}
-          trend="Activos"
-          isPositive={true}
-          subtitle="Registrados en la base de datos"
-          icon={TrendingUp}
-        />
       </div>
 
       {/* Main Grid: Live Products & Audit Movements */}
@@ -189,58 +225,58 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between pb-3 border-b border-[#222226]">
             <div>
               <h3 className="text-sm font-semibold text-zinc-100">
-                Productos en Base de Datos
+                Productos en Catálogo
               </h3>
               <p className="text-xs text-zinc-500">
                 Artículos cargados en Supabase con existencia física y precios
               </p>
             </div>
-            <span className="text-[11px] font-mono text-[#84cc16] bg-[#84cc16]/10 px-2 py-0.5 rounded border border-[#84cc16]/20">
-              {products.length} productos
-            </span>
+            <Link
+              href="/productos"
+              className="text-xs text-[#84cc16] hover:underline flex items-center gap-1 font-medium"
+            >
+              Ver catálogo completo <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
           <div className="space-y-2.5">
-            {products.map((prod) => {
-              const stock = stockList.find((s) => s.product_id === prod.id);
-              const physical = stock ? Number(stock.physical_stock) : 0;
-              const available = stock ? Number(stock.available_stock) : 0;
-
-              return (
-                <div
-                  key={prod.id}
-                  className="p-4 rounded-lg bg-[#161619] border border-[#222226] hover:border-[#2a2a30] transition-colors flex items-center justify-between"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-semibold text-zinc-400">
-                        SKU: {prod.sku}
-                      </span>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#84cc16]/10 text-[#84cc16] border border-[#84cc16]/30">
-                        {available} disp.
-                      </span>
-                    </div>
-                    <p className="text-sm text-zinc-100 font-semibold">{prod.name}</p>
-                    <p className="text-[11px] text-zinc-500">
-                      Costo: ${Number(prod.cost_price).toLocaleString('es-AR')} • Venta: ${Number(prod.sale_price).toLocaleString('es-AR')}
-                    </p>
+            {products.slice(0, 4).map((prod) => (
+              <div
+                key={prod.id}
+                className="p-3.5 rounded-lg bg-[#161619] border border-[#222226] hover:border-[#2a2a30] transition-colors flex items-center justify-between"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-semibold text-zinc-400">
+                      SKU: {prod.sku}
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#84cc16]/10 text-[#84cc16] border border-[#84cc16]/30">
+                      {prod.availableStock} disponibles
+                    </span>
                   </div>
-
-                  <div className="text-right space-y-1.5">
-                    <p className="text-sm font-bold font-mono text-[#84cc16]">
-                      ${Number(prod.sale_price).toLocaleString('es-AR')}
-                    </p>
-                    <button className="text-[11px] font-semibold px-2.5 py-1 rounded bg-[#1f2024] hover:bg-[#27282e] text-zinc-200 border border-[#303036] transition-colors">
-                      Gestionar Stock
-                    </button>
-                  </div>
+                  <p className="text-sm text-zinc-100 font-semibold">{prod.name}</p>
+                  <p className="text-[11px] text-zinc-500">
+                    Costo: ${prod.costPrice.toLocaleString('es-AR')} • Venta: ${prod.salePrice.toLocaleString('es-AR')}
+                  </p>
                 </div>
-              );
-            })}
+
+                <div className="text-right space-y-1.5">
+                  <p className="text-sm font-bold font-mono text-[#84cc16]">
+                    ${prod.salePrice.toLocaleString('es-AR')}
+                  </p>
+                  <button
+                    onClick={() => setIsPosOpen(true)}
+                    className="text-[11px] font-semibold px-2.5 py-1 rounded bg-[#1f2024] hover:bg-[#27282e] text-zinc-200 border border-[#303036] transition-colors"
+                  >
+                    Vender Ahora
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Right Column: Movimientos Auditados */}
+        {/* Right Column: Movimientos Auditados (Kardex) */}
         <div className="rounded-xl bg-[#121214] border border-[#222226] p-5 space-y-4">
           <div className="pb-3 border-b border-[#222226]">
             <h3 className="text-sm font-semibold text-zinc-100">
@@ -250,28 +286,66 @@ export default function DashboardPage() {
           </div>
 
           <div className="space-y-3">
-            <div className="pb-3 border-b border-[#1c1c20] last:border-0 flex items-start justify-between gap-3">
-              <div>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#1c1c20] text-[#84cc16]">
-                  INGRESO_AJUSTE
-                </span>
-                <p className="text-xs font-medium text-zinc-200 mt-1">
-                  Apertura Inicial de Inventario
-                </p>
-                <p className="text-[10px] text-zinc-500">Taladro Percutor 750W</p>
-              </div>
-              <div className="text-right shrink-0">
-                <span className="text-xs font-mono font-bold text-[#84cc16]">
-                  +25 un.
-                </span>
-                <p className="text-[10px] text-zinc-500 font-mono">
-                  Saldo: 25 un.
-                </p>
-              </div>
-            </div>
+            {recentMovements.length === 0 ? (
+              <p className="text-xs text-zinc-500 text-center py-4">
+                No hay movimientos registrados aún.
+              </p>
+            ) : (
+              recentMovements.map((mov) => {
+                const isNegative = Number(mov.quantity) < 0;
+                return (
+                  <div
+                    key={mov.id}
+                    className="pb-3 border-b border-[#1c1c20] last:border-0 flex items-start justify-between gap-3"
+                  >
+                    <div>
+                      <span
+                        className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                          isNegative
+                            ? 'bg-rose-500/10 text-rose-400'
+                            : 'bg-[#84cc16]/10 text-[#84cc16]'
+                        }`}
+                      >
+                        {mov.movement_type}
+                      </span>
+                      <p className="text-xs font-medium text-zinc-200 mt-1 line-clamp-1">
+                        {mov.product?.name || mov.notes || 'Movimiento de Stock'}
+                      </p>
+                      <p className="text-[10px] text-zinc-500">
+                        {new Date(mov.created_at).toLocaleTimeString('es-AR', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span
+                        className={`text-xs font-mono font-bold ${
+                          isNegative ? 'text-rose-400' : 'text-[#84cc16]'
+                        }`}
+                      >
+                        {isNegative ? '' : '+'}{mov.quantity} un.
+                      </span>
+                      <p className="text-[10px] text-zinc-500 font-mono">
+                        Saldo: {mov.balance_physical_after} un.
+                      </p>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       </div>
+
+      {/* Modal POS de Venta Rápida */}
+      <PosModal
+        isOpen={isPosOpen}
+        onClose={() => setIsPosOpen(false)}
+        products={products}
+        companyId={company?.id || ''}
+        onCompleteSale={handleCompleteSale as any}
+      />
     </div>
   );
 }
