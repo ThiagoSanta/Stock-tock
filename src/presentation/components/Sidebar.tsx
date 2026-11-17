@@ -14,6 +14,7 @@ import {
   Settings,
   Search,
   CheckCircle2,
+  AlertTriangle,
   LucideIcon,
 } from 'lucide-react';
 
@@ -32,6 +33,7 @@ const navigationItems: NavItem[] = [
   { name: 'Ventas', href: '/ventas', icon: Receipt },
   { name: 'Compras', href: '/compras', icon: Truck },
   { name: 'Clientes & Prov.', href: '/contactos', icon: Users },
+  { name: 'Alertas & Reportes', href: '/alertas', icon: AlertTriangle },
   { name: 'Configuración', href: '#configuracion', icon: Settings },
 ];
 
