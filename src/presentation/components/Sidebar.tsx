@@ -27,7 +27,7 @@ interface NavItem {
 const navigationItems: NavItem[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Catálogo', href: '/productos', icon: Package },
-  { name: 'Inventario', href: '#inventario', icon: Boxes },
+  { name: 'Inventario', href: '/inventario', icon: Boxes },
   { name: 'Pedidos', href: '/pedidos', icon: ShoppingBag },
   { name: 'Ventas', href: '#ventas', icon: Receipt },
   { name: 'Compras', href: '/compras', icon: Truck },
