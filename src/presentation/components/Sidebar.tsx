@@ -31,7 +31,7 @@ const navigationItems: NavItem[] = [
   { name: 'Pedidos', href: '/pedidos', icon: ShoppingBag },
   { name: 'Ventas', href: '/ventas', icon: Receipt },
   { name: 'Compras', href: '/compras', icon: Truck },
-  { name: 'Clientes & Prov.', href: '#contactos', icon: Users },
+  { name: 'Clientes & Prov.', href: '/contactos', icon: Users },
   { name: 'Configuración', href: '#configuracion', icon: Settings },
 ];
 
