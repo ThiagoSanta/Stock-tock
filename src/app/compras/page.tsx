@@ -1,0 +1,176 @@
+'use client';
+
+import React, { useEffect, useState, useMemo } from 'react';
+import Link from 'next/link';
+import { ArrowLeft, Truck, Plus } from 'lucide-react';
+import { Purchase, Supplier, PurchaseStatus } from '@/core/domain/purchases/types';
+import { ProductWithStock } from '@/core/application/ports/IProductRepository';
+import { SupabasePurchaseRepository } from '@/core/infrastructure/repositories/SupabasePurchaseRepository';
+import { SupabaseProductRepository } from '@/core/infrastructure/repositories/SupabaseProductRepository';
+import { CreatePurchaseUseCase } from '@/core/application/use-cases/purchases/CreatePurchaseUseCase';
+import { ReceivePurchaseUseCase } from '@/core/application/use-cases/purchases/ReceivePurchaseUseCase';
+import { PurchaseTable } from '@/presentation/modules/purchases/PurchaseTable';
+import { PurchaseModal } from '@/presentation/modules/purchases/PurchaseModal';
+import { PurchaseDetailModal } from '@/presentation/modules/purchases/PurchaseDetailModal';
+import { createClient } from '@/utils/supabase/client';
+
+export default function PurchasesPage() {
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [products, setProducts] = useState<ProductWithStock[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [companyId, setCompanyId] = useState<string>('');
+  const [warehouseId, setWarehouseId] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'ALL' | PurchaseStatus>('ALL');
+
+  const purchaseRepo = useMemo(() => new SupabasePurchaseRepository(), []);
+  const productRepo = useMemo(() => new SupabaseProductRepository(), []);
+
+  const createPurchaseUseCase = useMemo(() => new CreatePurchaseUseCase(purchaseRepo), [purchaseRepo]);
+  const receivePurchaseUseCase = useMemo(() => new ReceivePurchaseUseCase(purchaseRepo), [purchaseRepo]);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const supabase = createClient();
+      const { data: companies } = await supabase.from('companies').select('id').limit(1);
+
+      if (companies && companies.length > 0) {
+        const cId = companies[0].id;
+        setCompanyId(cId);
+
+        const { data: wh } = await supabase
+          .from('warehouses')
+          .select('id')
+          .eq('company_id', cId)
+          .eq('is_default', true)
+          .single();
+        if (wh) setWarehouseId(wh.id);
+
+        const [purchasesList, prods, sups] = await Promise.all([
+          purchaseRepo.findPurchases(cId),
+          productRepo.findAllWithStock(cId),
+          purchaseRepo.findSuppliers(cId),
+        ]);
+
+        setPurchases(purchasesList);
+        setProducts(prods);
+        setSuppliers(sups);
+      }
+    } catch (err) {
+      console.error('Error cargando órdenes de compra:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [purchaseRepo, productRepo]);
+
+  const handleCreatePurchase = async (
+    dto: Parameters<typeof createPurchaseUseCase.execute>[0]
+  ) => {
+    if (!companyId || !warehouseId) throw new Error('Empresa o depósito no configurado.');
+    await createPurchaseUseCase.execute({
+      ...dto,
+      companyId,
+      warehouseId,
+    });
+    await loadData();
+  };
+
+  const handleReceivePurchase = async (purchaseId: string) => {
+    if (!companyId) return;
+    await receivePurchaseUseCase.execute(purchaseId, companyId);
+    await loadData();
+  };
+
+  const filteredPurchases = useMemo(() => {
+    if (statusFilter === 'ALL') return purchases;
+    return purchases.filter((p) => p.status === statusFilter);
+  }, [purchases, statusFilter]);
+
+  return (
+    <div className="p-8 max-w-7xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#222226]">
+        <div>
+          <div className="flex items-center gap-2 text-xs text-zinc-500 mb-1">
+            <Link
+              href="/"
+              className="hover:text-zinc-300 flex items-center gap-1 transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Volver al Dashboard</span>
+            </Link>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+              <Truck className="w-4 h-4" />
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-zinc-100">
+              Compras a Proveedores
+            </h1>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="h-9 px-4 rounded-lg bg-[#84cc16] hover:bg-[#74b412] text-black text-xs font-semibold shadow-[0_0_15px_rgba(132,204,22,0.25)] transition-all flex items-center gap-1.5 shrink-0"
+        >
+          <Plus className="w-4 h-4 stroke-[2.5]" />
+          <span>Nueva Orden de Compra</span>
+        </button>
+      </div>
+
+      {/* Tabs de Filtro por Estado */}
+      <div className="flex items-center gap-1.5 p-1 rounded-lg bg-[#141518] border border-[#27272a] text-xs w-fit overflow-x-auto">
+        {[
+          { id: 'ALL', label: 'Todas' },
+          { id: 'EMITIDA', label: 'Pendientes de Recepción' },
+          { id: 'RECEPCION_TOTAL', label: 'Recibidas en Stock' },
+          { id: 'CANCELADA', label: 'Canceladas' },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setStatusFilter(tab.id as any)}
+            className={`px-3 py-1.5 rounded-md font-medium transition-all ${
+              statusFilter === tab.id
+                ? 'bg-[#22242a] text-[#84cc16]'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tabla de Compras */}
+      <PurchaseTable
+        purchases={filteredPurchases}
+        loading={loading}
+        onSelectPurchase={setSelectedPurchase}
+        onReceivePurchase={handleReceivePurchase}
+      />
+
+      {/* Modal Crear Orden de Compra */}
+      <PurchaseModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        products={products}
+        suppliers={suppliers}
+        onCreatePurchase={handleCreatePurchase as any}
+      />
+
+      {/* Modal Detalle de Compra y Recepción */}
+      <PurchaseDetailModal
+        purchase={selectedPurchase}
+        onClose={() => setSelectedPurchase(null)}
+        onReceive={handleReceivePurchase}
+      />
+    </div>
+  );
+}
