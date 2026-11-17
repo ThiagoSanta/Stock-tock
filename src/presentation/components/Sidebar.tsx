@@ -34,7 +34,7 @@ const navigationItems: NavItem[] = [
   { name: 'Compras', href: '/compras', icon: Truck },
   { name: 'Clientes & Prov.', href: '/contactos', icon: Users },
   { name: 'Alertas & Reportes', href: '/alertas', icon: AlertTriangle },
-  { name: 'Configuración', href: '#configuracion', icon: Settings },
+  { name: 'Configuración', href: '/configuracion', icon: Settings },
 ];
 
 export function Sidebar() {
