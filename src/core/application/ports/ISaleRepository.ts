@@ -1,4 +1,4 @@
-import { Sale, PaymentMethod } from '@/core/domain/sales/types';
+import { Sale, SaleItem, PaymentMethod } from '@/core/domain/sales/types';
 
 export interface CreateSaleItemDTO {
   productId: string;
@@ -19,7 +19,14 @@ export interface CreateDirectSaleDTO {
   items: CreateSaleItemDTO[];
 }
 
+export interface SaleWithDetails extends Sale {
+  marginPercentage: number;
+  warehouseName?: string;
+}
+
 export interface ISaleRepository {
   createDirectSale(dto: CreateDirectSaleDTO): Promise<Sale>;
   findRecentSales(companyId: string, limit?: number): Promise<Sale[]>;
+  findAllSales(companyId: string, options?: { origin?: string }): Promise<SaleWithDetails[]>;
+  findSaleById(saleId: string): Promise<SaleWithDetails | null>;
 }

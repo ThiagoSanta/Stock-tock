@@ -29,7 +29,7 @@ const navigationItems: NavItem[] = [
   { name: 'Catálogo', href: '/productos', icon: Package },
   { name: 'Inventario', href: '/inventario', icon: Boxes },
   { name: 'Pedidos', href: '/pedidos', icon: ShoppingBag },
-  { name: 'Ventas', href: '#ventas', icon: Receipt },
+  { name: 'Ventas', href: '/ventas', icon: Receipt },
   { name: 'Compras', href: '/compras', icon: Truck },
   { name: 'Clientes & Prov.', href: '#contactos', icon: Users },
   { name: 'Configuración', href: '#configuracion', icon: Settings },

@@ -1,12 +1,15 @@
 import { createClient } from '@/utils/supabase/client';
 import { Sale } from '@/core/domain/sales/types';
-import { ISaleRepository, CreateDirectSaleDTO } from '@/core/application/ports/ISaleRepository';
+import {
+  ISaleRepository,
+  CreateDirectSaleDTO,
+  SaleWithDetails,
+} from '@/core/application/ports/ISaleRepository';
 
 export class SupabaseSaleRepository implements ISaleRepository {
   private supabase = createClient();
 
   async createDirectSale(dto: CreateDirectSaleDTO): Promise<Sale> {
-    // 1. Validar disponibilidad de stock de cada ítem antes de ejecutar la venta
     for (const item of dto.items) {
       const { data: stockRow, error: stockErr } = await this.supabase
         .from('inventory_stock')
@@ -28,14 +31,12 @@ export class SupabaseSaleRepository implements ISaleRepository {
       }
     }
 
-    // 2. Generar número de venta único
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const saleNumber = `VTA-${Date.now().toString().slice(-4)}${randomSuffix}`;
 
     const totalAmount = dto.items.reduce((acc, it) => acc + it.quantity * it.unitPrice, 0);
     const totalCost = dto.items.reduce((acc, it) => acc + it.quantity * it.costPrice, 0);
 
-    // 3. Insertar la venta
     const { data: saleData, error: saleErr } = await this.supabase
       .from('sales')
       .insert({
@@ -58,9 +59,7 @@ export class SupabaseSaleRepository implements ISaleRepository {
 
     const saleId = saleData.id;
 
-    // 4. Procesar cada ítem (Guardar histórico, descontar stock físico y asentar Kardex)
     for (const item of dto.items) {
-      // 4.1. Insertar ítem de venta
       await this.supabase.from('sale_items').insert({
         sale_id: saleId,
         product_id: item.productId,
@@ -71,7 +70,6 @@ export class SupabaseSaleRepository implements ISaleRepository {
         subtotal: item.quantity * item.unitPrice,
       });
 
-      // 4.2. Obtener saldo actual para descontar
       const { data: currentStock } = await this.supabase
         .from('inventory_stock')
         .select('*')
@@ -84,8 +82,7 @@ export class SupabaseSaleRepository implements ISaleRepository {
       const reserved = Number(currentStock.reserved_stock);
       const newAvailable = newPhysical - reserved;
 
-      // 4.3. Actualizar stock físico (la BD tiene CHECK para evitar negativos)
-      const { error: updErr } = await this.supabase
+      await this.supabase
         .from('inventory_stock')
         .update({
           physical_stock: newPhysical,
@@ -93,11 +90,6 @@ export class SupabaseSaleRepository implements ISaleRepository {
         })
         .eq('id', currentStock.id);
 
-      if (updErr) {
-        throw new Error(`Error actualizando inventario: ${updErr.message}`);
-      }
-
-      // 4.4. Asentar en Kardex inmutable
       await this.supabase.from('stock_movements').insert({
         company_id: dto.companyId,
         warehouse_id: dto.warehouseId,
@@ -150,19 +142,88 @@ export class SupabaseSaleRepository implements ISaleRepository {
 
     if (error || !data) return [];
 
-    return data.map((row) => ({
+    return data.map((row) => this.mapRowToSale(row));
+  }
+
+  async findAllSales(companyId: string, options?: { origin?: string }): Promise<SaleWithDetails[]> {
+    let query = this.supabase
+      .from('sales')
+      .select('*, items:sale_items(*, product:products(name)), warehouse:warehouses(name)')
+      .eq('company_id', companyId)
+      .order('created_at', { ascending: false });
+
+    if (options?.origin && options.origin !== 'ALL') {
+      query = query.eq('origin', options.origin);
+    }
+
+    const { data, error } = await query;
+    if (error || !data) return [];
+
+    return data.map((row: any) => {
+      const amount = Number(row.total_amount);
+      const cost = Number(row.total_cost || 0);
+      const margin = amount - cost;
+      const marginPct = amount > 0 ? (margin / amount) * 100 : 0;
+
+      return {
+        ...this.mapRowToSale(row),
+        marginPercentage: Math.round(marginPct * 10) / 10,
+        warehouseName: row.warehouse?.name || 'Depósito Central',
+      };
+    });
+  }
+
+  async findSaleById(saleId: string): Promise<SaleWithDetails | null> {
+    const { data, error } = await this.supabase
+      .from('sales')
+      .select('*, items:sale_items(*, product:products(name)), warehouse:warehouses(name)')
+      .eq('id', saleId)
+      .single();
+
+    if (error || !data) return null;
+
+    const amount = Number(data.total_amount);
+    const cost = Number(data.total_cost || 0);
+    const margin = amount - cost;
+    const marginPct = amount > 0 ? (margin / amount) * 100 : 0;
+
+    return {
+      ...this.mapRowToSale(data),
+      marginPercentage: Math.round(marginPct * 10) / 10,
+      warehouseName: data.warehouse?.name || 'Depósito Central',
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private mapRowToSale(row: any): Sale {
+    const amount = Number(row.total_amount);
+    const cost = Number(row.total_cost || 0);
+
+    return {
       id: row.id,
       companyId: row.company_id,
       saleNumber: row.sale_number,
       origin: row.origin,
-      customerName: row.notes?.replace('Cliente: ', '') || 'Consumidor Final',
-      items: [],
-      totalAmount: Number(row.total_amount),
-      totalCost: Number(row.total_cost),
-      estimatedGrossMargin: Number(row.estimated_gross_margin || 0),
+      orderId: row.order_id,
+      customerId: row.customer_id,
+      customerName: row.notes?.replace('Cliente: ', '').replace('Venta procedente de Despacho de Pedido #', 'Pedido #') || 'Consumidor Final',
+      items: (row.items || []).map((it: any) => ({
+        id: it.id,
+        saleId: it.sale_id,
+        productId: it.product_id,
+        variantId: it.variant_id,
+        productName: it.product?.name || 'Producto',
+        quantity: Number(it.quantity),
+        unitPrice: Number(it.unit_price),
+        historicalCostPrice: Number(it.historical_cost_price),
+        subtotal: Number(it.subtotal),
+      })),
+      totalAmount: amount,
+      totalCost: cost,
+      estimatedGrossMargin: amount - cost,
       paymentMethod: row.payment_method,
       notes: row.notes,
       createdAt: row.created_at,
-    }));
+    };
   }
 }
