@@ -32,6 +32,7 @@ export interface Product {
   unitOfMeasure: 'UNIDAD' | 'KG' | 'LITRO' | 'METRO' | 'PACK';
   costPrice: number; // Costo promedio ponderado a nivel empresa
   salePrice: number;
+  wholesalePrice?: number;
   minStockAlert: number;
   maxStock?: number;
   tracksLotsAndExpiry: boolean; // Flag para lotes/vencimientos

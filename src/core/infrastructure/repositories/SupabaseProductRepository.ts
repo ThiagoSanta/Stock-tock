@@ -1,6 +1,10 @@
 import { createClient } from '@/utils/supabase/client';
 import { Product } from '@/core/domain/catalog/types';
-import { IProductRepository, CreateProductDTO } from '@/core/application/ports/IProductRepository';
+import {
+  IProductRepository,
+  ProductWithStock,
+  CreateProductWithStockDTO,
+} from '@/core/application/ports/IProductRepository';
 
 export class SupabaseProductRepository implements IProductRepository {
   private supabase = createClient();
@@ -13,11 +17,125 @@ export class SupabaseProductRepository implements IProductRepository {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching products:', error);
       throw new Error(`Error al obtener productos: ${error.message}`);
     }
 
-    return (data || []).map((row) => ({
+    return (data || []).map((row) => this.mapRowToProduct(row));
+  }
+
+  async findAllWithStock(companyId: string): Promise<ProductWithStock[]> {
+    const { data: prods, error: pErr } = await this.supabase
+      .from('products')
+      .select('*')
+      .eq('company_id', companyId)
+      .order('created_at', { ascending: false });
+
+    if (pErr) throw new Error(pErr.message);
+
+    const { data: stocks, error: sErr } = await this.supabase
+      .from('inventory_stock')
+      .select('*')
+      .eq('company_id', companyId);
+
+    if (sErr) throw new Error(sErr.message);
+
+    return (prods || []).map((prod) => {
+      const stock = (stocks || []).find((s) => s.product_id === prod.id);
+      return {
+        ...this.mapRowToProduct(prod),
+        physicalStock: stock ? Number(stock.physical_stock) : 0,
+        reservedStock: stock ? Number(stock.reserved_stock) : 0,
+        availableStock: stock ? Number(stock.available_stock) : 0,
+        warehouseId: stock ? stock.warehouse_id : '',
+      };
+    });
+  }
+
+  async findById(id: string): Promise<Product | null> {
+    const { data, error } = await this.supabase
+      .from('products')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) return null;
+    return this.mapRowToProduct(data);
+  }
+
+  async create(dto: CreateProductWithStockDTO): Promise<Product> {
+    // 1. Obtener el depósito por defecto si no se especificó uno
+    let warehouseId = dto.warehouseId;
+    if (!warehouseId) {
+      const { data: wh } = await this.supabase
+        .from('warehouses')
+        .select('id')
+        .eq('company_id', dto.companyId)
+        .eq('is_default', true)
+        .single();
+
+      warehouseId = wh?.id;
+    }
+
+    // 2. Insertar el producto
+    const { data: productData, error: prodErr } = await this.supabase
+      .from('products')
+      .insert({
+        company_id: dto.companyId,
+        name: dto.name.trim(),
+        description: dto.description?.trim(),
+        sku: dto.sku.trim().toUpperCase(),
+        barcode: dto.barcode?.trim() || null,
+        unit_of_measure: dto.unitOfMeasure,
+        cost_price: dto.costPrice,
+        sale_price: dto.salePrice,
+        min_stock_alert: dto.minStockAlert,
+        tracks_lots_and_expiry: dto.tracksLotsAndExpiry ?? false,
+      })
+      .select()
+      .single();
+
+    if (prodErr) throw new Error(`Error al crear producto: ${prodErr.message}`);
+
+    const newProductId = productData.id;
+    const initialQty = dto.initialStock ?? 0;
+
+    // 3. Crear el registro en inventory_stock
+    if (warehouseId) {
+      const { error: stockErr } = await this.supabase
+        .from('inventory_stock')
+        .insert({
+          company_id: dto.companyId,
+          warehouse_id: warehouseId,
+          product_id: newProductId,
+          physical_stock: initialQty,
+          reserved_stock: 0,
+        });
+
+      if (stockErr) console.error('Error inicializando stock:', stockErr);
+
+      // 4. Registrar movimiento en Kardex si hubo stock inicial
+      if (initialQty > 0) {
+        await this.supabase.from('stock_movements').insert({
+          company_id: dto.companyId,
+          warehouse_id: warehouseId,
+          product_id: newProductId,
+          movement_type: 'INGRESO_AJUSTE',
+          quantity: initialQty,
+          balance_physical_after: initialQty,
+          balance_reserved_after: 0,
+          balance_available_after: initialQty,
+          unit_cost: dto.costPrice,
+          notes: 'Inventario inicial al dar de alta el producto',
+        });
+      }
+    }
+
+    return this.mapRowToProduct(productData);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private mapRowToProduct(row: any): Product {
+    return {
       id: row.id,
       companyId: row.company_id,
       categoryId: row.category_id,
@@ -37,63 +155,6 @@ export class SupabaseProductRepository implements IProductRepository {
       active: row.active,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
-    }));
-  }
-
-  async findById(id: string): Promise<Product | null> {
-    const { data, error } = await this.supabase
-      .from('products')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error || !data) return null;
-
-    return {
-      id: data.id,
-      companyId: data.company_id,
-      categoryId: data.category_id,
-      name: data.name,
-      description: data.description,
-      sku: data.sku,
-      barcode: data.barcode,
-      unitOfMeasure: data.unit_of_measure,
-      costPrice: Number(data.cost_price),
-      salePrice: Number(data.sale_price),
-      wholesalePrice: data.wholesale_price ? Number(data.wholesale_price) : undefined,
-      minStockAlert: Number(data.min_stock_alert),
-      maxStock: data.max_stock ? Number(data.max_stock) : undefined,
-      tracksLotsAndExpiry: data.tracks_lots_and_expiry,
-      hasVariants: data.has_variants,
-      imageUrl: data.image_url,
-      active: data.active,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
     };
-  }
-
-  async create(dto: CreateProductDTO): Promise<Product> {
-    const { data, error } = await this.supabase
-      .from('products')
-      .insert({
-        company_id: dto.companyId,
-        name: dto.name,
-        description: dto.description,
-        sku: dto.sku,
-        barcode: dto.barcode,
-        unit_of_measure: dto.unitOfMeasure,
-        cost_price: dto.costPrice,
-        sale_price: dto.salePrice,
-        min_stock_alert: dto.minStockAlert,
-        tracks_lots_and_expiry: dto.tracksLotsAndExpiry ?? false,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      throw new Error(`Error al crear producto: ${error.message}`);
-    }
-
-    return this.findById(data.id) as Promise<Product>;
   }
 }

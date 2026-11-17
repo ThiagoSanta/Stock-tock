@@ -18,7 +18,7 @@ import {
 
 const navigationItems = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Catálogo', href: '#catalogo', icon: Package },
+  { name: 'Catálogo', href: '/productos', icon: Package },
   { name: 'Inventario', href: '#inventario', icon: Boxes },
   { name: 'Pedidos', href: '#pedidos', icon: ShoppingBag, badge: '3' },
   { name: 'Ventas', href: '#ventas', icon: Receipt },

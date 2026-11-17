@@ -1,6 +1,13 @@
 import { Product } from '@/core/domain/catalog/types';
 
-export interface CreateProductDTO {
+export interface ProductWithStock extends Product {
+  physicalStock: number;
+  reservedStock: number;
+  availableStock: number;
+  warehouseId: string;
+}
+
+export interface CreateProductWithStockDTO {
   companyId: string;
   name: string;
   description?: string;
@@ -11,10 +18,13 @@ export interface CreateProductDTO {
   salePrice: number;
   minStockAlert: number;
   tracksLotsAndExpiry?: boolean;
+  initialStock?: number;
+  warehouseId?: string;
 }
 
 export interface IProductRepository {
   findAll(companyId: string): Promise<Product[]>;
+  findAllWithStock(companyId: string): Promise<ProductWithStock[]>;
   findById(id: string): Promise<Product | null>;
-  create(data: CreateProductDTO): Promise<Product>;
+  create(data: CreateProductWithStockDTO): Promise<Product>;
 }
