@@ -14,13 +14,21 @@ import {
   Settings,
   Search,
   CheckCircle2,
+  LucideIcon,
 } from 'lucide-react';
 
-const navigationItems = [
+interface NavItem {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+  badge?: string;
+}
+
+const navigationItems: NavItem[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Catálogo', href: '/productos', icon: Package },
   { name: 'Inventario', href: '#inventario', icon: Boxes },
-  { name: 'Pedidos', href: '#pedidos', icon: ShoppingBag, badge: '3' },
+  { name: 'Pedidos', href: '/pedidos', icon: ShoppingBag },
   { name: 'Ventas', href: '#ventas', icon: Receipt },
   { name: 'Compras', href: '#compras', icon: Truck },
   { name: 'Clientes & Prov.', href: '#contactos', icon: Users },
