@@ -1,7 +1,5 @@
-'use client';
-
 import React from 'react';
-import { Search, Plus, Filter } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 
 interface ProductFiltersProps {
   searchTerm: string;
@@ -22,66 +20,66 @@ export function ProductFilters({
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
       {/* Search Bar */}
       <div className="relative flex-1 max-w-md">
-        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+        <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Buscar por nombre, SKU o código de barras..."
-          className="w-full h-9 pl-9 pr-3 rounded-lg bg-[#141518] border border-[#27272a] text-xs text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-[#84cc16] transition-colors"
+          className="w-full h-8 pl-8 pr-3 rounded bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 transition-colors shadow-xs"
         />
       </div>
 
       {/* Filter Tabs & New Product Button */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-        <div className="flex items-center p-1 rounded-lg bg-[#141518] border border-[#27272a] text-xs shrink-0">
+      <div className="flex items-center gap-2 overflow-x-auto">
+        <div className="flex items-center p-1 rounded-md bg-slate-100 border border-slate-200 text-xs shrink-0">
           <button
             onClick={() => onFilterChange('ALL')}
-            className={`px-2.5 py-1 rounded-md font-medium transition-all ${
+            className={`px-2.5 py-1 rounded font-medium transition-all cursor-pointer ${
               stockFilter === 'ALL'
-                ? 'bg-[#22242a] text-zinc-100'
-                : 'text-zinc-400 hover:text-zinc-200'
+                ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             Todos
           </button>
           <button
             onClick={() => onFilterChange('NORMAL')}
-            className={`px-2.5 py-1 rounded-md font-medium transition-all ${
+            className={`px-2.5 py-1 rounded font-medium transition-all cursor-pointer ${
               stockFilter === 'NORMAL'
-                ? 'bg-[#22242a] text-[#84cc16]'
-                : 'text-zinc-400 hover:text-zinc-200'
+                ? 'bg-white text-emerald-700 shadow-xs font-semibold'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             Stock Normal
           </button>
           <button
             onClick={() => onFilterChange('LOW')}
-            className={`px-2.5 py-1 rounded-md font-medium transition-all ${
+            className={`px-2.5 py-1 rounded font-medium transition-all cursor-pointer ${
               stockFilter === 'LOW'
-                ? 'bg-[#22242a] text-amber-400'
-                : 'text-zinc-400 hover:text-zinc-200'
+                ? 'bg-white text-amber-700 shadow-xs font-semibold'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Bajo Mínimo
+            Bajo Stock
           </button>
           <button
             onClick={() => onFilterChange('OUT')}
-            className={`px-2.5 py-1 rounded-md font-medium transition-all ${
+            className={`px-2.5 py-1 rounded font-medium transition-all cursor-pointer ${
               stockFilter === 'OUT'
-                ? 'bg-[#22242a] text-rose-400'
-                : 'text-zinc-400 hover:text-zinc-200'
+                ? 'bg-white text-rose-700 shadow-xs font-semibold'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Agotados
+            Quiebre (0)
           </button>
         </div>
 
         <button
           onClick={onOpenCreateModal}
-          className="h-9 px-3.5 rounded-lg bg-[#84cc16] hover:bg-[#74b412] text-black text-xs font-semibold shadow-[0_0_15px_rgba(132,204,22,0.25)] transition-all flex items-center gap-1.5 shrink-0"
+          className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
         >
-          <Plus className="w-4 h-4 stroke-[2.5]" />
+          <Plus className="w-4 h-4" />
           <span>Nuevo Producto</span>
         </button>
       </div>

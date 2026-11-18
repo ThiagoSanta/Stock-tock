@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import { X, Users, Truck, AlertCircle } from 'lucide-react';
 import { CreateCustomerDTO } from '@/core/application/use-cases/contacts/CreateCustomerUseCase';
@@ -80,37 +78,32 @@ export function ContactModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-[#121214] border border-[#27272a] rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#222226]">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-zinc-800 text-zinc-300">
-              {contactType === 'CUSTOMER' ? <Users className="w-5 h-5" /> : <Truck className="w-5 h-5 text-[#84cc16]" />}
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-white border border-slate-200 rounded-lg w-full max-w-lg overflow-hidden shadow-xl">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
+              {contactType === 'CUSTOMER' ? <Users className="w-3.5 h-3.5" /> : <Truck className="w-3.5 h-3.5" />}
             </div>
-            <div>
-              <h3 className="font-semibold text-zinc-100 text-sm">
-                {contactType === 'CUSTOMER' ? 'Nuevo Cliente' : 'Nuevo Proveedor'}
-              </h3>
-              <p className="text-[11px] text-zinc-400">
-                {contactType === 'CUSTOMER' ? 'Registrar cliente o cuenta comercial' : 'Registrar proveedor o fabricante'}
-              </p>
-            </div>
+            <h3 className="font-semibold text-slate-900 text-xs uppercase tracking-wider">
+              {contactType === 'CUSTOMER' ? 'Nuevo Cliente' : 'Nuevo Proveedor'}
+            </h3>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800">
+          <button onClick={onClose} className="p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Contact Type Switcher */}
-        <div className="px-6 pt-4">
-          <div className="grid grid-cols-2 p-1 bg-[#18181b] rounded-lg border border-[#27272a]">
+        <div className="px-4 pt-3">
+          <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-md border border-slate-200 text-xs">
             <button
               type="button"
               onClick={() => setContactType('CUSTOMER')}
-              className={`py-1.5 text-xs font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
+              className={`py-1 rounded font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 contactType === 'CUSTOMER'
-                  ? 'bg-zinc-800 text-zinc-100 shadow'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Users className="w-3.5 h-3.5" /> Cliente
@@ -118,10 +111,10 @@ export function ContactModal({
             <button
               type="button"
               onClick={() => setContactType('SUPPLIER')}
-              className={`py-1.5 text-xs font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
+              className={`py-1 rounded font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 contactType === 'SUPPLIER'
-                  ? 'bg-zinc-800 text-[#84cc16] shadow font-semibold'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Truck className="w-3.5 h-3.5" /> Proveedor
@@ -129,17 +122,17 @@ export function ContactModal({
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 space-y-3">
           {error && (
-            <div className="p-3 rounded-lg bg-rose-950/40 border border-rose-900/60 text-rose-300 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+            <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           <div>
-            <label className="block text-[11px] font-medium text-zinc-400 mb-1">
-              Nombre / Razón Social <span className="text-rose-400">*</span>
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
+              Nombre / Razón Social <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
@@ -147,13 +140,13 @@ export function ContactModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={contactType === 'CUSTOMER' ? 'Ej: Distribuidora Sur S.A.' : 'Ej: Bodega Catena Zapata'}
-              className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+              className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-medium text-zinc-400 mb-1">
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
                 {contactType === 'CUSTOMER' ? 'DNI / CUIT' : 'CUIT Fiscal'}
               </label>
               <input
@@ -161,33 +154,33 @@ export function ContactModal({
                 value={taxId}
                 onChange={(e) => setTaxId(e.target.value)}
                 placeholder="Ej: 30-71123456-8"
-                className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+                className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
               />
             </div>
             {contactType === 'SUPPLIER' ? (
               <div>
-                <label className="block text-[11px] font-medium text-zinc-400 mb-1">
+                <label className="block text-[11px] font-medium text-slate-600 mb-1">
                   Persona de Contacto
                 </label>
                 <input
                   type="text"
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
-                  placeholder="Ej: Laura Gómez (Ventas)"
-                  className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+                  placeholder="Ej: Laura Gómez"
+                  className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
                 />
               </div>
             ) : (
               <div>
-                <label className="block text-[11px] font-medium text-zinc-400 mb-1">
+                <label className="block text-[11px] font-medium text-slate-600 mb-1">
                   Teléfono / WhatsApp
                 </label>
                 <input
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Ej: +54 9 11 4455-6677"
-                  className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+                  placeholder="+54 9 11 4455-6677"
+                  className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
                 />
               </div>
             )}
@@ -195,7 +188,7 @@ export function ContactModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-medium text-zinc-400 mb-1">
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
                 Correo Electrónico
               </label>
               <input
@@ -203,82 +196,66 @@ export function ContactModal({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="contacto@empresa.com"
-                className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+                className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
               />
             </div>
             {contactType === 'SUPPLIER' ? (
               <div>
-                <label className="block text-[11px] font-medium text-zinc-400 mb-1">
+                <label className="block text-[11px] font-medium text-slate-600 mb-1">
                   Teléfono / WhatsApp
                 </label>
                 <input
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Ej: +54 9 11 4455-6677"
-                  className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+                  placeholder="+54 9 11 4455-6677"
+                  className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
                 />
               </div>
             ) : (
               <div>
-                <label className="block text-[11px] font-medium text-zinc-400 mb-1">
-                  Dirección de Entrega
+                <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                  Dirección
                 </label>
                 <input
                   type="text"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Av. Corrientes 1234, CABA"
-                  className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+                  placeholder="Av. Corrientes 1234"
+                  className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
                 />
               </div>
             )}
           </div>
 
-          {contactType === 'SUPPLIER' && (
-            <div>
-              <label className="block text-[11px] font-medium text-zinc-400 mb-1">
-                Dirección / Depósito Proveedor
-              </label>
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Ruta 7 Km 1000, Mendoza"
-                className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
-              />
-            </div>
-          )}
-
           <div>
-            <label className="block text-[11px] font-medium text-zinc-400 mb-1">
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
               Notas u Observaciones
             </label>
             <textarea
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Condiciones comerciales acordadas, días de entrega preferidos..."
-              className="w-full p-2.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16] resize-none"
+              placeholder="Condiciones comerciales acordadas..."
+              className="w-full p-2 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400 resize-none"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#222226]">
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-xs rounded-lg bg-[#18181b] border border-[#27272a] text-zinc-300 hover:bg-zinc-800 transition-colors"
+              className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-xs font-semibold rounded-lg bg-[#84cc16] text-black hover:bg-[#9ae624] transition-colors flex items-center gap-1.5"
+              className="h-8 px-4 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              {loading && <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />}
-              <span>Guardar {contactType === 'CUSTOMER' ? 'Cliente' : 'Proveedor'}</span>
+              {loading ? 'Guardando...' : `Guardar ${contactType === 'CUSTOMER' ? 'Cliente' : 'Proveedor'}`}
             </button>
           </div>
         </form>

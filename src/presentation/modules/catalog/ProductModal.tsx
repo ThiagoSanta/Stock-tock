@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import { X, PackagePlus } from 'lucide-react';
 import { CreateProductWithStockDTO } from '@/core/application/ports/IProductRepository';
@@ -50,7 +48,6 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
         minStockAlert: parseFloat(minStockAlert) || 0,
       });
 
-      // Limpiar y cerrar
       setName('');
       setSku('');
       setBarcode('');
@@ -58,43 +55,44 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
       setSalePrice('0');
       setInitialStock('0');
       onClose();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error desconocido al guardar');
+    } catch (err: any) {
+      setError(err.message || 'Error al guardar el producto.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
-      <div className="w-full max-w-lg rounded-xl bg-[#121214] border border-[#27272a] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+      <div className="w-full max-w-lg rounded-lg bg-white border border-slate-200 shadow-xl overflow-hidden">
         {/* Modal Header */}
-        <div className="h-14 px-5 border-b border-[#222226] flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[#84cc16]/10 text-[#84cc16] flex items-center justify-center">
-              <PackagePlus className="w-4 h-4" />
+        <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
+              <PackagePlus className="w-3.5 h-3.5" />
             </div>
-            <h3 className="text-sm font-semibold text-zinc-100">Nuevo Producto</h3>
+            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+              Nuevo Producto
+            </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-zinc-200 p-1 rounded-md hover:bg-[#1f1f23] transition-colors"
+            className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 space-y-3">
           {error && (
-            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">
+            <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs">
               {error}
             </div>
           )}
 
-          {/* Nombre */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1">
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
               Nombre del Producto *
             </label>
             <input
@@ -103,14 +101,13 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ej: Pintura Látex Interior 10L"
-              className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#84cc16]"
+              className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400"
             />
           </div>
 
-          {/* SKU & Código de Barras */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1">
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
                 SKU / Código Interno *
               </label>
               <input
@@ -119,11 +116,11 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
                 placeholder="PIN-LAT-10"
-                className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#84cc16]"
+                className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1">
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
                 Código de Barras (EAN)
               </label>
               <input
@@ -131,21 +128,20 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
                 value={barcode}
                 onChange={(e) => setBarcode(e.target.value)}
                 placeholder="779000123456"
-                className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#84cc16]"
+                className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400"
               />
             </div>
           </div>
 
-          {/* Unidad & Stock Mínimo */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1">
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
                 Unidad de Medida
               </label>
               <select
                 value={unitOfMeasure}
                 onChange={(e) => setUnitOfMeasure(e.target.value as any)}
-                className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+                className="w-full h-8 px-2 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
               >
                 <option value="UNIDAD">Unidad</option>
                 <option value="KG">Kilogramos (KG)</option>
@@ -155,23 +151,22 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1">
-                Alerta de Stock Mínimo
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                Alerta Stock Mínimo
               </label>
               <input
                 type="number"
                 min="0"
                 value={minStockAlert}
                 onChange={(e) => setMinStockAlert(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs font-mono text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+                className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:border-slate-400"
               />
             </div>
           </div>
 
-          {/* Costo & Precio de Venta */}
-          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#222226]">
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1">
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
                 Costo de Compra ($)
               </label>
               <input
@@ -180,11 +175,11 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
                 min="0"
                 value={costPrice}
                 onChange={(e) => setCostPrice(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs font-mono text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+                className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:border-slate-400"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1">
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
                 Precio de Venta ($) *
               </label>
               <input
@@ -194,14 +189,13 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
                 required
                 value={salePrice}
                 onChange={(e) => setSalePrice(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs font-mono text-[#84cc16] font-semibold focus:outline-none focus:border-[#84cc16]"
+                className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs font-mono text-slate-900 font-semibold focus:outline-none focus:border-slate-400"
               />
             </div>
           </div>
 
-          {/* Stock Inicial */}
-          <div className="p-3 rounded-lg bg-[#161619] border border-[#27272a]">
-            <label className="block text-xs font-medium text-zinc-300 mb-1">
+          <div className="p-3 rounded bg-slate-50 border border-slate-200">
+            <label className="block text-[11px] font-medium text-slate-700 mb-1">
               Stock Físico Inicial a Ingresar
             </label>
             <input
@@ -209,36 +203,28 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
               min="0"
               value={initialStock}
               onChange={(e) => setInitialStock(e.target.value)}
-              className="w-full h-9 px-3 rounded-lg bg-[#121214] border border-[#27272a] text-xs font-mono text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+              className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:border-slate-400"
             />
-            <p className="text-[10px] text-zinc-500 mt-1.5">
-              Se registrará un movimiento de inventario en el Kardex automáticamente.
+            <p className="text-[10px] text-slate-400 mt-1">
+              Genera movimiento auditado INGRESO_AJUSTE en Kardex.
             </p>
           </div>
 
-          {/* Botones */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#222226]">
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="h-9 px-4 rounded-lg bg-[#18181b] hover:bg-[#202024] text-xs font-medium text-zinc-300 transition-colors"
+              className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="h-9 px-5 rounded-lg bg-[#84cc16] hover:bg-[#74b412] text-black text-xs font-semibold shadow-[0_0_15px_rgba(132,204,22,0.25)] transition-all flex items-center gap-1.5"
+              className="h-8 px-4 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              {loading ? (
-                <>
-                  <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                  <span>Guardando...</span>
-                </>
-              ) : (
-                <span>Crear Producto</span>
-              )}
+              {loading ? 'Guardando...' : 'Crear Producto'}
             </button>
           </div>
         </form>

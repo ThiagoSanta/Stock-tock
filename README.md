@@ -94,15 +94,15 @@ El esquema completo se encuentra en `docs/04-modelo-datos-supabase.sql`. Podés 
 node scripts/migrate.mjs
 ```
 
-### 3. Ejecución en Desarrollo
+### 3. Ejecución en Desarrollo (Vite SPA Ultrarrápido)
 ```bash
 npm install
 npm run dev
 ```
-Acceder a [http://localhost:3000](http://localhost:3000).
+El servidor de desarrollo con Vite arranca en menos de 1 segundo. Acceder a [http://localhost:3000](http://localhost:3000).
 
 ### 4. Compilación de Producción
 ```bash
 npm run build
 ```
-Genera las 12 rutas prerenderizadas estáticas y optimizadas por Turbopack.
+Genera la SPA estática hiper-optimizada en la carpeta `dist/` en ~2 segundos.

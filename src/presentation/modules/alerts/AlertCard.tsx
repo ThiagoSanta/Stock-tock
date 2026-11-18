@@ -1,8 +1,6 @@
-'use client';
-
 import React from 'react';
-import Link from 'next/link';
-import { AlertCircle, AlertTriangle, Info, Clock, ArrowRight, ShieldAlert } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { AlertTriangle, Info, Clock, ArrowRight, ShieldAlert } from 'lucide-react';
 import { SystemAlert } from '@/core/domain/alerts/types';
 
 interface AlertCardProps {
@@ -14,61 +12,61 @@ export function AlertCard({ alert }: AlertCardProps) {
   const isWarning = alert.severity === 'WARNING';
 
   const badgeStyle = isCritical
-    ? 'bg-rose-950/40 text-rose-400 border-rose-900/60'
+    ? 'bg-rose-50 text-rose-700 border-rose-200'
     : isWarning
-    ? 'bg-amber-950/40 text-amber-400 border-amber-900/60'
-    : 'bg-sky-950/40 text-sky-400 border-sky-900/60';
+    ? 'bg-amber-50 text-amber-700 border-amber-200'
+    : 'bg-sky-50 text-sky-700 border-sky-200';
 
   const borderStyle = isCritical
-    ? 'border-rose-900/40 hover:border-rose-700/60'
+    ? 'border-rose-200 bg-rose-50/20'
     : isWarning
-    ? 'border-amber-900/40 hover:border-amber-700/60'
-    : 'border-zinc-800 hover:border-zinc-700';
+    ? 'border-amber-200 bg-amber-50/20'
+    : 'border-slate-200 bg-white';
 
   const IconComponent = () => {
     if (alert.type === 'PENDING_ORDER_RESERVATION') {
-      return <Clock className="w-4 h-4 text-amber-400 shrink-0" />;
+      return <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />;
     }
     if (isCritical) {
-      return <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />;
+      return <ShieldAlert className="w-3.5 h-3.5 text-rose-600 shrink-0" />;
     }
     if (isWarning) {
-      return <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />;
+      return <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />;
     }
-    return <Info className="w-4 h-4 text-sky-400 shrink-0" />;
+    return <Info className="w-3.5 h-3.5 text-sky-600 shrink-0" />;
   };
 
   return (
     <div
-      className={`p-4 rounded-xl bg-[#121214] border ${borderStyle} transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4`}
+      className={`p-3.5 rounded-lg border ${borderStyle} transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs`}
     >
-      <div className="flex items-start gap-3">
-        <div className="p-2 rounded-lg bg-[#18181b] border border-[#27272a] mt-0.5">
+      <div className="flex items-start gap-2.5">
+        <div className="p-1.5 rounded bg-white border border-slate-200 mt-0.5">
           <IconComponent />
         </div>
-        <div className="space-y-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h4 className="text-xs font-semibold text-zinc-100">{alert.title}</h4>
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono border ${badgeStyle}`}>
+        <div className="space-y-0.5">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <h4 className="text-xs font-semibold text-slate-900">{alert.title}</h4>
+            <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono border ${badgeStyle}`}>
               {alert.severity}
             </span>
             {alert.warehouseName && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-400 font-mono">
+              <span className="px-1.5 py-0.2 rounded text-[10px] bg-slate-100 border border-slate-200 text-slate-600 font-mono">
                 {alert.warehouseName}
               </span>
             )}
           </div>
-          <p className="text-xs text-zinc-400 leading-relaxed max-w-2xl">{alert.description}</p>
+          <p className="text-[11px] text-slate-600 leading-relaxed max-w-2xl">{alert.description}</p>
         </div>
       </div>
 
       <div className="shrink-0 flex items-center justify-end">
         <Link
-          href={alert.actionUrl}
-          className="h-8 px-3 rounded-lg bg-[#18181b] border border-[#27272a] hover:bg-zinc-800 text-zinc-200 text-xs font-medium flex items-center gap-1.5 transition-colors"
+          to={alert.actionUrl}
+          className="h-7 px-2.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-medium flex items-center gap-1 transition-colors border border-slate-200"
         >
           <span>{alert.actionLabel}</span>
-          <ArrowRight className="w-3.5 h-3.5 text-[#84cc16]" />
+          <ArrowRight className="w-3 h-3 text-slate-500" />
         </Link>
       </div>
     </div>

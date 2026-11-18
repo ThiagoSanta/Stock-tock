@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import { Building2, Save, CheckCircle2, AlertCircle } from 'lucide-react';
 import { CompanySettings } from '@/core/domain/settings/types';
@@ -44,75 +42,77 @@ export function CompanyForm({ company, onUpdate }: CompanyFormProps) {
   };
 
   return (
-    <div className="rounded-xl bg-[#121214] border border-[#222226] p-6 space-y-6">
-      <div className="flex items-center gap-3 pb-4 border-b border-[#222226]">
-        <div className="p-2 rounded-lg bg-zinc-800 text-[#84cc16]">
-          <Building2 className="w-5 h-5" />
+    <div className="rounded-lg bg-white border border-slate-200 p-4 space-y-4 shadow-xs">
+      <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200">
+        <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
+          <Building2 className="w-3.5 h-3.5" />
         </div>
         <div>
-          <h3 className="font-semibold text-zinc-100 text-sm">Perfil de la Organización</h3>
-          <p className="text-xs text-zinc-400">
-            Identificación legal y comercial para tickets, comprobantes y reportes
+          <h3 className="font-semibold text-slate-900 text-xs uppercase tracking-wider">
+            Perfil de la Empresa
+          </h3>
+          <p className="text-[11px] text-slate-500">
+            Identificación legal y comercial para comprobantes y reportes
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
+      <form onSubmit={handleSubmit} className="space-y-3 max-w-2xl">
         {error && (
-          <div className="p-3 rounded-lg bg-rose-950/40 border border-rose-900/60 text-rose-300 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="p-3 rounded-lg bg-emerald-950/40 border border-emerald-900/60 text-emerald-300 text-xs flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <div className="p-2.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
             <span>Cambios guardados exitosamente.</span>
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-[11px] font-medium text-zinc-400 mb-1">
-              Nombre de Fantasía / Razón Social <span className="text-rose-400">*</span>
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
+              Razón Social / Nombre Comercial <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+              className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-medium text-zinc-400 mb-1">
-              Identificación Tributaria (CUIT / RUT)
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
+              Identificación Fiscal (CUIT / RUT)
             </label>
             <input
               type="text"
               value={taxId}
               onChange={(e) => setTaxId(e.target.value)}
-              placeholder="Ej: 30-71234567-8"
-              className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+              placeholder="30-71234567-8"
+              className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-[11px] font-medium text-zinc-400 mb-1">
-              Moneda Principal del Sistema (V1)
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
+              Moneda Principal
             </label>
-            <div className="flex items-center gap-2 h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-400 select-none">
-              <span className="font-mono font-bold text-zinc-200">{company.primaryCurrency}</span>
-              <span className="text-[10px] text-zinc-500 font-mono">(Regla SINGLE: Fijo en ARS)</span>
+            <div className="flex items-center gap-2 h-8 px-2.5 rounded bg-slate-50 border border-slate-200 text-xs text-slate-600">
+              <span className="font-mono font-bold text-slate-900">{company.primaryCurrency}</span>
+              <span className="text-[10px] text-slate-400 font-mono">(Regla SINGLE: Fijo en ARS)</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-medium text-zinc-400 mb-1">
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
               URL del Logo (Opcional)
             </label>
             <input
@@ -120,23 +120,19 @@ export function CompanyForm({ company, onUpdate }: CompanyFormProps) {
               value={logoUrl}
               onChange={(e) => setLogoUrl(e.target.value)}
               placeholder="https://..."
-              className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+              className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
             />
           </div>
         </div>
 
-        <div className="pt-2">
+        <div className="pt-1">
           <button
             type="submit"
             disabled={saving}
-            className="px-4 py-2 text-xs font-semibold rounded-lg bg-[#84cc16] text-black hover:bg-[#9ae624] transition-colors flex items-center gap-1.5"
+            className="h-8 px-4 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            {saving ? (
-              <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Save className="w-3.5 h-3.5" />
-            )}
-            <span>Guardar Configuración</span>
+            <Save className="w-3.5 h-3.5" />
+            <span>{saving ? 'Guardando...' : 'Guardar Configuración'}</span>
           </button>
         </div>
       </form>

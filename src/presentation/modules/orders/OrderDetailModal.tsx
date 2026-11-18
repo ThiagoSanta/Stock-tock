@@ -1,7 +1,5 @@
-'use client';
-
 import React, { useState } from 'react';
-import { X, CheckCircle2, Truck, XCircle, AlertCircle, FileText } from 'lucide-react';
+import { X, CheckCircle2, Truck, XCircle, AlertCircle } from 'lucide-react';
 import { Order } from '@/core/domain/orders/types';
 
 interface OrderDetailModalProps {
@@ -38,142 +36,140 @@ export function OrderDetailModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
-      <div className="w-full max-w-xl rounded-2xl bg-[#121214] border border-[#27272a] shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+      <div className="w-full max-w-xl rounded-lg bg-white border border-slate-200 shadow-xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="h-14 px-6 border-b border-[#222226] flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-zinc-800 text-zinc-300 flex items-center justify-center font-mono font-bold text-xs">
-              #
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-zinc-100">
-                Detalle del Pedido <span className="font-mono text-[#84cc16]">{order.orderNumber}</span>
-              </h3>
-            </div>
+        <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
+              {order.orderNumber}
+            </span>
+            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+              Detalle del Pedido
+            </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-zinc-200 p-1.5 rounded-lg hover:bg-[#1a1a1e]"
+            className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4">
+        <div className="p-4 space-y-3 overflow-y-auto max-h-[80vh]">
           {error && (
-            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+            <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          {/* Info Cards */}
-          <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-[#161619] border border-[#222226] text-xs">
+          {/* Info Card */}
+          <div className="grid grid-cols-2 gap-3 p-3 rounded bg-slate-50 border border-slate-200 text-xs">
             <div>
-              <span className="text-[11px] text-zinc-500 block">Cliente</span>
-              <span className="font-medium text-zinc-100">{order.customerName}</span>
+              <span className="text-[10px] text-slate-500 uppercase block font-semibold">Cliente</span>
+              <span className="font-medium text-slate-900">{order.customerName}</span>
             </div>
             <div>
-              <span className="text-[11px] text-zinc-500 block">Estado Actual</span>
-              <span className="font-mono font-semibold text-[#84cc16]">{order.status}</span>
-            </div>
-            <div>
-              <span className="text-[11px] text-zinc-500 block">Fecha Creación</span>
-              <span className="text-zinc-300 font-mono text-[11px]">
+              <span className="text-[10px] text-slate-500 uppercase block font-semibold">Fecha de Emisión</span>
+              <span className="font-mono text-slate-700">
                 {new Date(order.createdAt).toLocaleString('es-AR')}
               </span>
             </div>
             <div>
-              <span className="text-[11px] text-zinc-500 block">Total del Pedido</span>
-              <span className="font-mono font-bold text-zinc-100">
+              <span className="text-[10px] text-slate-500 uppercase block font-semibold">Estado Actual</span>
+              <span className="font-medium text-slate-900">{order.status}</span>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-500 uppercase block font-semibold">Monto Total</span>
+              <span className="font-mono font-bold text-slate-900">
                 ${order.totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
               </span>
             </div>
           </div>
 
-          {/* Table of items */}
-          <div className="rounded-xl bg-[#161619] border border-[#222226] overflow-hidden text-xs">
-            <div className="p-2.5 bg-[#1a1a1e] border-b border-[#222226] font-semibold text-zinc-400 flex justify-between">
-              <span>Producto</span>
-              <span>Subtotal</span>
-            </div>
-            <div className="p-3 space-y-2 divide-y divide-[#202026]">
-              {order.items.map((it) => (
-                <div key={it.id} className="pt-2 first:pt-0 flex justify-between items-center">
-                  <div>
-                    <p className="font-medium text-zinc-200">{it.productName}</p>
-                    <span className="text-[10px] text-zinc-500 font-mono">
-                      {it.quantityRequested} un. × ${it.unitPrice.toLocaleString('es-AR')}
-                    </span>
-                  </div>
-                  <span className="font-mono font-semibold text-zinc-100">
-                    ${it.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-              ))}
+          {/* Items Table */}
+          <div className="space-y-1.5">
+            <span className="text-[11px] font-medium text-slate-600 uppercase tracking-wider block">
+              Ítems del Pedido ({order.items.length})
+            </span>
+            <div className="rounded border border-slate-200 overflow-hidden">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 text-[10px] uppercase font-semibold">
+                  <tr>
+                    <th className="py-2 px-3">Producto</th>
+                    <th className="py-2 px-3 text-center">Cant. Solicitada</th>
+                    <th className="py-2 px-3 text-right">Precio Unit.</th>
+                    <th className="py-2 px-3 text-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {order.items.map((it) => (
+                    <tr key={it.id}>
+                      <td className="py-2 px-3 font-medium text-slate-900">{it.productName}</td>
+                      <td className="py-2 px-3 text-center font-mono text-slate-700">
+                        {it.quantityRequested} un.
+                      </td>
+                      <td className="py-2 px-3 text-right font-mono text-slate-600">
+                        ${it.unitPrice.toFixed(2)}
+                      </td>
+                      <td className="py-2 px-3 text-right font-mono font-bold text-slate-900">
+                        ${it.subtotal.toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
           {/* Action Buttons based on status */}
-          <div className="pt-4 border-t border-[#222226] flex items-center justify-between">
-            <div>
-              {order.status === 'CONFIRMADO' && (
-                <span className="text-[11px] text-blue-400 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Mercadería reservada en inventario</span>
-                </span>
-              )}
-            </div>
+          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+            {order.status !== 'CANCELADO' && order.status !== 'DESPACHADO_TOTAL' ? (
+              <button
+                type="button"
+                onClick={() => handleAction(onCancel)}
+                disabled={loading}
+                className="h-8 px-3 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-medium transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                <XCircle className="w-3.5 h-3.5" />
+                <span>Cancelar Pedido</span>
+              </button>
+            ) : (
+              <div />
+            )}
 
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
+              >
+                Cerrar
+              </button>
+
               {order.status === 'BORRADOR' && (
-                <>
-                  <button
-                    onClick={() => handleAction(onCancel)}
-                    disabled={loading}
-                    className="h-9 px-3 rounded-lg bg-[#18181b] hover:bg-[#202024] text-rose-400 text-xs font-medium"
-                  >
-                    Descartar
-                  </button>
-                  <button
-                    onClick={() => handleAction(onConfirm)}
-                    disabled={loading}
-                    className="h-9 px-4 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm flex items-center gap-1.5"
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Confirmar (Reservar Stock)</span>
-                  </button>
-                </>
+                <button
+                  type="button"
+                  onClick={() => handleAction(onConfirm)}
+                  disabled={loading}
+                  className="h-8 px-4 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Confirmar y Reservar Stock</span>
+                </button>
               )}
 
               {order.status === 'CONFIRMADO' && (
-                <>
-                  <button
-                    onClick={() => handleAction(onCancel)}
-                    disabled={loading}
-                    className="h-9 px-3 rounded-lg bg-[#18181b] hover:bg-[#202024] text-rose-400 text-xs font-medium"
-                  >
-                    Cancelar Pedido
-                  </button>
-                  <button
-                    onClick={() => handleAction(onDispatch)}
-                    disabled={loading}
-                    className="h-9 px-5 rounded-lg bg-[#84cc16] hover:bg-[#74b412] text-black text-xs font-semibold shadow-[0_0_15px_rgba(132,204,22,0.25)] flex items-center gap-1.5"
-                  >
-                    <Truck className="w-4 h-4" />
-                    <span>Despachar (Asentar Venta)</span>
-                  </button>
-                </>
-              )}
-
-              {(order.status === 'DESPACHADO_TOTAL' || order.status === 'CANCELADO') && (
                 <button
-                  onClick={onClose}
-                  className="h-9 px-4 rounded-lg bg-[#18181b] text-zinc-300 text-xs font-medium"
+                  type="button"
+                  onClick={() => handleAction(onDispatch)}
+                  disabled={loading}
+                  className="h-8 px-4 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
-                  Cerrar
+                  <Truck className="w-3.5 h-3.5" />
+                  <span>Despachar y Descontar Stock</span>
                 </button>
               )}
             </div>

@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import { X, SlidersHorizontal, AlertTriangle, ArrowRight } from 'lucide-react';
 import { InventoryStockDetailed, AdjustStockDTO } from '@/core/application/ports/IInventoryRepository';
@@ -88,42 +86,43 @@ export function StockAdjustmentModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
-      <div className="w-full max-w-lg rounded-2xl bg-[#121214] border border-[#27272a] shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+      <div className="w-full max-w-lg rounded-lg bg-white border border-slate-200 shadow-xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="h-14 px-6 border-b border-[#222226] flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[#84cc16]/10 text-[#84cc16] flex items-center justify-center">
-              <SlidersHorizontal className="w-4 h-4" />
+        <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
+              <SlidersHorizontal className="w-3.5 h-3.5" />
             </div>
-            <h3 className="text-sm font-semibold text-zinc-100">Ajuste Manual de Inventario</h3>
+            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+              Ajuste Manual de Inventario
+            </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-zinc-200 p-1.5 rounded-lg hover:bg-[#1a1a1e]"
+            className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 space-y-3">
           {error && (
-            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0" />
+            <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          {/* Producto */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1">
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
               Producto a Ajustar *
             </label>
             <select
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
-              className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+              className="w-full h-8 px-2 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
             >
               {stockList.map((item) => (
                 <option key={item.productId} value={item.productId}>
@@ -133,19 +132,18 @@ export function StockAdjustmentModal({
             </select>
           </div>
 
-          {/* Tipo de Ajuste */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
               Tipo de Movimiento
             </label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setType('INGRESO_AJUSTE')}
-                className={`h-9 px-3 rounded-lg border text-xs font-medium transition-all ${
+                className={`h-8 px-3 rounded border text-xs font-medium transition-all cursor-pointer ${
                   type === 'INGRESO_AJUSTE'
-                    ? 'bg-[#84cc16]/15 border-[#84cc16] text-[#84cc16]'
-                    : 'bg-[#18181b] border-[#27272a] text-zinc-400'
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-semibold'
+                    : 'bg-white border-slate-200 text-slate-600'
                 }`}
               >
                 + Ingreso / Sobrante
@@ -153,10 +151,10 @@ export function StockAdjustmentModal({
               <button
                 type="button"
                 onClick={() => setType('SALIDA_AJUSTE')}
-                className={`h-9 px-3 rounded-lg border text-xs font-medium transition-all ${
+                className={`h-8 px-3 rounded border text-xs font-medium transition-all cursor-pointer ${
                   type === 'SALIDA_AJUSTE'
-                    ? 'bg-rose-500/15 border-rose-500 text-rose-400'
-                    : 'bg-[#18181b] border-[#27272a] text-zinc-400'
+                    ? 'bg-rose-50 border-rose-300 text-rose-800 font-semibold'
+                    : 'bg-white border-slate-200 text-slate-600'
                 }`}
               >
                 - Salida / Merma / Rotura
@@ -164,79 +162,77 @@ export function StockAdjustmentModal({
             </div>
           </div>
 
-          {/* Cantidad */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1">
-              Cantidad a Ajustar *
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
+              Cantidad de Unidades *
             </label>
             <input
               type="number"
-              min="1"
+              min="0.01"
+              step="any"
               required
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
-              className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs font-mono text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+              className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:border-slate-400"
             />
           </div>
 
-          {/* Simulación de Impacto en Stock */}
-          <div className="p-3.5 rounded-xl bg-[#161619] border border-[#27272a] space-y-1.5 text-xs">
-            <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
-              Simulación de Saldo Resultante
+          {/* Live impact simulation */}
+          <div className="p-3 rounded bg-slate-50 border border-slate-200 space-y-1.5">
+            <span className="text-[10px] font-mono font-medium text-slate-500 uppercase tracking-wider block">
+              Simulación de Impacto Inmediato
             </span>
-            <div className="flex items-center justify-between font-mono">
-              <span className="text-zinc-400">
-                Físico actual: <strong className="text-zinc-200">{currentPhysical}</strong>
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 text-zinc-600" />
-              <span className="text-zinc-200 font-bold">
-                Nuevo Físico:{' '}
-                <span className={type === 'SALIDA_AJUSTE' ? 'text-rose-400' : 'text-[#84cc16]'}>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-600">Stock Físico:</span>
+              <div className="flex items-center gap-1.5 font-mono">
+                <span className="text-slate-500">{currentPhysical} un.</span>
+                <ArrowRight className="w-3 h-3 text-slate-400" />
+                <span className={`font-semibold ${type === 'INGRESO_AJUSTE' ? 'text-emerald-700' : 'text-slate-900'}`}>
                   {resultingPhysical} un.
                 </span>
-              </span>
+              </div>
             </div>
-            <div className="flex items-center justify-between font-mono text-[11px]">
-              <span className="text-zinc-500">Disp: {currentAvailable} un.</span>
-              <span className="text-zinc-400">
-                Nuevo Disp:{' '}
-                <strong className={isInvalidNegative ? 'text-rose-500' : 'text-[#84cc16]'}>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-600">Stock Disponible:</span>
+              <div className="flex items-center gap-1.5 font-mono">
+                <span className="text-slate-500">{currentAvailable} un.</span>
+                <ArrowRight className="w-3 h-3 text-slate-400" />
+                <span className={`font-bold ${isInvalidNegative ? 'text-rose-600' : 'text-slate-900'}`}>
                   {resultingAvailable} un.
-                </strong>
-              </span>
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Motivo Obligatorio */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1">
-              Motivo del Ajuste (Obligatorio para Auditoría) *
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
+              Motivo del Ajuste (Auditoría) *
             </label>
             <textarea
               required
               rows={2}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Ej: Recuento físico mensual / Merma por daño en embalaje..."
-              className="w-full p-2.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#84cc16]"
+              placeholder="Ej: Conteo físico semestral, mercadería dañada durante traslado..."
+              className="w-full p-2 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400 resize-none"
             />
           </div>
 
-          {/* Footer */}
-          <div className="pt-3 border-t border-[#222226] flex items-center justify-end gap-2">
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="h-9 px-4 rounded-lg bg-[#18181b] hover:bg-[#202024] text-xs font-medium text-zinc-300"
+              disabled={loading}
+              className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading || isInvalidNegative}
-              className="h-9 px-5 rounded-lg bg-[#84cc16] hover:bg-[#74b412] disabled:opacity-40 text-black text-xs font-bold shadow-sm"
+              className="h-8 px-4 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
-              {loading ? 'Guardando...' : 'Aplicar Ajuste'}
+              {loading ? 'Asentando...' : 'Confirmar Ajuste'}
             </button>
           </div>
         </form>

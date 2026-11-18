@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -66,7 +64,6 @@ export function PosModal({
 
   if (!isOpen) return null;
 
-  // Filtrar productos para la búsqueda
   const filteredProducts = products
     .filter((p) => {
       const q = searchTerm.toLowerCase().trim();
@@ -77,9 +74,8 @@ export function PosModal({
           (p.barcode && p.barcode.toLowerCase().includes(q)))
       );
     })
-    .slice(0, 5); // Mostrar hasta 5 coincidencias
+    .slice(0, 5);
 
-  // Agregar al carrito
   const addToCart = (product: ProductWithStock) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.product.id === product.id);
@@ -113,7 +109,6 @@ export function PosModal({
     setCart((prev) => prev.filter((item) => item.product.id !== productId));
   };
 
-  // Validaciones y totales
   const totalAmount = cart.reduce(
     (sum, item) => sum + item.quantity * item.product.salePrice,
     0
@@ -124,7 +119,6 @@ export function PosModal({
   );
   const estimatedMargin = totalAmount - totalCost;
 
-  // Verificar si algún ítem supera el stock disponible
   const hasInsufficientStock = cart.some(
     (item) => item.quantity > item.product.availableStock
   );
@@ -159,23 +153,21 @@ export function PosModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
-      <div className="w-full max-w-2xl rounded-2xl bg-[#121214] border border-[#27272a] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+      <div className="w-full max-w-2xl rounded-lg bg-white border border-slate-200 shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="h-14 px-6 border-b border-[#222226] flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[#84cc16]/10 text-[#84cc16] flex items-center justify-center font-bold">
-              <Receipt className="w-4 h-4" />
+        <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
+              <Receipt className="w-3.5 h-3.5" />
             </div>
-            <div>
-              <h3 className="text-sm font-semibold text-zinc-100">
-                Venta Rápida (Mostrador / POS)
-              </h3>
-            </div>
+            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+              Venta Rápida (Mostrador / POS)
+            </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-zinc-200 p-1.5 rounded-lg hover:bg-[#1a1a1e] transition-colors"
+            className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -183,84 +175,82 @@ export function PosModal({
 
         {/* Pantalla de Éxito / Ticket */}
         {completedSale ? (
-          <div className="p-8 text-center space-y-4 my-auto">
-            <div className="w-14 h-14 rounded-full bg-[#84cc16]/15 border border-[#84cc16]/30 text-[#84cc16] flex items-center justify-center mx-auto animate-in zoom-in-75">
-              <CheckCircle2 className="w-8 h-8" />
+          <div className="p-6 text-center space-y-3 my-auto">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto border border-emerald-200">
+              <CheckCircle2 className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="text-lg font-bold text-zinc-100">
+              <h4 className="text-sm font-bold text-slate-900">
                 ¡Venta Registrada con Éxito!
               </h4>
-              <p className="text-xs text-zinc-400 mt-1">
-                Comprobante <span className="font-mono text-zinc-200 font-semibold">{completedSale.saleNumber}</span> • Stock descontado en tiempo real
+              <p className="text-xs text-slate-500 mt-0.5">
+                Comprobante <span className="font-mono text-slate-800 font-semibold">{completedSale.saleNumber}</span> • Stock descontado en tiempo real
               </p>
             </div>
 
-            <div className="max-w-xs mx-auto p-4 rounded-xl bg-[#161619] border border-[#27272a] text-left space-y-2 text-xs">
-              <div className="flex justify-between text-zinc-400">
+            <div className="max-w-xs mx-auto p-3 rounded bg-slate-50 border border-slate-200 text-left space-y-1.5 text-xs">
+              <div className="flex justify-between text-slate-600">
                 <span>Cliente:</span>
-                <span className="text-zinc-200 font-medium">{completedSale.customerName}</span>
+                <span className="text-slate-900 font-medium">{completedSale.customerName}</span>
               </div>
-              <div className="flex justify-between text-zinc-400">
+              <div className="flex justify-between text-slate-600">
                 <span>Medio de Pago:</span>
-                <span className="text-zinc-200 font-mono font-medium">{completedSale.paymentMethod}</span>
+                <span className="text-slate-900 font-mono font-medium">{completedSale.paymentMethod}</span>
               </div>
-              <div className="flex justify-between text-zinc-400 pt-2 border-t border-[#222226]">
-                <span className="font-semibold text-zinc-200">Total Cobrado:</span>
-                <span className="font-mono font-bold text-base text-[#84cc16]">
+              <div className="flex justify-between text-slate-600 pt-1.5 border-t border-slate-200">
+                <span className="font-semibold text-slate-800">Total Cobrado:</span>
+                <span className="font-mono font-bold text-sm text-slate-900">
                   ${completedSale.totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center justify-center gap-3 pt-4">
+            <div className="flex items-center justify-center gap-2 pt-2">
               <button
                 onClick={() => {
                   setCompletedSale(null);
                   setCart([]);
                 }}
-                className="h-9 px-4 rounded-lg bg-[#84cc16] hover:bg-[#74b412] text-black text-xs font-semibold shadow-sm transition-all"
+                className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer"
               >
                 Nueva Venta
               </button>
               <button
                 onClick={onClose}
-                className="h-9 px-4 rounded-lg bg-[#18181b] hover:bg-[#222226] text-zinc-300 text-xs font-medium transition-colors"
+                className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
               >
-                Cerrar Mostrador
+                Cerrar
               </button>
             </div>
           </div>
         ) : (
-          /* Flujo Normal de Venta */
-          <div className="p-6 overflow-y-auto space-y-5 flex-1">
+          <div className="p-4 overflow-y-auto space-y-3 flex-1">
             {error && (
-              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0" />
+              <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
             {/* Buscador de Producto */}
             <div className="relative">
-              <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-                Buscar Producto o Escanear Código de Barras
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                Buscar Producto o Escanear Código
               </label>
               <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   autoFocus
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Escribí nombre, SKU o pistoleá el código..."
-                  className="w-full h-10 pl-9 pr-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-[#84cc16] font-sans"
+                  placeholder="Nombre, SKU o pistolear código de barras..."
+                  className="w-full h-8 pl-8 pr-3 rounded bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400"
                 />
               </div>
 
-              {/* Autocomplete Dropdown */}
               {filteredProducts.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 rounded-xl bg-[#18181c] border border-[#2a2a30] shadow-xl overflow-hidden z-20">
+                <div className="absolute top-full left-0 right-0 mt-1 rounded bg-white border border-slate-200 shadow-lg overflow-hidden z-20 divide-y divide-slate-100">
                   {filteredProducts.map((p) => {
                     const isOut = p.availableStock <= 0;
                     return (
@@ -268,17 +258,17 @@ export function PosModal({
                         key={p.id}
                         type="button"
                         onClick={() => addToCart(p)}
-                        className={`w-full p-2.5 text-left text-xs border-b border-[#222226] last:border-0 flex items-center justify-between hover:bg-[#202026] transition-colors ${
+                        className={`w-full p-2 text-left text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${
                           isOut ? 'opacity-50' : ''
                         }`}
                       >
                         <div>
-                          <p className="font-semibold text-zinc-100">{p.name}</p>
-                          <span className="text-[10px] font-mono text-zinc-500">
+                          <p className="font-medium text-slate-900">{p.name}</p>
+                          <span className="text-[10px] font-mono text-slate-400">
                             SKU: {p.sku} • Disp: {p.availableStock} {p.unitOfMeasure}
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-sm text-[#84cc16]">
+                        <span className="font-mono font-bold text-slate-900">
                           ${p.salePrice.toLocaleString('es-AR')}
                         </span>
                       </button>
@@ -289,19 +279,19 @@ export function PosModal({
             </div>
 
             {/* Lista del Carrito */}
-            <div className="rounded-xl bg-[#161619] border border-[#222226] overflow-hidden">
-              <div className="p-3 bg-[#1a1a1e] border-b border-[#222226] flex items-center justify-between text-xs font-semibold text-zinc-400">
+            <div className="rounded border border-slate-200 overflow-hidden">
+              <div className="px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
                 <span className="flex items-center gap-1.5">
                   <ShoppingCart className="w-3.5 h-3.5" />
-                  <span>Ítems en el Mostrador ({cart.length})</span>
+                  <span>Ítems en Mostrador ({cart.length})</span>
                 </span>
                 <span>Subtotal</span>
               </div>
 
-              <div className="p-2 space-y-1.5 max-h-48 overflow-y-auto divide-y divide-[#202026]">
+              <div className="p-2 space-y-1 max-h-44 overflow-y-auto divide-y divide-slate-100">
                 {cart.length === 0 ? (
-                  <p className="p-6 text-center text-xs text-zinc-500">
-                    Buscá o escaneá un producto arriba para agregarlo al ticket.
+                  <p className="p-5 text-center text-xs text-slate-400">
+                    Buscá o escaneá un producto arriba para agregarlo.
                   </p>
                 ) : (
                   cart.map(({ product, quantity }) => {
@@ -309,34 +299,33 @@ export function PosModal({
                     return (
                       <div
                         key={product.id}
-                        className="p-2 pt-3 flex items-center justify-between gap-3 text-xs"
+                        className="p-1.5 flex items-center justify-between gap-2 text-xs"
                       >
-                        <div className="flex-1">
-                          <p className="font-medium text-zinc-200">{product.name}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-slate-900 truncate">{product.name}</p>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] font-mono text-zinc-500">
+                            <span className="text-[10px] font-mono text-slate-500">
                               ${product.salePrice.toLocaleString('es-AR')} c/u
                             </span>
                             {isInsufficient && (
-                              <span className="text-[10px] font-semibold text-rose-400 bg-rose-500/10 px-1.5 py-0.2 rounded border border-rose-500/20">
+                              <span className="text-[10px] font-semibold text-rose-700 bg-rose-50 px-1.5 rounded border border-rose-200">
                                 Stock insuficiente (Quedan {product.availableStock})
                               </span>
                             )}
                           </div>
                         </div>
 
-                        {/* Cantidad controls */}
                         <div className="flex items-center gap-1.5">
                           <button
                             type="button"
                             onClick={() => updateQuantity(product.id, -1)}
-                            className="w-6 h-6 rounded bg-[#202024] hover:bg-[#28282e] text-zinc-300 flex items-center justify-center"
+                            className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center cursor-pointer"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
                           <span
-                            className={`w-8 text-center font-mono font-bold ${
-                              isInsufficient ? 'text-rose-400' : 'text-zinc-100'
+                            className={`w-6 text-center font-mono font-bold ${
+                              isInsufficient ? 'text-rose-600' : 'text-slate-900'
                             }`}
                           >
                             {quantity}
@@ -344,22 +333,20 @@ export function PosModal({
                           <button
                             type="button"
                             onClick={() => updateQuantity(product.id, 1)}
-                            className="w-6 h-6 rounded bg-[#202024] hover:bg-[#28282e] text-zinc-300 flex items-center justify-center"
+                            className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center cursor-pointer"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
                         </div>
 
-                        {/* Subtotal */}
-                        <span className="w-20 text-right font-mono font-semibold text-zinc-100">
+                        <span className="w-20 text-right font-mono font-bold text-slate-900">
                           ${(quantity * product.salePrice).toLocaleString('es-AR')}
                         </span>
 
-                        {/* Quitar */}
                         <button
                           type="button"
                           onClick={() => removeFromCart(product.id)}
-                          className="text-zinc-500 hover:text-rose-400 p-1"
+                          className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -371,28 +358,28 @@ export function PosModal({
             </div>
 
             {/* Medio de Pago y Cliente */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-                  Nombre del Cliente (Opcional)
+                <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                  Cliente (Opcional)
                 </label>
                 <input
                   type="text"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="Consumidor Final"
-                  className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
+                  className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-                  Medio de Cobro Declarado
+                <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                  Medio de Cobro
                 </label>
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className="grid grid-cols-2 gap-1">
                   {[
                     { id: 'EFECTIVO', label: 'Efectivo', icon: Banknote },
-                    { id: 'TRANSFERENCIA', label: 'Transferencia', icon: ArrowRightLeft },
+                    { id: 'TRANSFERENCIA', label: 'Transfer.', icon: ArrowRightLeft },
                     { id: 'TARJETA_DEBITO', label: 'Débito', icon: CreditCard },
                     { id: 'TARJETA_CREDITO', label: 'Crédito', icon: CreditCard },
                   ].map((m) => {
@@ -403,13 +390,13 @@ export function PosModal({
                         key={m.id}
                         type="button"
                         onClick={() => setPaymentMethod(m.id as PaymentMethod)}
-                        className={`h-9 px-2 rounded-lg border text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all ${
+                        className={`h-7 px-2 rounded border text-[11px] font-medium flex items-center justify-center gap-1 transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-[#84cc16]/15 border-[#84cc16] text-[#84cc16]'
-                            : 'bg-[#18181b] border-[#27272a] text-zinc-400 hover:text-zinc-200'
+                            ? 'bg-slate-900 border-slate-900 text-white font-semibold'
+                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                         }`}
                       >
-                        <Icon className="w-3.5 h-3.5" />
+                        <Icon className="w-3 h-3" />
                         <span>{m.label}</span>
                       </button>
                     );
@@ -418,16 +405,16 @@ export function PosModal({
               </div>
             </div>
 
-            {/* Footer con Total y Botón de Cobro */}
-            <div className="pt-4 border-t border-[#222226] flex items-center justify-between">
+            {/* Footer */}
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
               <div>
-                <span className="text-[11px] text-zinc-400 block">Total a Cobrar</span>
-                <span className="text-2xl font-bold font-mono text-[#84cc16]">
+                <span className="text-[10px] text-slate-500 uppercase block font-semibold">Total a Cobrar</span>
+                <span className="text-xl font-bold font-mono text-slate-900">
                   ${totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                 </span>
                 {totalAmount > 0 && (
-                  <span className="text-[10px] text-zinc-500 block">
-                    Margen bruto est.: ${estimatedMargin.toLocaleString('es-AR')}
+                  <span className="text-[10px] text-emerald-700 block font-medium">
+                    Margen bruto: ${estimatedMargin.toLocaleString('es-AR')}
                   </span>
                 )}
               </div>
@@ -436,7 +423,7 @@ export function PosModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="h-10 px-4 rounded-lg bg-[#18181b] hover:bg-[#202024] text-xs font-medium text-zinc-300 transition-colors"
+                  className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -444,16 +431,9 @@ export function PosModal({
                   type="button"
                   onClick={handleCheckout}
                   disabled={cart.length === 0 || hasInsufficientStock || loading}
-                  className="h-10 px-6 rounded-lg bg-[#84cc16] hover:bg-[#74b412] disabled:opacity-40 disabled:pointer-events-none text-black text-xs font-bold shadow-[0_0_20px_rgba(132,204,22,0.3)] transition-all flex items-center gap-2"
+                  className="h-8 px-4 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  {loading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      <span>Registrando Venta...</span>
-                    </>
-                  ) : (
-                    <span>Confirmar y Cobrar</span>
-                  )}
+                  {loading ? 'Cobrando...' : 'Confirmar y Cobrar'}
                 </button>
               </div>
             </div>

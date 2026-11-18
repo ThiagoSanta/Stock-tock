@@ -1,8 +1,6 @@
-'use client';
-
 import React from 'react';
 import { SaleWithDetails } from '@/core/application/ports/ISaleRepository';
-import { Receipt, TrendingUp, Eye } from 'lucide-react';
+import { Receipt, Eye } from 'lucide-react';
 
 interface SalesTableProps {
   sales: SaleWithDetails[];
@@ -13,19 +11,19 @@ interface SalesTableProps {
 export function SalesTable({ sales, loading, onSelectSale }: SalesTableProps) {
   if (loading) {
     return (
-      <div className="p-12 text-center rounded-xl bg-[#121214] border border-[#222226]">
-        <div className="w-6 h-6 border-2 border-[#84cc16] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-xs text-zinc-400">Cargando historial de ventas...</p>
+      <div className="p-8 text-center rounded-lg bg-white border border-slate-200 shadow-xs">
+        <div className="w-5 h-5 border-2 border-slate-800 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+        <p className="text-xs text-slate-500">Cargando ventas...</p>
       </div>
     );
   }
 
   if (sales.length === 0) {
     return (
-      <div className="p-12 text-center rounded-xl bg-[#121214] border border-[#222226] space-y-2">
-        <Receipt className="w-8 h-8 text-zinc-600 mx-auto" />
-        <h4 className="text-sm font-semibold text-zinc-300">No hay ventas registradas</h4>
-        <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+      <div className="p-8 text-center rounded-lg bg-white border border-slate-200 space-y-1 shadow-xs">
+        <Receipt className="w-6 h-6 text-slate-400 mx-auto mb-2" />
+        <h4 className="text-xs font-semibold text-slate-900">No hay ventas registradas</h4>
+        <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
           Las ventas realizadas desde el Mostrador POS o por despacho de pedidos se listarán aquí.
         </p>
       </div>
@@ -33,22 +31,22 @@ export function SalesTable({ sales, loading, onSelectSale }: SalesTableProps) {
   }
 
   return (
-    <div className="rounded-xl bg-[#121214] border border-[#222226] overflow-hidden">
+    <div className="rounded-lg bg-white border border-slate-200 overflow-hidden shadow-xs">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
-          <thead className="bg-[#161619] border-b border-[#222226] text-zinc-400 uppercase tracking-wider text-[10px] font-semibold">
+          <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-semibold">
             <tr>
-              <th className="py-3 px-4">Comprobante #</th>
-              <th className="py-3 px-4">Fecha & Hora</th>
-              <th className="py-3 px-4">Cliente / Destino</th>
-              <th className="py-3 px-4 text-center">Canal Origen</th>
-              <th className="py-3 px-4 text-center">Medio de Cobro</th>
-              <th className="py-3 px-4 text-right">Total Facturado</th>
-              <th className="py-3 px-4 text-right">Margen Bruto Est.</th>
-              <th className="py-3 px-4 text-right">Acción</th>
+              <th className="py-2.5 px-3">Comprobante #</th>
+              <th className="py-2.5 px-3">Fecha & Hora</th>
+              <th className="py-2.5 px-3">Cliente / Destino</th>
+              <th className="py-2.5 px-3 text-center">Canal Origen</th>
+              <th className="py-2.5 px-3 text-center">Medio de Cobro</th>
+              <th className="py-2.5 px-3 text-right">Total Facturado</th>
+              <th className="py-2.5 px-3 text-right">Margen Bruto Est.</th>
+              <th className="py-2.5 px-3 text-right">Acción</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#1c1c20]">
+          <tbody className="divide-y divide-slate-100">
             {sales.map((sale) => {
               const isPos = sale.origin === 'VENTA_DIRECTA_MOSTRADOR';
 
@@ -56,62 +54,44 @@ export function SalesTable({ sales, loading, onSelectSale }: SalesTableProps) {
                 <tr
                   key={sale.id}
                   onClick={() => onSelectSale(sale)}
-                  className="hover:bg-[#16161a] transition-colors cursor-pointer"
+                  className="hover:bg-slate-50/80 transition-colors cursor-pointer"
                 >
-                  {/* Comprobante */}
-                  <td className="py-3.5 px-4 font-mono font-semibold text-zinc-200">
+                  <td className="py-2 px-3 font-mono font-semibold text-slate-900">
                     {sale.saleNumber}
                   </td>
-
-                  {/* Fecha */}
-                  <td className="py-3.5 px-4 font-mono text-zinc-400 text-[11px]">
+                  <td className="py-2 px-3 font-mono text-[11px] text-slate-500">
                     {new Date(sale.createdAt).toLocaleString('es-AR')}
                   </td>
-
-                  {/* Cliente */}
-                  <td className="py-3.5 px-4">
-                    <span className="font-medium text-zinc-100">{sale.customerName}</span>
+                  <td className="py-2 px-3 font-medium text-slate-800">
+                    {sale.customerName}
                   </td>
-
-                  {/* Origen */}
-                  <td className="py-3.5 px-4 text-center">
+                  <td className="py-2 px-3 text-center">
                     <span
-                      className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                      className={`text-[10px] font-medium px-1.5 py-0.2 rounded border ${
                         isPos
-                          ? 'bg-[#84cc16]/10 text-[#84cc16] border-[#84cc16]/20'
-                          : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                          ? 'bg-slate-100 text-slate-700 border-slate-200'
+                          : 'bg-blue-50 text-blue-700 border-blue-200'
                       }`}
                     >
-                      {isPos ? 'Mostrador POS' : 'Despacho Pedido'}
+                      {isPos ? 'Mostrador POS' : 'Despacho'}
                     </span>
                   </td>
-
-                  {/* Medio de Pago */}
-                  <td className="py-3.5 px-4 text-center font-mono text-zinc-400 text-[11px]">
+                  <td className="py-2 px-3 text-center font-mono text-[11px] text-slate-600">
                     {sale.paymentMethod}
                   </td>
-
-                  {/* Total */}
-                  <td className="py-3.5 px-4 text-right font-mono font-bold text-zinc-100 text-sm">
+                  <td className="py-2 px-3 text-right font-mono font-bold text-slate-900">
                     ${sale.totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                   </td>
-
-                  {/* Margen */}
-                  <td className="py-3.5 px-4 text-right font-mono">
-                    <span className="text-[#84cc16] font-semibold block">
-                      ${sale.estimatedGrossMargin.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-                    </span>
-                    <span className="text-[10px] text-zinc-500">
-                      ({sale.marginPercentage}%)
-                    </span>
+                  <td className="py-2 px-3 text-right font-mono font-medium text-emerald-700">
+                    +${sale.estimatedGrossMargin.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                   </td>
-
-                  {/* Botón Ver */}
-                  <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                  <td className="py-2 px-3 text-right">
                     <button
-                      onClick={() => onSelectSale(sale)}
-                      className="p-1.5 rounded-lg bg-[#1f2024] hover:bg-[#28282e] text-zinc-300 hover:text-zinc-100 transition-colors"
-                      title="Ver Comprobante"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectSale(sale);
+                      }}
+                      className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                     >
                       <Eye className="w-3.5 h-3.5" />
                     </button>

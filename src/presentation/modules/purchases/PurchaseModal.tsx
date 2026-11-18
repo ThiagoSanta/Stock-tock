@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import { X, Truck, Plus, Trash2, Search } from 'lucide-react';
 import { ProductWithStock } from '@/core/application/ports/IProductRepository';
@@ -116,35 +114,36 @@ export function PurchaseModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
-      <div className="w-full max-w-2xl rounded-2xl bg-[#121214] border border-[#27272a] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+      <div className="w-full max-w-2xl rounded-lg bg-white border border-slate-200 shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="h-14 px-6 border-b border-[#222226] flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
-              <Truck className="w-4 h-4" />
+        <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
+              <Truck className="w-3.5 h-3.5" />
             </div>
-            <h3 className="text-sm font-semibold text-zinc-100">Nueva Orden de Compra</h3>
+            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+              Nueva Orden de Compra
+            </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-zinc-200 p-1.5 rounded-lg hover:bg-[#1a1a1e]"
+            className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 flex-1">
+        <form onSubmit={handleSubmit} className="p-4 overflow-y-auto space-y-3 flex-1">
           {error && (
-            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">
+            <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs">
               {error}
             </div>
           )}
 
-          {/* Proveedor */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1">
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
               Proveedor *
             </label>
             <input
@@ -153,44 +152,42 @@ export function PurchaseModal({
               value={supplierName}
               onChange={(e) => setSupplierName(e.target.value)}
               placeholder="Ej: Distribuidora Mayorista Bosch / Aceros SA"
-              className="w-full h-9 px-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#84cc16]"
+              className="w-full h-8 px-2.5 rounded bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400"
             />
           </div>
 
-          {/* Buscar Producto para agregar */}
           <div className="relative">
-            <label className="block text-xs font-medium text-zinc-400 mb-1">
-              Agregar Productos a la Orden
+            <label className="block text-[11px] font-medium text-slate-600 mb-1">
+              Buscar Producto para Comprar
             </label>
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar por nombre o SKU para abastecer..."
-                className="w-full h-9 pl-9 pr-3 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#84cc16]"
+                placeholder="Buscar por nombre o SKU..."
+                className="w-full h-8 pl-8 pr-3 rounded bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400"
               />
             </div>
 
-            {/* Dropdown de productos */}
             {filteredProducts.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 rounded-xl bg-[#18181c] border border-[#2a2a30] shadow-xl overflow-hidden z-20">
+              <div className="absolute z-10 left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded bg-white border border-slate-200 shadow-lg divide-y divide-slate-100">
                 {filteredProducts.map((p) => (
                   <button
                     key={p.id}
                     type="button"
                     onClick={() => addProduct(p)}
-                    className="w-full p-2.5 text-left text-xs border-b border-[#222226] last:border-0 flex items-center justify-between hover:bg-[#202026] transition-colors"
+                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between text-xs transition-colors cursor-pointer"
                   >
                     <div>
-                      <p className="font-semibold text-zinc-100">{p.name}</p>
-                      <span className="text-[10px] font-mono text-zinc-500">
-                        SKU: {p.sku} • Stock actual: {p.physicalStock} un.
+                      <span className="font-medium text-slate-900">{p.name}</span>
+                      <span className="text-[10px] text-slate-400 ml-2 font-mono">
+                        SKU: {p.sku} • Stock Físico: {p.physicalStock} un.
                       </span>
                     </div>
-                    <span className="font-mono text-xs text-zinc-400">
-                      Costo actual: ${p.costPrice.toLocaleString('es-AR')}
+                    <span className="font-mono text-slate-600">
+                      Costo PPP: ${p.costPrice.toFixed(2)}
                     </span>
                   </button>
                 ))}
@@ -198,103 +195,102 @@ export function PurchaseModal({
             )}
           </div>
 
-          {/* Lista de Ítems a pedir */}
-          <div className="rounded-xl bg-[#161619] border border-[#222226] overflow-hidden">
-            <div className="p-3 bg-[#1a1a1e] border-b border-[#222226] flex items-center justify-between text-xs font-semibold text-zinc-400">
-              <span>Ítems ({items.length})</span>
-              <span>Subtotal</span>
-            </div>
+          {/* Items */}
+          <div className="space-y-2">
+            <span className="block text-[11px] font-medium text-slate-600">
+              Productos a Ordenar ({items.length})
+            </span>
 
-            <div className="p-2 space-y-1.5 max-h-48 overflow-y-auto divide-y divide-[#202026]">
-              {items.length === 0 ? (
-                <p className="p-6 text-center text-xs text-zinc-500">
-                  Ningún producto seleccionado. Buscá arriba para agregar.
-                </p>
-              ) : (
-                items.map((it) => (
+            {items.length === 0 ? (
+              <div className="p-6 text-center rounded border border-dashed border-slate-200 text-slate-400 text-xs">
+                Usa el buscador para añadir artículos a la compra.
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 border border-slate-200 rounded overflow-hidden">
+                {items.map((it) => (
                   <div
                     key={it.product.id}
-                    className="p-2 pt-3 flex items-center justify-between gap-3 text-xs"
+                    className="p-2.5 flex items-center justify-between gap-3 bg-white hover:bg-slate-50/50"
                   >
-                    <div className="flex-1">
-                      <p className="font-medium text-zinc-200">{it.product.name}</p>
-                      <span className="text-[10px] font-mono text-zinc-500">
-                        Stock actual: {it.product.physicalStock} un.
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-slate-900 truncate">
+                        {it.product.name}
+                      </p>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        SKU: {it.product.sku}
                       </span>
                     </div>
 
-                    {/* Cantidad a comprar */}
-                    <div className="flex items-center gap-1.5">
-                      <input
-                        type="number"
-                        min="1"
-                        value={it.quantityOrdered}
-                        onChange={(e) =>
-                          updateQuantity(it.product.id, parseInt(e.target.value) || 1)
-                        }
-                        className="w-16 h-8 px-2 rounded bg-[#1f2024] border border-[#2e2e34] text-center font-mono text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
-                      />
-                      <span className="text-[10px] text-zinc-500">{it.product.unitOfMeasure}</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="w-20">
+                        <input
+                          type="number"
+                          min="1"
+                          step="1"
+                          value={it.quantityOrdered}
+                          onChange={(e) =>
+                            updateQuantity(it.product.id, parseFloat(e.target.value) || 1)
+                          }
+                          className="w-full h-7 px-2 text-center rounded bg-slate-50 border border-slate-200 text-xs font-mono text-slate-900"
+                        />
+                      </div>
+
+                      <div className="w-24 text-right">
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={it.unitCost}
+                          onChange={(e) =>
+                            updateCost(it.product.id, parseFloat(e.target.value) || 0)
+                          }
+                          className="w-full h-7 px-2 text-right rounded bg-slate-50 border border-slate-200 text-xs font-mono text-slate-900"
+                        />
+                      </div>
+
+                      <span className="w-24 text-right font-mono font-bold text-xs text-slate-900">
+                        ${(it.quantityOrdered * it.unitCost).toLocaleString('es-AR', {
+                          minimumFractionDigits: 2,
+                        })}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => removeItem(it.product.id)}
+                        className="p-1 rounded text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-
-                    {/* Costo Unitario Pactado */}
-                    <div className="flex items-center gap-1">
-                      <span className="text-zinc-500">$</span>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={it.unitCost}
-                        onChange={(e) =>
-                          updateCost(it.product.id, parseFloat(e.target.value) || 0)
-                        }
-                        className="w-24 h-8 px-2 rounded bg-[#1f2024] border border-[#2e2e34] text-right font-mono text-xs text-zinc-100 focus:outline-none focus:border-[#84cc16]"
-                      />
-                    </div>
-
-                    {/* Subtotal */}
-                    <span className="w-24 text-right font-mono font-bold text-zinc-100">
-                      ${(it.quantityOrdered * it.unitCost).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={() => removeItem(it.product.id)}
-                      className="text-zinc-500 hover:text-rose-400 p-1"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
                   </div>
-                ))
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Footer del Formulario */}
-          <div className="pt-4 border-t border-[#222226] flex items-center justify-between">
-            <div>
-              <span className="text-[11px] text-zinc-400 block">Total Inversión</span>
-              <span className="text-2xl font-bold font-mono text-[#84cc16]">
-                ${totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-              </span>
-            </div>
+          <div className="flex items-center justify-between p-3 rounded bg-slate-50 border border-slate-200">
+            <span className="text-xs font-medium text-slate-600">Total Orden de Compra</span>
+            <span className="text-lg font-bold font-mono text-slate-900">
+              ${totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="h-10 px-4 rounded-lg bg-[#18181b] hover:bg-[#202024] text-xs font-medium text-zinc-300 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={items.length === 0 || loading}
-                className="h-10 px-6 rounded-lg bg-[#84cc16] hover:bg-[#74b412] disabled:opacity-40 text-black text-xs font-bold shadow-sm transition-all"
-              >
-                {loading ? 'Emitiendo...' : 'Emitir Orden de Compra'}
-              </button>
-            </div>
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={loading || items.length === 0}
+              className="h-8 px-4 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              {loading ? 'Guardando...' : 'Crear Orden de Compra'}
+            </button>
           </div>
         </form>
       </div>
