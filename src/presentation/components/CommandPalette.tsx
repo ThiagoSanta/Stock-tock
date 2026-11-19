@@ -182,6 +182,18 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
         },
       },
       {
+        id: 'action-transfer-stock',
+        title: 'Transferencia entre Depósitos',
+        description: 'Mover existencias entre sucursales o depósitos con remito interno',
+        category: 'Acciones Rápidas',
+        icon: Boxes,
+        keywords: ['transferencia', 'depósito', 'sucursal', 'traslado', 'remito'],
+        action: () => {
+          navigate('/inventario');
+          onClose();
+        },
+      },
+      {
         id: 'action-new-product',
         title: 'Nuevo Producto en Catálogo',
         description: 'Dar de alta un nuevo artículo con SKU y precio de venta',

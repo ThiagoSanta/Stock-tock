@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Boxes, History, SlidersHorizontal, PackageCheck, Clock } from 'lucide-react';
+import { ArrowLeft, Boxes, History, SlidersHorizontal, PackageCheck, Clock, ArrowRightLeft } from 'lucide-react';
 import {
   InventoryStockDetailed,
   StockMovementDetailed,
@@ -9,26 +9,34 @@ import { SupabaseInventoryRepository } from '@/core/infrastructure/repositories/
 import { GetInventoryBalanceUseCase } from '@/core/application/use-cases/inventory/GetInventoryBalanceUseCase';
 import { GetKardexUseCase } from '@/core/application/use-cases/inventory/GetKardexUseCase';
 import { AdjustStockUseCase } from '@/core/application/use-cases/inventory/AdjustStockUseCase';
+import { TransferStockUseCase } from '@/core/application/use-cases/inventory/TransferStockUseCase';
 import { InventoryStockTable } from '@/presentation/modules/inventory/InventoryStockTable';
 import { KardexTable } from '@/presentation/modules/inventory/KardexTable';
 import { StockAdjustmentModal } from '@/presentation/modules/inventory/StockAdjustmentModal';
+import { TransferStockModal } from '@/presentation/modules/inventory/TransferStockModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
+import { createClient } from '@/utils/supabase/client';
+import { WarehouseSettings } from '@/core/domain/settings/types';
 
 export function InventoryPage() {
   const [stockList, setStockList] = useState<InventoryStockDetailed[]>([]);
   const [kardexMovements, setKardexMovements] = useState<StockMovementDetailed[]>([]);
+  const [warehouses, setWarehouses] = useState<WarehouseSettings[]>([]);
+  const [selectedWarehouseFilter, setSelectedWarehouseFilter] = useState<string>('ALL');
   const [companyId, setCompanyId] = useState<string>('');
   const [warehouseId, setWarehouseId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'STOCK' | 'KARDEX'>('STOCK');
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [selectedStockItem, setSelectedStockItem] = useState<InventoryStockDetailed | undefined>();
 
   const repo = useMemo(() => new SupabaseInventoryRepository(), []);
   const getBalanceUseCase = useMemo(() => new GetInventoryBalanceUseCase(repo), [repo]);
   const getKardexUseCase = useMemo(() => new GetKardexUseCase(repo), [repo]);
   const adjustStockUseCase = useMemo(() => new AdjustStockUseCase(repo), [repo]);
+  const transferStockUseCase = useMemo(() => new TransferStockUseCase(repo), [repo]);
 
   const loadData = async () => {
     setLoading(true);
@@ -38,13 +46,30 @@ export function InventoryPage() {
         setCompanyId(context.companyId);
         setWarehouseId(context.defaultWarehouseId);
 
-        const [stocks, movs] = await Promise.all([
+        const supabase = createClient();
+        const [stocks, movs, whRes] = await Promise.all([
           getBalanceUseCase.execute(context.companyId),
           getKardexUseCase.execute(context.companyId, { limit: 100 }),
+          supabase
+            .from('warehouses')
+            .select('*')
+            .eq('company_id', context.companyId)
+            .eq('active', true),
         ]);
 
         setStockList(stocks);
         setKardexMovements(movs);
+        setWarehouses(
+          (whRes.data || []).map((w: any) => ({
+            id: w.id,
+            companyId: w.company_id,
+            name: w.name,
+            code: w.code,
+            address: w.address,
+            isDefault: w.is_default,
+            active: w.active,
+          }))
+        );
       }
     } catch (err) {
       console.error('Error cargando inventario:', err);
@@ -69,16 +94,42 @@ export function InventoryPage() {
     await loadData();
   };
 
+  const handleConfirmTransfer = async (data: {
+    originWarehouseId: string;
+    destinationWarehouseId: string;
+    productId: string;
+    quantity: number;
+    reason: string;
+  }) => {
+    if (!companyId) throw new Error('Empresa no identificada.');
+    const result = await transferStockUseCase.execute({
+      companyId,
+      originWarehouseId: data.originWarehouseId,
+      destinationWarehouseId: data.destinationWarehouseId,
+      productId: data.productId,
+      quantity: data.quantity,
+      reason: data.reason,
+    });
+    await loadData();
+    return result;
+  };
+
   const handleOpenAdjust = (item?: InventoryStockDetailed) => {
     setSelectedStockItem(item);
     setIsAdjustModalOpen(true);
   };
 
+  // Filtro de inventario por depósito
+  const filteredStockList = useMemo(() => {
+    if (selectedWarehouseFilter === 'ALL') return stockList;
+    return stockList.filter((s) => s.warehouseId === selectedWarehouseFilter);
+  }, [stockList, selectedWarehouseFilter]);
+
   // KPIs
-  const totalPhysical = stockList.reduce((sum, s) => sum + s.physicalStock, 0);
-  const totalAvailable = stockList.reduce((sum, s) => sum + s.availableStock, 0);
-  const totalReserved = stockList.reduce((sum, s) => sum + s.reservedStock, 0);
-  const totalValuation = stockList.reduce((sum, s) => sum + s.totalValuation, 0);
+  const totalPhysical = filteredStockList.reduce((sum, s) => sum + s.physicalStock, 0);
+  const totalAvailable = filteredStockList.reduce((sum, s) => sum + s.availableStock, 0);
+  const totalReserved = filteredStockList.reduce((sum, s) => sum + s.reservedStock, 0);
+  const totalValuation = filteredStockList.reduce((sum, s) => sum + s.totalValuation, 0);
 
   return (
     <div className="space-y-5">
@@ -104,13 +155,48 @@ export function InventoryPage() {
           </div>
         </div>
 
-        <button
-          onClick={() => handleOpenAdjust()}
-          className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
-        >
-          <SlidersHorizontal className="w-3.5 h-3.5" />
-          <span>Ajustar Stock Manual</span>
-        </button>
+        {/* Acciones de Depósito & Transferencias */}
+        <div className="flex flex-wrap items-center gap-2">
+          {warehouses.length > 1 && (
+            <select
+              aria-label="Filtrar por depósito"
+              value={selectedWarehouseFilter}
+              onChange={(e) => setSelectedWarehouseFilter(e.target.value)}
+              className="h-8 px-2.5 rounded bg-white border border-slate-300 text-xs font-semibold text-slate-800 focus:outline-none focus:border-slate-900 cursor-pointer shadow-2xs"
+            >
+              <option value="ALL">Todos los depósitos ({warehouses.length})</option>
+              {warehouses.map((w) => (
+                <option key={w.id} value={w.id}>
+                  {w.name} {w.isDefault ? '★' : ''}
+                </option>
+              ))}
+            </select>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setIsTransferModalOpen(true)}
+            disabled={warehouses.length < 2}
+            title={
+              warehouses.length < 2
+                ? 'Para transferir necesitás al menos 2 depósitos activos (crealos en Configuración)'
+                : 'Mover mercadería entre depósitos con remito interno'
+            }
+            className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:pointer-events-none text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs"
+          >
+            <ArrowRightLeft className="w-3.5 h-3.5" />
+            <span>Transferir entre Depósitos</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleOpenAdjust()}
+            className="h-8 px-3 rounded bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+            <span>Ajustar Stock</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -178,7 +264,7 @@ export function InventoryPage() {
       {/* Tab Content */}
       {activeTab === 'STOCK' ? (
         <InventoryStockTable
-          stockList={stockList}
+          stockList={filteredStockList}
           loading={loading}
           onOpenAdjustModal={handleOpenAdjust}
         />
@@ -193,6 +279,16 @@ export function InventoryPage() {
         stockList={stockList}
         selectedItem={selectedStockItem}
         onConfirmAdjust={handleConfirmAdjust as any}
+      />
+
+      {/* Modal de Transferencia entre Depósitos */}
+      <TransferStockModal
+        isOpen={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
+        stockList={stockList}
+        warehouses={warehouses}
+        companyId={companyId}
+        onConfirmTransfer={handleConfirmTransfer}
       />
     </div>
   );

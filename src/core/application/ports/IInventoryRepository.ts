@@ -43,6 +43,25 @@ export interface AdjustStockDTO {
   reason: string;
 }
 
+export interface TransferStockDTO {
+  companyId: string;
+  originWarehouseId: string;
+  destinationWarehouseId: string;
+  productId: string;
+  variantId?: string;
+  quantity: number;
+  reason?: string;
+}
+
+export interface TransferStockResult {
+  transferNumber: string;
+  productId: string;
+  quantity: number;
+  originWarehouseId: string;
+  destinationWarehouseId: string;
+  createdAt: string;
+}
+
 export interface IInventoryRepository {
   getStockBalance(companyId: string, warehouseId?: string): Promise<InventoryStockDetailed[]>;
   getKardexMovements(
@@ -50,4 +69,5 @@ export interface IInventoryRepository {
     options?: { limit?: number; type?: string; productId?: string }
   ): Promise<StockMovementDetailed[]>;
   adjustStock(dto: AdjustStockDTO): Promise<StockMovement>;
+  transferStock(dto: TransferStockDTO): Promise<TransferStockResult>;
 }
