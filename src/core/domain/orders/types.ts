@@ -5,6 +5,7 @@
 
 export type OrderStatus =
   | 'BORRADOR'
+  | 'PRESUPUESTO'
   | 'CONFIRMADO'
   | 'EN_PREPARACION'
   | 'DESPACHADO_PARCIAL'

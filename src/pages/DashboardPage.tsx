@@ -349,6 +349,8 @@ export function DashboardPage() {
         onClose={() => setIsPosOpen(false)}
         products={products}
         companyId={company?.id || ''}
+        companyName={company?.name || 'Stock·tock'}
+        defaultWarehouseId={defaultWarehouseId}
         onCompleteSale={handleCompleteSale as any}
       />
     </div>

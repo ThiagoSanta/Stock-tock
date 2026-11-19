@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   X,
   Search,
@@ -14,14 +14,35 @@ import {
   ArrowRightLeft,
   Printer,
   BookOpen,
+  Pause,
+  Play,
+  Percent,
+  DollarSign,
+  MessageCircle,
+  FileText,
+  Clock,
 } from 'lucide-react';
 import { ProductWithStock } from '@/core/application/ports/IProductRepository';
 import { PaymentMethod, Sale } from '@/core/domain/sales/types';
 import { SaleA4InvoiceModal } from '@/presentation/modules/sales/SaleA4InvoiceModal';
+import { QuoteA4Modal, QuoteData } from '@/presentation/modules/orders/QuoteA4Modal';
+import { createClient } from '@/utils/supabase/client';
 
-interface CartItem {
+export interface CartItem {
   product: ProductWithStock;
   quantity: number;
+}
+
+export interface PausedTicket {
+  id: string;
+  customerName: string;
+  cart: CartItem[];
+  adjustmentType: 'NONE' | 'DISCOUNT_PERCENT' | 'DISCOUNT_FIXED' | 'SURCHARGE_PERCENT' | 'SURCHARGE_FIXED';
+  adjustmentValue: string;
+  paymentMethod: PaymentMethod;
+  notes: string;
+  timestamp: string;
+  total: number;
 }
 
 interface PosModalProps {
@@ -29,9 +50,12 @@ interface PosModalProps {
   onClose: () => void;
   products: ProductWithStock[];
   companyId: string;
+  companyName?: string;
+  defaultWarehouseId?: string;
   onCompleteSale: (saleData: {
     paymentMethod: PaymentMethod;
     customerName: string;
+    notes?: string;
     items: Array<{
       productId: string;
       productName: string;
@@ -46,6 +70,9 @@ export function PosModal({
   isOpen,
   onClose,
   products,
+  companyId,
+  companyName = 'Stock·tock',
+  defaultWarehouseId,
   onCompleteSale,
 }: PosModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -57,6 +84,69 @@ export function PosModal({
   const [completedSale, setCompletedSale] = useState<Sale | null>(null);
   const [showA4Receipt, setShowA4Receipt] = useState(false);
 
+  // Descuentos y Recargos en Mostrador
+  const [adjustmentType, setAdjustmentType] = useState<
+    'NONE' | 'DISCOUNT_PERCENT' | 'DISCOUNT_FIXED' | 'SURCHARGE_PERCENT' | 'SURCHARGE_FIXED'
+  >('NONE');
+  const [adjustmentValue, setAdjustmentValue] = useState<string>('');
+  const [saleNotes, setSaleNotes] = useState('');
+
+  // Carritos en Espera (Pausar Venta)
+  const [pausedTickets, setPausedTickets] = useState<PausedTicket[]>(() => {
+    try {
+      const saved = localStorage.getItem('stocktock_paused_pos_tickets');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [showPausedList, setShowPausedList] = useState(false);
+
+  // Módulo de Presupuestos A4
+  const [activeQuote, setActiveQuote] = useState<QuoteData | null>(null);
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Guardar tickets pausados en localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('stocktock_paused_pos_tickets', JSON.stringify(pausedTickets));
+    } catch {
+      // Silencioso
+    }
+  }, [pausedTickets]);
+
+  // Atajos de teclado en Mostrador (F2, F3, F4, F8, F9)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Si el modal de A4 o de presupuesto está abierto, no capturar atajos
+      if (showA4Receipt || activeQuote) return;
+
+      if (e.key === 'F2') {
+        e.preventDefault();
+        setPaymentMethod('EFECTIVO');
+      } else if (e.key === 'F3') {
+        e.preventDefault();
+        setPaymentMethod('TRANSFERENCIA');
+      } else if (e.key === 'F4') {
+        e.preventDefault();
+        setPaymentMethod('CUENTA_CORRIENTE');
+      } else if (e.key === 'F8') {
+        e.preventDefault();
+        handlePauseCurrentTicket();
+      } else if (e.key === 'F9') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, cart, customerName, adjustmentType, adjustmentValue, paymentMethod, saleNotes, showA4Receipt, activeQuote]);
+
   useEffect(() => {
     if (!isOpen) {
       setCart([]);
@@ -64,11 +154,17 @@ export function PosModal({
       setCompletedSale(null);
       setError(null);
       setShowA4Receipt(false);
+      setActiveQuote(null);
+      setAdjustmentType('NONE');
+      setAdjustmentValue('');
+      setSaleNotes('');
+      setShowPausedList(false);
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
+  // Filtrado rápido de catálogo
   const filteredProducts = products
     .filter((p) => {
       const q = searchTerm.toLowerCase().trim();
@@ -86,14 +182,13 @@ export function PosModal({
       const existing = prev.find((item) => item.product.id === product.id);
       if (existing) {
         return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
       return [...prev, { product, quantity: 1 }];
     });
     setSearchTerm('');
+    searchInputRef.current?.focus();
   };
 
   const updateQuantity = (productId: string, delta: number) => {
@@ -114,20 +209,71 @@ export function PosModal({
     setCart((prev) => prev.filter((item) => item.product.id !== productId));
   };
 
-  const totalAmount = cart.reduce(
-    (sum, item) => sum + item.quantity * item.product.salePrice,
-    0
-  );
-  const totalCost = cart.reduce(
-    (sum, item) => sum + item.quantity * item.product.costPrice,
-    0
-  );
-  const estimatedMargin = totalAmount - totalCost;
+  // Cálculos de Totales y Ajustes (Descuentos y Recargos)
+  const rawSubtotal = cart.reduce((sum, item) => sum + item.quantity * item.product.salePrice, 0);
+  const totalCost = cart.reduce((sum, item) => sum + item.quantity * item.product.costPrice, 0);
 
-  const hasInsufficientStock = cart.some(
-    (item) => item.quantity > item.product.availableStock
-  );
+  const numAdj = parseFloat(adjustmentValue) || 0;
+  let adjustmentAmount = 0; // Positivo si es recargo, negativo si es descuento
 
+  if (adjustmentType === 'DISCOUNT_PERCENT') {
+    adjustmentAmount = -((rawSubtotal * numAdj) / 100);
+  } else if (adjustmentType === 'DISCOUNT_FIXED') {
+    adjustmentAmount = -Math.min(rawSubtotal, numAdj);
+  } else if (adjustmentType === 'SURCHARGE_PERCENT') {
+    adjustmentAmount = (rawSubtotal * numAdj) / 100;
+  } else if (adjustmentType === 'SURCHARGE_FIXED') {
+    adjustmentAmount = numAdj;
+  }
+
+  const finalTotalAmount = Math.max(0, rawSubtotal + adjustmentAmount);
+  const estimatedMargin = finalTotalAmount - totalCost;
+
+  const hasInsufficientStock = cart.some((item) => item.quantity > item.product.availableStock);
+
+  // 1. Pausar ticket actual
+  const handlePauseCurrentTicket = () => {
+    if (cart.length === 0) return;
+
+    const newTicket: PausedTicket = {
+      id: `PAUSA-${Date.now().toString().slice(-6)}`,
+      customerName: customerName.trim() || 'Consumidor Final',
+      cart: [...cart],
+      adjustmentType,
+      adjustmentValue,
+      paymentMethod,
+      notes: saleNotes,
+      timestamp: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+      total: finalTotalAmount,
+    };
+
+    setPausedTickets((prev) => [newTicket, ...prev]);
+    setCart([]);
+    setCustomerName('Consumidor Final');
+    setAdjustmentType('NONE');
+    setAdjustmentValue('');
+    setSaleNotes('');
+    setShowPausedList(false);
+  };
+
+  // 2. Reanudar ticket pausado
+  const handleResumeTicket = (ticket: PausedTicket) => {
+    setCart(ticket.cart);
+    setCustomerName(ticket.customerName);
+    setAdjustmentType(ticket.adjustmentType);
+    setAdjustmentValue(ticket.adjustmentValue);
+    setPaymentMethod(ticket.paymentMethod);
+    setSaleNotes(ticket.notes);
+    setPausedTickets((prev) => prev.filter((t) => t.id !== ticket.id));
+    setShowPausedList(false);
+  };
+
+  // 3. Eliminar ticket pausado
+  const handleDeletePausedTicket = (ticketId: string) => {
+    setPausedTickets((prev) => prev.filter((t) => t.id !== ticketId));
+  };
+
+  // 4. Cobro definitivo de venta
   const handleCheckout = async () => {
     if (cart.length === 0) return;
     if (hasInsufficientStock) {
@@ -145,18 +291,38 @@ export function PosModal({
 
     setLoading(true);
     setError(null);
+
+    // Preparar detalle de descuento o recargo en notas
+    let adjustmentDetail = '';
+    if (adjustmentType === 'DISCOUNT_PERCENT') {
+      adjustmentDetail = ` [Desc. ${numAdj}%: -$${Math.abs(adjustmentAmount).toFixed(2)}]`;
+    } else if (adjustmentType === 'DISCOUNT_FIXED') {
+      adjustmentDetail = ` [Desc. Fijo: -$${Math.abs(adjustmentAmount).toFixed(2)}]`;
+    } else if (adjustmentType === 'SURCHARGE_PERCENT') {
+      adjustmentDetail = ` [Recargo ${numAdj}%: +$${adjustmentAmount.toFixed(2)}]`;
+    } else if (adjustmentType === 'SURCHARGE_FIXED') {
+      adjustmentDetail = ` [Recargo Fijo: +$${adjustmentAmount.toFixed(2)}]`;
+    }
+
+    const fullNotes = `${saleNotes.trim()}${adjustmentDetail}`.trim();
+
     try {
+      // Ajustar proporcionalmente el precio unitario si hubo recargo o descuento global
+      const factor = rawSubtotal > 0 ? finalTotalAmount / rawSubtotal : 1;
+
       const result = await onCompleteSale({
         paymentMethod,
         customerName: customerName.trim() || 'Consumidor Final',
+        notes: fullNotes || undefined,
         items: cart.map((item) => ({
           productId: item.product.id,
           productName: item.product.name,
           quantity: item.quantity,
-          unitPrice: item.product.salePrice,
+          unitPrice: Math.round(item.product.salePrice * factor * 100) / 100,
           costPrice: item.product.costPrice,
         })),
       });
+
       setCompletedSale(result);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al procesar la venta');
@@ -165,69 +331,219 @@ export function PosModal({
     }
   };
 
+  // 5. Emitir Presupuesto / Cotización A4
+  const handleGenerateQuote = async () => {
+    if (cart.length === 0) {
+      setError('Agregá al menos 1 producto al carrito para generar el presupuesto.');
+      return;
+    }
+
+    const quoteNumber = `PTO-${Math.floor(100000 + Math.random() * 900000)}`;
+    const today = new Date();
+    const validUntilDate = new Date();
+    validUntilDate.setDate(today.getDate() + 15);
+
+    const quoteData: QuoteData = {
+      quoteNumber,
+      date: today.toLocaleDateString('es-AR'),
+      validUntil: validUntilDate.toLocaleDateString('es-AR'),
+      customerName: customerName.trim() || 'Consumidor / Cliente Solicitante',
+      companyName,
+      items: cart.map((item) => ({
+        name: item.product.name,
+        quantity: item.quantity,
+        unitPrice: item.product.salePrice,
+        subtotal: item.quantity * item.product.salePrice,
+      })),
+      totalAmount: finalTotalAmount,
+      notes: saleNotes || undefined,
+    };
+
+    // Guardar también en tabla orders como PRESUPUESTO si companyId está disponible
+    try {
+      if (companyId) {
+        const supabase = createClient();
+        await supabase.from('orders').insert({
+          company_id: companyId,
+          warehouse_id: defaultWarehouseId || '00000000-0000-0000-0000-000000000000',
+          order_number: quoteNumber,
+          status: 'PRESUPUESTO',
+          total_amount: finalTotalAmount,
+          notes: `Presupuesto emitido a ${customerName}. Validez 15 días. ${saleNotes}`,
+        });
+      }
+    } catch (err) {
+      console.warn('Presupuesto no persistido en orders:', err);
+    }
+
+    setActiveQuote(quoteData);
+  };
+
+  // 6. Enlace WhatsApp directo con comprobante
+  const handleSendWhatsApp = () => {
+    if (!completedSale) return;
+
+    const itemsText = cart
+      .map((it) => `• ${it.quantity}x ${it.product.name} ($${it.product.salePrice.toLocaleString('es-AR')})`)
+      .join('\n');
+
+    const message =
+      `¡Hola! Le enviamos el comprobante de su compra en *${companyName}*:\n\n` +
+      `🧾 *Comprobante:* ${completedSale.saleNumber}\n` +
+      `👤 *Cliente:* ${completedSale.customerName}\n` +
+      `💰 *Total Abonado:* $${completedSale.totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}\n` +
+      `💳 *Medio de Pago:* ${completedSale.paymentMethod}\n` +
+      `📅 *Fecha:* ${new Date(completedSale.createdAt).toLocaleDateString('es-AR')} ${new Date(completedSale.createdAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}\n\n` +
+      `📦 *Detalle de Artículos:*\n${itemsText}\n\n` +
+      `¡Muchas gracias por su compra!`;
+
+    const encoded = encodeURIComponent(message);
+    window.open(`https://wa.me/?text=${encoded}`, '_blank');
+  };
+
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="pos-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/60 backdrop-blur-xs"
     >
-      <div className="w-full max-w-2xl rounded-lg bg-white border border-slate-300 shadow-xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-150">
-        {/* Header */}
+      <div className="w-full max-w-2xl rounded-xl bg-white border border-slate-300 shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-in fade-in zoom-in-95 duration-150 font-sans">
+        {/* Header con Atajos y Botón de Carritos en Espera */}
         <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between shrink-0 bg-slate-50">
           <div className="flex items-center gap-2">
-            <div
-              aria-hidden="true"
-              className="w-6 h-6 rounded bg-slate-900 text-white flex items-center justify-center"
-            >
+            <div className="w-6 h-6 rounded bg-slate-900 text-white flex items-center justify-center">
               <Receipt className="w-3.5 h-3.5" />
             </div>
-            <h3
-              id="pos-modal-title"
-              className="text-xs font-bold text-slate-900 uppercase tracking-wider"
-            >
+            <h3 id="pos-modal-title" className="text-xs font-bold text-slate-900 uppercase tracking-wider">
               Venta Rápida (Mostrador / POS)
             </h3>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Cerrar ventana de venta rápida"
-            className="text-slate-500 hover:text-slate-800 p-1.5 rounded hover:bg-slate-200 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-900"
-          >
-            <X className="w-4 h-4" aria-hidden="true" />
-          </button>
+
+          <div className="flex items-center gap-2">
+            {/* Botón Carritos en Espera */}
+            <button
+              type="button"
+              onClick={() => setShowPausedList((prev) => !prev)}
+              className={`h-7 px-2.5 rounded text-[11px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border ${
+                pausedTickets.length > 0
+                  ? 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100'
+                  : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-100'
+              }`}
+              title="Ver tickets pausados"
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>En Espera ({pausedTickets.length})</span>
+            </button>
+
+            {/* Botón Pausar Venta */}
+            <button
+              type="button"
+              onClick={handlePauseCurrentTicket}
+              disabled={cart.length === 0}
+              className="h-7 px-2.5 rounded bg-white hover:bg-slate-100 border border-slate-200 disabled:opacity-40 text-slate-700 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+              title="Pausar ticket actual para atender al siguiente cliente (F8)"
+            >
+              <Pause className="w-3 h-3 text-slate-500" />
+              <span>Pausar (F8)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Cerrar mostrador"
+              className="text-slate-400 hover:text-slate-800 p-1 rounded hover:bg-slate-200 transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Pantalla de Éxito / Ticket */}
-        {completedSale ? (
-          <div className="p-6 text-center space-y-3.5 my-auto">
-            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center mx-auto border border-emerald-300">
-              <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
+        {/* Panel Desplegable de Carritos en Espera */}
+        {showPausedList && (
+          <div className="p-3 bg-amber-50/70 border-b border-amber-200 space-y-2 animate-in fade-in duration-100">
+            <div className="flex items-center justify-between text-xs font-bold text-amber-900">
+              <span className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-amber-700" />
+                <span>Tickets Pausados en Mostrador</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowPausedList(false)}
+                className="text-[11px] text-amber-800 hover:underline cursor-pointer"
+              >
+                Cerrar lista
+              </button>
             </div>
+
+            {pausedTickets.length === 0 ? (
+              <p className="text-xs text-amber-800">No hay ventas pausadas actualmente.</p>
+            ) : (
+              <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                {pausedTickets.map((t) => (
+                  <div
+                    key={t.id}
+                    className="p-2 rounded bg-white border border-amber-200 flex items-center justify-between text-xs shadow-2xs"
+                  >
+                    <div>
+                      <p className="font-bold text-slate-900">
+                        {t.customerName}{' '}
+                        <span className="font-mono text-slate-400 font-normal">({t.timestamp})</span>
+                      </p>
+                      <p className="text-[11px] text-slate-500 font-mono">
+                        {t.cart.length} artículos • ${t.total.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleResumeTicket(t)}
+                        className="h-6 px-2.5 rounded bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                      >
+                        <Play className="w-3 h-3" />
+                        <span>Reanudar</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeletePausedTicket(t.id)}
+                        className="h-6 w-6 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
+                        title="Descartar ticket"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Pantalla de Éxito / Ticket Cerrado */}
+        {completedSale ? (
+          <div className="p-6 text-center space-y-4 my-auto">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center mx-auto border border-emerald-300">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+
             <div>
-              <h4 className="text-base font-bold text-slate-900">
-                ¡Venta Registrada con Éxito!
-              </h4>
-              <p className="text-xs text-slate-600 mt-0.5 font-medium">
+              <h4 className="text-base font-bold text-slate-900">¡Venta Registrada con Éxito!</h4>
+              <p className="text-xs text-slate-600 mt-0.5">
                 Comprobante{' '}
-                <span className="font-mono text-slate-900 font-bold">
-                  {completedSale.saleNumber}
-                </span>{' '}
-                • Stock descontado en tiempo real
+                <span className="font-mono text-slate-900 font-bold">{completedSale.saleNumber}</span> •
+                Stock actualizado en tiempo real
               </p>
             </div>
 
-            <div className="max-w-xs mx-auto p-3.5 rounded bg-slate-50 border border-slate-200 text-left space-y-2 text-xs">
+            <div className="max-w-xs mx-auto p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-left space-y-2 text-xs">
               <div className="flex justify-between text-slate-700">
                 <span className="font-medium">Cliente:</span>
                 <span className="text-slate-900 font-semibold">{completedSale.customerName}</span>
               </div>
               <div className="flex justify-between text-slate-700">
                 <span className="font-medium">Medio de Pago:</span>
-                <span className="text-slate-900 font-mono font-semibold">
-                  {completedSale.paymentMethod}
-                </span>
+                <span className="text-slate-900 font-mono font-semibold">{completedSale.paymentMethod}</span>
               </div>
               <div className="flex justify-between text-slate-700 pt-2 border-t border-slate-200">
                 <span className="font-bold text-slate-900">Total Cobrado:</span>
@@ -237,15 +553,27 @@ export function PosModal({
               </div>
             </div>
 
+            {/* Acciones tras la venta */}
             <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
               <button
                 type="button"
-                onClick={() => setShowA4Receipt(true)}
-                className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer border border-slate-300"
+                onClick={handleSendWhatsApp}
+                className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                title="Compartir comprobante formateado por WhatsApp"
               >
-                <Printer className="w-3.5 h-3.5 text-slate-700" aria-hidden="true" />
-                <span>Imprimir Comprobante A4</span>
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>Enviar por WhatsApp</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setShowA4Receipt(true)}
+                className="h-8 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer border border-slate-300"
+              >
+                <Printer className="w-3.5 h-3.5 text-slate-700" />
+                <span>Imprimir A4</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => {
@@ -253,16 +581,9 @@ export function PosModal({
                   setCart([]);
                   setShowA4Receipt(false);
                 }}
-                className="h-8 px-3.5 rounded bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs focus-visible:ring-2 focus-visible:ring-slate-900"
+                className="h-8 px-3.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
               >
                 Nueva Venta
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                className="h-8 px-3.5 rounded bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 text-xs font-semibold transition-colors cursor-pointer"
-              >
-                Cerrar
               </button>
             </div>
 
@@ -278,38 +599,42 @@ export function PosModal({
             {error && (
               <div
                 role="alert"
-                className="p-3 rounded bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-center gap-2 font-medium"
+                className="p-3 rounded-lg bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-center gap-2 font-medium"
               >
-                <AlertTriangle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
-            {/* Buscador de Producto */}
+            {/* Buscador de Producto (F9) */}
             <div className="relative">
-              <label htmlFor="pos-search" className="block text-xs font-semibold text-slate-700 mb-1">
-                Buscar Producto o Escanear Código
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label htmlFor="pos-search" className="text-xs font-semibold text-slate-700">
+                  Buscar Producto o Pistolear Código
+                </label>
+                <kbd className="text-[10px] bg-slate-100 border border-slate-200 text-slate-500 px-1 py-0.2 rounded font-mono">
+                  F9 para buscar
+                </kbd>
+              </div>
+
               <div className="relative">
-                <Search
-                  className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-                  aria-hidden="true"
-                />
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
+                  ref={searchInputRef}
                   id="pos-search"
                   type="search"
                   autoFocus
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Nombre, SKU o pistolear código de barras..."
-                  className="w-full h-8 pl-8 pr-3 rounded bg-white border border-slate-300 text-xs text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                  placeholder="Escribí nombre, SKU o escaneá código de barras..."
+                  className="w-full h-8 pl-8 pr-3 rounded-lg bg-white border border-slate-300 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900"
                 />
               </div>
 
               {filteredProducts.length > 0 && (
                 <div
                   role="listbox"
-                  className="absolute top-full left-0 right-0 mt-1 rounded bg-white border border-slate-300 shadow-lg overflow-hidden z-20 divide-y divide-slate-100"
+                  className="absolute top-full left-0 right-0 mt-1 rounded-lg bg-white border border-slate-300 shadow-xl overflow-hidden z-20 divide-y divide-slate-100"
                 >
                   {filteredProducts.map((p) => {
                     const isOut = p.availableStock <= 0;
@@ -321,13 +646,13 @@ export function PosModal({
                         aria-selected="false"
                         disabled={isOut}
                         onClick={() => addToCart(p)}
-                        className={`w-full p-2.5 text-left text-xs flex items-center justify-between hover:bg-slate-100 transition-colors cursor-pointer ${
+                        className={`w-full p-2.5 text-left text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${
                           isOut ? 'opacity-40 cursor-not-allowed bg-slate-50' : ''
                         }`}
                       >
                         <div>
                           <p className="font-semibold text-slate-900">{p.name}</p>
-                          <span className="text-[11px] font-mono text-slate-600">
+                          <span className="text-[11px] font-mono text-slate-500">
                             SKU: {p.sku} • Disp: {p.availableStock} {p.unitOfMeasure}
                           </span>
                         </div>
@@ -342,18 +667,18 @@ export function PosModal({
             </div>
 
             {/* Lista del Carrito */}
-            <div className="rounded border border-slate-200 overflow-hidden">
-              <div className="px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <div className="rounded-lg border border-slate-200 overflow-hidden">
+              <div className="px-3 py-1.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700 uppercase tracking-wider">
                 <span className="flex items-center gap-1.5">
-                  <ShoppingCart className="w-3.5 h-3.5 text-slate-600" aria-hidden="true" />
+                  <ShoppingCart className="w-3.5 h-3.5 text-slate-600" />
                   <span>Ítems en Mostrador ({cart.length})</span>
                 </span>
                 <span>Subtotal</span>
               </div>
 
-              <div className="p-2 space-y-1 max-h-44 overflow-y-auto divide-y divide-slate-100">
+              <div className="p-1 space-y-0.5 max-h-40 overflow-y-auto divide-y divide-slate-100">
                 {cart.length === 0 ? (
-                  <p className="p-5 text-center text-xs text-slate-500 font-medium">
+                  <p className="p-4 text-center text-xs text-slate-400">
                     Buscá o escaneá un producto arriba para agregarlo.
                   </p>
                 ) : (
@@ -362,30 +687,29 @@ export function PosModal({
                     return (
                       <div
                         key={product.id}
-                        className="p-2 flex items-center justify-between gap-2 text-xs"
+                        className="p-1.5 flex items-center justify-between gap-2 text-xs hover:bg-slate-50/50 rounded"
                       >
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-slate-900 truncate">{product.name}</p>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[11px] font-mono text-slate-600">
+                            <span className="text-[11px] font-mono text-slate-500">
                               ${product.salePrice.toLocaleString('es-AR')} c/u
                             </span>
                             {isInsufficient && (
-                              <span className="text-[11px] font-semibold text-rose-900 bg-rose-50 px-1.5 rounded border border-rose-300">
-                                Stock insuficiente (Quedan {product.availableStock})
+                              <span className="text-[10px] font-semibold text-rose-700 bg-rose-50 px-1 rounded border border-rose-200">
+                                Supera stock ({product.availableStock})
                               </span>
                             )}
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1">
                           <button
                             type="button"
-                            aria-label={`Restar una unidad de ${product.name}`}
                             onClick={() => updateQuantity(product.id, -1)}
-                            className="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center cursor-pointer transition-colors"
                           >
-                            <Minus className="w-3 h-3" aria-hidden="true" />
+                            <Minus className="w-3 h-3" />
                           </button>
                           <span
                             className={`w-7 text-center font-mono font-bold tabular-nums ${
@@ -396,11 +720,10 @@ export function PosModal({
                           </span>
                           <button
                             type="button"
-                            aria-label={`Sumar una unidad de ${product.name}`}
                             onClick={() => updateQuantity(product.id, 1)}
-                            className="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center cursor-pointer transition-colors"
                           >
-                            <Plus className="w-3 h-3" aria-hidden="true" />
+                            <Plus className="w-3 h-3" />
                           </button>
                         </div>
 
@@ -410,11 +733,10 @@ export function PosModal({
 
                         <button
                           type="button"
-                          aria-label={`Quitar ${product.name} del carrito`}
                           onClick={() => removeFromCart(product.id)}
-                          className="text-slate-400 hover:text-rose-700 p-1 rounded hover:bg-slate-100 transition-colors cursor-pointer"
+                          className="text-slate-400 hover:text-rose-600 p-1 rounded transition-colors cursor-pointer"
                         >
-                          <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     );
@@ -423,7 +745,50 @@ export function PosModal({
               </div>
             </div>
 
-            {/* Medio de Pago y Cliente */}
+            {/* Ajustes de Descuento / Recargo en Mostrador */}
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-slate-700 text-[11px] flex items-center gap-1">
+                  <Percent className="w-3 h-3 text-slate-400" />
+                  <span>Ajuste comercial:</span>
+                </span>
+                <select
+                  value={adjustmentType}
+                  onChange={(e) => setAdjustmentType(e.target.value as any)}
+                  className="h-7 px-2 rounded border border-slate-300 text-xs text-slate-800 bg-white focus:outline-none"
+                >
+                  <option value="NONE">Sin ajuste (Precio lista)</option>
+                  <option value="DISCOUNT_PERCENT">Descuento (%)</option>
+                  <option value="DISCOUNT_FIXED">Descuento fijo ($)</option>
+                  <option value="SURCHARGE_PERCENT">Recargo (%)</option>
+                  <option value="SURCHARGE_FIXED">Recargo fijo ($)</option>
+                </select>
+              </div>
+
+              {adjustmentType !== 'NONE' && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={adjustmentValue}
+                    onChange={(e) => setAdjustmentValue(e.target.value)}
+                    placeholder={adjustmentType.includes('PERCENT') ? 'Ej: 10' : 'Ej: 1500'}
+                    className="w-24 h-7 px-2 rounded border border-slate-300 text-xs font-mono font-semibold text-slate-900 bg-white focus:outline-none"
+                  />
+                  <span
+                    className={`font-mono font-bold text-xs ${
+                      adjustmentAmount < 0 ? 'text-emerald-700' : 'text-amber-700'
+                    }`}
+                  >
+                    {adjustmentAmount < 0 ? '-' : '+'}
+                    ${Math.abs(adjustmentAmount).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Cliente y Medio de Cobro */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div>
                 <label htmlFor="pos-customer" className="block text-xs font-semibold text-slate-700 mb-1">
@@ -435,21 +800,22 @@ export function PosModal({
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="Consumidor Final"
-                  className="w-full h-8 px-2.5 rounded bg-white border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                  className="w-full h-8 px-2.5 rounded-lg bg-white border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Medio de Cobro
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5" role="group" aria-label="Medio de cobro">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-slate-700">Medio de Cobro</label>
+                  <span className="text-[10px] text-slate-400 font-mono">F2 Efectivo • F3 Transf • F4 Cta Cte</span>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-1" role="group">
                   {[
                     { id: 'EFECTIVO', label: 'Efectivo', icon: Banknote },
-                    { id: 'TRANSFERENCIA', label: 'Transfer.', icon: ArrowRightLeft },
+                    { id: 'TRANSFERENCIA', label: 'Transf.', icon: ArrowRightLeft },
                     { id: 'TARJETA_DEBITO', label: 'Débito', icon: CreditCard },
                     { id: 'TARJETA_CREDITO', label: 'Crédito', icon: CreditCard },
-                    { id: 'CUENTA_CORRIENTE', label: 'Cta. Cte.', icon: BookOpen },
+                    { id: 'CUENTA_CORRIENTE', label: 'Cta Cte', icon: BookOpen },
                   ].map((m) => {
                     const Icon = m.icon;
                     const isSelected = paymentMethod === m.id;
@@ -457,16 +823,15 @@ export function PosModal({
                       <button
                         key={m.id}
                         type="button"
-                        aria-pressed={isSelected}
                         onClick={() => setPaymentMethod(m.id as PaymentMethod)}
-                        className={`h-7 px-2 rounded border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        className={`h-7 px-1 rounded border text-[11px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-slate-900 border-slate-900 text-white shadow-xs'
-                            : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'
+                            ? 'bg-slate-900 border-slate-900 text-white shadow-2xs'
+                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
-                        <Icon className="w-3 h-3" aria-hidden="true" />
-                        <span>{m.label}</span>
+                        <Icon className="w-3 h-3" />
+                        <span className="truncate">{m.label}</span>
                       </button>
                     );
                   })}
@@ -474,18 +839,25 @@ export function PosModal({
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+            {/* Footer y Totales */}
+            <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-[11px] text-slate-600 uppercase block font-bold tracking-wider">
+                <span className="text-[10px] text-slate-500 uppercase block font-bold tracking-wider">
                   Total a Cobrar
                 </span>
-                <span className="text-xl font-bold font-mono text-slate-900 tabular-nums">
-                  ${totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-                </span>
-                {totalAmount > 0 && (
-                  <span className="text-xs text-emerald-800 block font-semibold">
-                    Margen bruto: ${estimatedMargin.toLocaleString('es-AR')}
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-bold font-mono text-slate-900 tabular-nums">
+                    ${finalTotalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                  </span>
+                  {adjustmentAmount !== 0 && (
+                    <span className="text-xs font-mono text-slate-400 line-through">
+                      ${rawSubtotal.toLocaleString('es-AR')}
+                    </span>
+                  )}
+                </div>
+                {finalTotalAmount > 0 && (
+                  <span className="text-[11px] text-emerald-800 block font-semibold">
+                    Margen bruto estimado: ${estimatedMargin.toLocaleString('es-AR')}
                   </span>
                 )}
               </div>
@@ -493,22 +865,35 @@ export function PosModal({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={onClose}
-                  className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
+                  onClick={handleGenerateQuote}
+                  disabled={cart.length === 0}
+                  className="h-8 px-2.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 disabled:opacity-40 text-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                  title="Emitir presupuesto formal imprimible en A4 sin descontar stock"
                 >
-                  Cancelar
+                  <FileText className="w-3.5 h-3.5 text-slate-600" />
+                  <span>Presupuesto A4</span>
                 </button>
+
                 <button
                   type="button"
                   onClick={handleCheckout}
                   disabled={cart.length === 0 || hasInsufficientStock || loading}
-                  className="h-8 px-4 rounded bg-slate-900 hover:bg-slate-800 active:bg-slate-950 disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs focus-visible:ring-2 focus-visible:ring-slate-900"
+                  className="h-8 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 disabled:opacity-40 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   {loading ? 'Cobrando...' : 'Confirmar y Cobrar'}
                 </button>
               </div>
             </div>
           </div>
+        )}
+
+        {/* Modal de Presupuesto A4 */}
+        {activeQuote && (
+          <QuoteA4Modal
+            isOpen={!!activeQuote}
+            onClose={() => setActiveQuote(null)}
+            quote={activeQuote}
+          />
         )}
       </div>
     </div>

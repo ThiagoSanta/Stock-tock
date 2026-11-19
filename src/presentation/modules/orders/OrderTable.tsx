@@ -53,6 +53,12 @@ export function OrderTable({
             <Clock className="w-3 h-3" aria-hidden="true" /> Borrador
           </span>
         );
+      case 'PRESUPUESTO':
+        return (
+          <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded border bg-purple-50 text-purple-900 border-purple-300">
+            <FileText className="w-3 h-3" aria-hidden="true" /> Presupuesto
+          </span>
+        );
       case 'CONFIRMADO':
         return (
           <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded border bg-blue-50 text-blue-900 border-blue-300">
@@ -119,6 +125,16 @@ export function OrderTable({
                 </td>
                 <td className="py-2.5 px-3 text-right">
                   <div className="flex items-center justify-end gap-1.5">
+                    {order.status === 'PRESUPUESTO' && (
+                      <button
+                        type="button"
+                        onClick={() => onConfirmOrder(order.id)}
+                        title="Aprobar presupuesto y comprometer mercadería en depósito"
+                        className="px-2.5 py-1 text-xs font-semibold rounded bg-purple-50 text-purple-900 hover:bg-purple-100 border border-purple-300 transition-colors cursor-pointer"
+                      >
+                        Aprobar Pedido
+                      </button>
+                    )}
                     {order.status === 'BORRADOR' && (
                       <button
                         type="button"
