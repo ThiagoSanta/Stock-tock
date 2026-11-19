@@ -1,14 +1,22 @@
 import React from 'react';
 import { SupplierWithMetrics } from '@/core/domain/contacts/types';
-import { Truck, Mail, Phone, User, CheckCircle2, XCircle } from 'lucide-react';
+import { Truck, Mail, Phone, User, CheckCircle2, XCircle, FileSpreadsheet, Banknote } from 'lucide-react';
 
 interface SupplierTableProps {
   suppliers: SupplierWithMetrics[];
   loading: boolean;
   onToggleStatus: (id: string, newStatus: boolean) => void;
+  onOpenPayment?: (supplier: SupplierWithMetrics) => void;
+  onOpenStatement?: (supplier: SupplierWithMetrics) => void;
 }
 
-export function SupplierTable({ suppliers, loading, onToggleStatus }: SupplierTableProps) {
+export function SupplierTable({
+  suppliers,
+  loading,
+  onToggleStatus,
+  onOpenPayment,
+  onOpenStatement,
+}: SupplierTableProps) {
   if (loading) {
     return (
       <div
@@ -50,6 +58,7 @@ export function SupplierTable({ suppliers, loading, onToggleStatus }: SupplierTa
               <th scope="col" className="py-3 px-3">Vías de Comunicación</th>
               <th scope="col" className="py-3 px-3 text-center">Órdenes</th>
               <th scope="col" className="py-3 px-3 text-right">Volumen Comprado</th>
+              <th scope="col" className="py-3 px-3 text-right">Saldo Deuda</th>
               <th scope="col" className="py-3 px-3 text-center">Estado</th>
               <th scope="col" className="py-3 px-3 text-right">Acción</th>
             </tr>
@@ -102,6 +111,17 @@ export function SupplierTable({ suppliers, loading, onToggleStatus }: SupplierTa
                 <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 tabular-nums">
                   ${s.totalSpent.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                 </td>
+                <td className="py-2.5 px-3 text-right font-mono font-bold tabular-nums">
+                  <span
+                    className={
+                      (s.currentBalance ?? 0) > 0
+                        ? 'text-amber-700'
+                        : 'text-emerald-700'
+                    }
+                  >
+                    ${(s.currentBalance ?? 0).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                  </span>
+                </td>
                 <td className="py-2.5 px-3 text-center">
                   <span
                     className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-semibold border ${
@@ -122,14 +142,38 @@ export function SupplierTable({ suppliers, loading, onToggleStatus }: SupplierTa
                   </span>
                 </td>
                 <td className="py-2.5 px-3 text-right">
-                  <button
-                    type="button"
-                    onClick={() => onToggleStatus(s.id, !s.active)}
-                    aria-label={`${s.active ? 'Desactivar' : 'Reactivar'} proveedor ${s.name}`}
-                    className="px-2.5 py-1 text-xs font-semibold rounded bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 border border-slate-300 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-900"
-                  >
-                    {s.active ? 'Desactivar' : 'Reactivar'}
-                  </button>
+                  <div className="flex items-center justify-end gap-1.5">
+                    {onOpenPayment && (
+                      <button
+                        type="button"
+                        onClick={() => onOpenPayment(s)}
+                        title="Registrar pago a proveedor"
+                        className="px-2 py-1 text-xs font-semibold rounded bg-slate-900 hover:bg-slate-800 text-white transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
+                      >
+                        <Banknote className="w-3 h-3" />
+                        <span>Pago</span>
+                      </button>
+                    )}
+                    {onOpenStatement && (
+                      <button
+                        type="button"
+                        onClick={() => onOpenStatement(s)}
+                        title="Ver resumen y estado de cuenta corriente"
+                        className="px-2 py-1 text-xs font-semibold rounded bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
+                      >
+                        <FileSpreadsheet className="w-3 h-3 text-slate-500" />
+                        <span>Cta. Cte.</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => onToggleStatus(s.id, !s.active)}
+                      aria-label={`${s.active ? 'Desactivar' : 'Reactivar'} proveedor ${s.name}`}
+                      className="px-2 py-1 text-xs font-semibold rounded bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 border border-slate-300 transition-colors cursor-pointer"
+                    >
+                      {s.active ? 'Baja' : 'Alta'}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

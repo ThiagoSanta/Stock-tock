@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Truck, Plus } from 'lucide-react';
+import { ArrowLeft, Truck, Plus, ArrowUpDown } from 'lucide-react';
 import { Purchase, Supplier, PurchaseStatus } from '@/core/domain/purchases/types';
 import { ProductWithStock } from '@/core/application/ports/IProductRepository';
 import { SupabasePurchaseRepository } from '@/core/infrastructure/repositories/SupabasePurchaseRepository';
@@ -10,6 +10,7 @@ import { ReceivePurchaseUseCase } from '@/core/application/use-cases/purchases/R
 import { PurchaseTable } from '@/presentation/modules/purchases/PurchaseTable';
 import { PurchaseModal } from '@/presentation/modules/purchases/PurchaseModal';
 import { PurchaseDetailModal } from '@/presentation/modules/purchases/PurchaseDetailModal';
+import { SupplierCostComparisonModal } from '@/presentation/modules/purchases/SupplierCostComparisonModal';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function PurchasesPage() {
@@ -21,6 +22,7 @@ export function PurchasesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCostComparisonOpen, setIsCostComparisonOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'ALL' | PurchaseStatus>('ALL');
 
   const purchaseRepo = useMemo(() => new SupabasePurchaseRepository(), []);
@@ -105,13 +107,25 @@ export function PurchasesPage() {
           </div>
         </div>
 
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Nueva Orden de Compra</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsCostComparisonOpen(true)}
+            title="Comparativa de costos entre proveedores para cada producto"
+            className="h-8 px-3 rounded bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
+          >
+            <ArrowUpDown className="w-3.5 h-3.5 text-slate-500" />
+            <span>Comparar Costos</span>
+          </button>
+
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nueva Orden de Compra</span>
+          </button>
+        </div>
       </div>
 
       {/* Tabs de Filtro por Estado */}
@@ -158,6 +172,14 @@ export function PurchasesPage() {
         purchase={selectedPurchase}
         onClose={() => setSelectedPurchase(null)}
         onReceive={handleReceivePurchase}
+      />
+
+      {/* Modal Comparativa de Costos por Proveedor */}
+      <SupplierCostComparisonModal
+        isOpen={isCostComparisonOpen}
+        onClose={() => setIsCostComparisonOpen(false)}
+        products={products}
+        companyId={companyId}
       />
     </div>
   );

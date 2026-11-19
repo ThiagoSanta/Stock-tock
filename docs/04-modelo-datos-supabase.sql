@@ -410,3 +410,27 @@ GRANT ALL ON stock_lots TO anon, authenticated, service_role;
 CREATE INDEX IF NOT EXISTS idx_stock_lots_product ON stock_lots(product_id);
 CREATE INDEX IF NOT EXISTS idx_stock_lots_company ON stock_lots(company_id);
 CREATE INDEX IF NOT EXISTS idx_stock_lots_expiry ON stock_lots(expiry_date) WHERE expiry_date IS NOT NULL;
+
+
+-- ==============================================================================
+-- ACTUALIZACIÓN: PUNTO 4 - PROVEEDORES & ACTUALIZACIÓN DE PRECIOS
+-- ==============================================================================
+
+-- 1. Tabla de Pagos a Proveedores / Órdenes de Pago Internas
+CREATE TABLE IF NOT EXISTS supplier_payments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    supplier_id UUID NOT NULL REFERENCES suppliers(id) ON DELETE CASCADE,
+    payment_order_number VARCHAR(50) NOT NULL,
+    amount NUMERIC(14, 2) NOT NULL,
+    payment_method VARCHAR(30) NOT NULL DEFAULT 'EFECTIVO',
+    notes TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT unique_payment_order_number_per_company UNIQUE (company_id, payment_order_number)
+);
+
+CREATE INDEX IF NOT EXISTS idx_supplier_payments_lookup ON supplier_payments(company_id, supplier_id, created_at DESC);
+
+ALTER TABLE supplier_payments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY allow_all_supplier_payments ON supplier_payments FOR ALL USING (true) WITH CHECK (true);
+GRANT ALL ON supplier_payments TO anon, authenticated, service_role;

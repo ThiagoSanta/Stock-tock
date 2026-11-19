@@ -91,12 +91,30 @@ export class SupabaseContactRepository implements IContactRepository {
 
     if (purchErr) console.warn('Warning fetching supplier purchases metrics:', purchErr);
 
+    // Fetch supplier payments for account balance
+    const { data: paymentsData, error: payErr } = await this.supabase
+      .from('supplier_payments')
+      .select('supplier_id, amount')
+      .eq('company_id', companyId);
+
+    if (payErr) console.warn('Warning fetching supplier payments:', payErr);
+
     const purchasesList = purchasesData || [];
+    const paymentsList = paymentsData || [];
 
     return (suppliersData || []).map((s: any) => {
       const supplierPurchases = purchasesList.filter((p: any) => p.supplier_id === s.id);
+      const supplierPayments = paymentsList.filter((p: any) => p.supplier_id === s.id);
+
       const totalPurchasesCount = supplierPurchases.length;
       const totalSpent = supplierPurchases.reduce((acc: number, p: any) => acc + Number(p.total_amount || 0), 0);
+      const totalPaid = supplierPayments.reduce((acc: number, p: any) => acc + Number(p.amount || 0), 0);
+      
+      // Saldo deudor: Total compras no canceladas menos total pagos efectuados
+      const validPurchases = supplierPurchases.filter((p: any) => p.status !== 'CANCELADA');
+      const totalDebt = validPurchases.reduce((acc: number, p: any) => acc + Number(p.total_amount || 0), 0);
+      const currentBalance = totalDebt - totalPaid;
+
       const lastPurchaseDate = supplierPurchases.length > 0
         ? supplierPurchases.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at
         : undefined;
@@ -115,6 +133,9 @@ export class SupabaseContactRepository implements IContactRepository {
         createdAt: s.created_at,
         totalPurchasesCount,
         totalSpent,
+        totalDebt,
+        totalPaid,
+        currentBalance,
         lastPurchaseDate,
       };
     });

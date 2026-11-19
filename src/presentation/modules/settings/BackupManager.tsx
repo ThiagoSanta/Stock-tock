@@ -55,6 +55,7 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
         cashMovementsRes,
         cashShiftsRes,
         stockLotsRes,
+        supplierPaymentsRes,
       ] = await Promise.all([
         supabase.from('companies').select('*').eq('id', companyId),
         supabase.from('warehouses').select('*').eq('company_id', companyId),
@@ -71,6 +72,7 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
         supabase.from('cash_movements').select('*').eq('company_id', companyId),
         supabase.from('cash_shifts').select('*').eq('company_id', companyId),
         supabase.from('stock_lots').select('*').eq('company_id', companyId),
+        supabase.from('supplier_payments').select('*').eq('company_id', companyId),
       ]);
 
       const productIds = (productsRes.data || []).map((p: any) => p.id);
@@ -120,6 +122,7 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
           cashMovements: cashMovementsRes.data || [],
           cashShifts: cashShiftsRes.data || [],
           stockLots: stockLotsRes.data || [],
+          supplierPayments: supplierPaymentsRes.data || [],
         },
       };
 
@@ -228,6 +231,10 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
 
       if (db.stockLots?.length > 0) {
         await supabase.from('stock_lots').upsert(db.stockLots, { onConflict: 'id' });
+      }
+
+      if (db.supplierPayments?.length > 0) {
+        await supabase.from('supplier_payments').upsert(db.supplierPayments, { onConflict: 'id' });
       }
 
       setRestoreSuccess(

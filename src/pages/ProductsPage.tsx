@@ -12,6 +12,8 @@ import { PriceListModal } from '@/presentation/modules/catalog/PriceListModal';
 import { ProductImportModal } from '@/presentation/modules/catalog/ProductImportModal';
 import { LabelGeneratorModal } from '@/presentation/modules/catalog/LabelGeneratorModal';
 import { LotManagementModal } from '@/presentation/modules/inventory/LotManagementModal';
+import { BulkPriceUpdateModal } from '@/presentation/modules/catalog/BulkPriceUpdateModal';
+import { SupplierCostComparisonModal } from '@/presentation/modules/purchases/SupplierCostComparisonModal';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function ProductsPage() {
@@ -24,6 +26,8 @@ export function ProductsPage() {
   const [isPriceListOpen, setIsPriceListOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isLabelsOpen, setIsLabelsOpen] = useState(false);
+  const [isBulkUpdateOpen, setIsBulkUpdateOpen] = useState(false);
+  const [isCostComparisonOpen, setIsCostComparisonOpen] = useState(false);
   const [selectedProductForLots, setSelectedProductForLots] = useState<ProductWithStock | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [stockFilter, setStockFilter] = useState<'ALL' | 'NORMAL' | 'LOW' | 'OUT'>('ALL');
@@ -121,6 +125,8 @@ export function ProductsPage() {
         onOpenPriceList={() => setIsPriceListOpen(true)}
         onOpenImportModal={() => setIsImportOpen(true)}
         onOpenLabels={() => setIsLabelsOpen(true)}
+        onOpenBulkPriceUpdate={() => setIsBulkUpdateOpen(true)}
+        onOpenCostComparison={() => setIsCostComparisonOpen(true)}
       />
 
       {/* Tabla de Productos */}
@@ -172,6 +178,23 @@ export function ProductsPage() {
           productSku={selectedProductForLots.sku}
         />
       )}
+
+      {/* Modal de Actualizador Masivo de Precios */}
+      <BulkPriceUpdateModal
+        isOpen={isBulkUpdateOpen}
+        onClose={() => setIsBulkUpdateOpen(false)}
+        products={products}
+        companyId={companyId}
+        onUpdateComplete={loadData}
+      />
+
+      {/* Modal de Comparativa de Costos por Proveedor */}
+      <SupplierCostComparisonModal
+        isOpen={isCostComparisonOpen}
+        onClose={() => setIsCostComparisonOpen(false)}
+        products={products}
+        companyId={companyId}
+      />
     </div>
   );
 }

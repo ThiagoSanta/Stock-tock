@@ -42,4 +42,7 @@ export interface SupplierWithMetrics extends Supplier {
   totalPurchasesCount: number;
   totalSpent: number;
   lastPurchaseDate?: string;
+  currentBalance?: number;
+  totalDebt?: number;
+  totalPaid?: number;
 }

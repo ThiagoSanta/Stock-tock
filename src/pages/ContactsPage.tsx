@@ -12,6 +12,8 @@ import { SupplierTable } from '@/presentation/modules/contacts/SupplierTable';
 import { ContactModal } from '@/presentation/modules/contacts/ContactModal';
 import { CustomerPaymentModal } from '@/presentation/modules/contacts/CustomerPaymentModal';
 import { CustomerAccountStatementModal } from '@/presentation/modules/contacts/CustomerAccountStatementModal';
+import { SupplierPaymentModal } from '@/presentation/modules/contacts/SupplierPaymentModal';
+import { SupplierAccountStatementModal } from '@/presentation/modules/contacts/SupplierAccountStatementModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 
@@ -25,6 +27,8 @@ export function ContactsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [payingCustomer, setPayingCustomer] = useState<CustomerWithMetrics | null>(null);
   const [statementCustomer, setStatementCustomer] = useState<CustomerWithMetrics | null>(null);
+  const [payingSupplier, setPayingSupplier] = useState<SupplierWithMetrics | null>(null);
+  const [statementSupplier, setStatementSupplier] = useState<SupplierWithMetrics | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const contactRepo = useMemo(() => new SupabaseContactRepository(), []);
@@ -229,6 +233,8 @@ export function ContactsPage() {
           suppliers={filteredSuppliers}
           loading={loading}
           onToggleStatus={handleToggleSupplier}
+          onOpenPayment={(s) => setPayingSupplier(s)}
+          onOpenStatement={(s) => setStatementSupplier(s)}
         />
       )}
 
@@ -244,7 +250,7 @@ export function ContactsPage() {
         />
       )}
 
-      {/* Modal de Cobranza y Recibo A4 */}
+      {/* Modal de Cobranza y Recibo A4 Clientes */}
       {payingCustomer && (
         <CustomerPaymentModal
           isOpen={!!payingCustomer}
@@ -255,7 +261,7 @@ export function ContactsPage() {
         />
       )}
 
-      {/* Modal de Estado de Cuenta Corriente A4 */}
+      {/* Modal de Estado de Cuenta Corriente A4 Clientes */}
       {statementCustomer && (
         <CustomerAccountStatementModal
           isOpen={!!statementCustomer}
@@ -265,6 +271,31 @@ export function ContactsPage() {
           onOpenPayment={(c) => {
             setStatementCustomer(null);
             setPayingCustomer(c);
+          }}
+        />
+      )}
+
+      {/* Modal de Orden de Pago A4 Proveedores */}
+      {payingSupplier && (
+        <SupplierPaymentModal
+          isOpen={!!payingSupplier}
+          onClose={() => setPayingSupplier(null)}
+          supplier={payingSupplier}
+          companyName={companyName}
+          onPaymentSuccess={loadData}
+        />
+      )}
+
+      {/* Modal de Estado de Cuenta Corriente A4 Proveedores */}
+      {statementSupplier && (
+        <SupplierAccountStatementModal
+          isOpen={!!statementSupplier}
+          onClose={() => setStatementSupplier(null)}
+          supplier={statementSupplier}
+          companyName={companyName}
+          onOpenPayment={(s) => {
+            setStatementSupplier(null);
+            setPayingSupplier(s);
           }}
         />
       )}

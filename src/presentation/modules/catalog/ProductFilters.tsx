@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, Printer, Upload, Tag } from 'lucide-react';
+import { Search, Plus, Printer, Upload, Tag, Percent, ArrowUpDown } from 'lucide-react';
 
 interface ProductFiltersProps {
   searchTerm: string;
@@ -10,6 +10,8 @@ interface ProductFiltersProps {
   onOpenPriceList?: () => void;
   onOpenImportModal?: () => void;
   onOpenLabels?: () => void;
+  onOpenBulkPriceUpdate?: () => void;
+  onOpenCostComparison?: () => void;
 }
 
 export function ProductFilters({
@@ -21,6 +23,8 @@ export function ProductFilters({
   onOpenPriceList,
   onOpenImportModal,
   onOpenLabels,
+  onOpenBulkPriceUpdate,
+  onOpenCostComparison,
 }: ProductFiltersProps) {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -137,6 +141,30 @@ export function ProductFilters({
           >
             <Tag className="w-3.5 h-3.5 text-slate-500" />
             <span>Etiquetas A4</span>
+          </button>
+        )}
+
+        {onOpenBulkPriceUpdate && (
+          <button
+            type="button"
+            onClick={onOpenBulkPriceUpdate}
+            title="Ajuste masivo de precios por porcentaje"
+            className="h-8 px-2.5 rounded bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
+          >
+            <Percent className="w-3.5 h-3.5 text-slate-500" />
+            <span>Aumento Masivo %</span>
+          </button>
+        )}
+
+        {onOpenCostComparison && (
+          <button
+            type="button"
+            onClick={onOpenCostComparison}
+            title="Comparativa de costos entre proveedores"
+            className="h-8 px-2.5 rounded bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
+          >
+            <ArrowUpDown className="w-3.5 h-3.5 text-slate-500" />
+            <span>Comparar Costos</span>
           </button>
         )}
 
