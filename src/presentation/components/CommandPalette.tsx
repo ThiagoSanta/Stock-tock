@@ -220,6 +220,18 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
 
       // Reportes & Auditoría
       {
+        id: 'report-reconcile',
+        title: 'Conciliación y Cierre de Inventario Físico',
+        description: 'Cargar conteo real y asentar diferencias en Kardex en lote',
+        category: 'Reportes & Auditoría',
+        icon: FileSpreadsheet,
+        keywords: ['conciliación', 'conteo', 'auditoría', 'sobrantes', 'faltantes', 'cierre', 'kardex'],
+        action: () => {
+          navigate('/alertas');
+          onClose();
+        },
+      },
+      {
         id: 'report-audit-sheet',
         title: 'Planilla de Conteo Físico',
         description: 'Visualizar e imprimir planilla para auditoría a ciegas en depósito',

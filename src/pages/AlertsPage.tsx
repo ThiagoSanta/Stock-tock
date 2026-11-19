@@ -9,6 +9,7 @@ import {
   Printer,
   FileSpreadsheet,
   CheckCircle2,
+  ClipboardCheck,
 } from 'lucide-react';
 import { SystemAlert, InventoryExportRow } from '@/core/domain/alerts/types';
 import { SupabaseAlertRepository } from '@/core/infrastructure/repositories/SupabaseAlertRepository';
@@ -16,6 +17,7 @@ import { GetSystemAlertsUseCase } from '@/core/application/use-cases/alerts/GetS
 import { ExportInventoryReportUseCase } from '@/core/application/use-cases/alerts/ExportInventoryReportUseCase';
 import { AlertCard } from '@/presentation/modules/alerts/AlertCard';
 import { PhysicalAuditSheetModal } from '@/presentation/modules/alerts/PhysicalAuditSheetModal';
+import { InventoryReconciliationModal } from '@/presentation/modules/alerts/InventoryReconciliationModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 
@@ -23,9 +25,12 @@ export function AlertsPage() {
   const [alerts, setAlerts] = useState<SystemAlert[]>([]);
   const [exportRows, setExportRows] = useState<InventoryExportRow[]>([]);
   const [companyName, setCompanyName] = useState<string>('');
+  const [companyId, setCompanyId] = useState<string>('');
+  const [defaultWarehouseId, setDefaultWarehouseId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [severityFilter, setSeverityFilter] = useState<'ALL' | 'CRITICAL' | 'WARNING' | 'INFO'>('ALL');
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const [isReconcileModalOpen, setIsReconcileModalOpen] = useState(false);
 
   const alertRepo = useMemo(() => new SupabaseAlertRepository(), []);
   const getAlertsUseCase = useMemo(() => new GetSystemAlertsUseCase(alertRepo), [alertRepo]);
@@ -37,6 +42,8 @@ export function AlertsPage() {
       const context = await getCompanyContext();
       if (context) {
         setCompanyName(context.companyName);
+        setCompanyId(context.companyId);
+        setDefaultWarehouseId(context.defaultWarehouseId);
 
         const [alertsList, rows] = await Promise.all([
           getAlertsUseCase.execute(context.companyId),
@@ -103,8 +110,16 @@ export function AlertsPage() {
           </div>
         </div>
 
-        {/* Action Export Buttons */}
-        <div className="flex items-center gap-2">
+        {/* Action Export & Audit Buttons */}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setIsReconcileModalOpen(true)}
+            className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+          >
+            <ClipboardCheck className="w-3.5 h-3.5" />
+            <span>Conciliar Inventario</span>
+          </button>
+
           <button
             onClick={() => setIsAuditModalOpen(true)}
             className="h-8 px-3 rounded bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
@@ -115,9 +130,9 @@ export function AlertsPage() {
 
           <button
             onClick={handleDownloadCSV}
-            className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="h-8 px-3 rounded bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5 text-slate-500" />
             <span>Exportar CSV</span>
           </button>
         </div>
@@ -230,6 +245,18 @@ export function AlertsPage() {
           onClose={() => setIsAuditModalOpen(false)}
           rows={exportRows}
           companyName={companyName}
+        />
+      )}
+
+      {/* Reconciliation Modal */}
+      {isReconcileModalOpen && (
+        <InventoryReconciliationModal
+          isOpen={isReconcileModalOpen}
+          onClose={() => setIsReconcileModalOpen(false)}
+          products={exportRows}
+          companyId={companyId}
+          warehouseId={defaultWarehouseId}
+          onReconciliationComplete={loadData}
         />
       )}
     </div>
