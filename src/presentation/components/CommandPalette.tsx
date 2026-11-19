@@ -15,7 +15,6 @@ import {
   SlidersHorizontal,
   FileSpreadsheet,
   ArrowRight,
-  X,
   LucideIcon,
 } from 'lucide-react';
 
@@ -47,7 +46,7 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       {
         id: 'nav-dashboard',
         title: 'Dashboard General',
-        description: 'Control de operaciones, KPIs comerciales y Kardex reciente',
+        description: 'Control de operaciones, métricas comerciales y Kardex auditado',
         category: 'Módulos',
         icon: LayoutDashboard,
         keywords: ['inicio', 'home', 'kpi', 'panel', 'resumen', 'métricas'],
@@ -95,7 +94,7 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       {
         id: 'nav-sales',
         title: 'Historial de Ventas',
-        description: 'Ventas directas de mostrador y facturación con CMV y márgenes',
+        description: 'Ventas directas de mostrador, CMV y márgenes de ganancia',
         category: 'Módulos',
         icon: Receipt,
         keywords: ['ventas', 'tickets', 'facturas', 'mostrador', 'pos', 'cobros'],
@@ -182,7 +181,7 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       {
         id: 'action-new-product',
         title: 'Nuevo Producto en Catálogo',
-        description: 'Dar de alta un nuevo artículo con SKU y precio',
+        description: 'Dar de alta un nuevo artículo con SKU y precio de venta',
         category: 'Acciones Rápidas',
         icon: Plus,
         keywords: ['crear producto', 'alta producto', 'nuevo artículo'],
@@ -206,7 +205,7 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       {
         id: 'action-new-purchase',
         title: 'Nueva Orden de Compra',
-        description: 'Emitir orden de compra para reponer existencias',
+        description: 'Emitir orden de compra para reponer existencias con proveedores',
         category: 'Acciones Rápidas',
         icon: Plus,
         keywords: ['comprar', 'nueva compra', 'abastecer', 'orden de compra'],
@@ -232,7 +231,7 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       {
         id: 'report-export-csv',
         title: 'Exportar Balance de Inventario (CSV)',
-        description: 'Descargar archivo Excel / CSV con todas las existencias y costos',
+        description: 'Descargar archivo con todas las existencias y costos valuados',
         category: 'Reportes & Auditoría',
         icon: FileSpreadsheet,
         keywords: ['exportar', 'csv', 'excel', 'descargar'],
@@ -265,7 +264,10 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
     if (isOpen) {
       setQuery('');
       setSelectedIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 30);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -301,41 +303,39 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       role="dialog"
       aria-modal="true"
       aria-label="Búsqueda rápida y comandos del sistema"
-      className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-slate-950/40 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl rounded-xl bg-white border border-slate-200 shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
+        className="w-full max-w-xl rounded-xl bg-white border border-slate-200/90 shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Search Input Bar */}
-        <div className="h-13 px-4 border-b border-slate-200 flex items-center gap-3">
+        {/* Barra del input de búsqueda */}
+        <div className="h-12 px-3.5 border-b border-slate-100 flex items-center gap-2.5 bg-white">
           <Search className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
           <input
             ref={inputRef}
-            type="search"
+            type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Escribí para buscar módulos, opciones o acciones del sistema..."
-            className="w-full h-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+            placeholder="Buscar módulo, función o acción rápida..."
+            className="w-full h-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none border-none ring-0 shadow-none px-0"
           />
           <button
             type="button"
             onClick={onClose}
             aria-label="Cerrar buscador"
-            className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors"
+            className="text-[11px] font-sans font-medium text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-1.5 py-0.5 rounded transition-colors cursor-pointer shrink-0"
           >
-            <kbd className="text-[11px] bg-slate-100 border border-slate-200 text-slate-500 px-1.5 py-0.5 rounded font-sans font-medium">
-              ESC
-            </kbd>
+            Esc
           </button>
         </div>
 
-        {/* Results List */}
-        <div className="max-h-96 overflow-y-auto p-2 divide-y divide-slate-100">
+        {/* Lista de comandos */}
+        <div className="max-h-[360px] overflow-y-auto p-1.5 space-y-0.5">
           {filteredCommands.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-500">
-              No se encontraron comandos o pantallas para <span className="font-semibold text-slate-800">"{query}"</span>
+            <div className="py-10 text-center text-xs text-slate-500">
+              No se encontraron resultados para <span className="font-semibold text-slate-800">"{query}"</span>
             </div>
           ) : (
             filteredCommands.map((cmd, idx) => {
@@ -348,35 +348,39 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
                   type="button"
                   onClick={cmd.action}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`w-full p-2.5 rounded-lg text-left text-xs flex items-center justify-between gap-3 transition-colors cursor-pointer ${
-                    isSelected ? 'bg-slate-100 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'
+                  className={`w-full px-3 py-2 rounded-lg text-left text-xs flex items-center justify-between gap-3 transition-colors cursor-pointer ${
+                    isSelected
+                      ? 'bg-slate-100 text-slate-900'
+                      : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
+                      className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${
                         isSelected
-                          ? 'bg-white border-slate-300 text-slate-900 shadow-xs'
-                          : 'bg-slate-50 border-slate-200 text-slate-500'
+                          ? 'text-slate-900'
+                          : 'text-slate-400'
                       }`}
                     >
                       <Icon className="w-4 h-4" aria-hidden="true" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-slate-900 truncate">{cmd.title}</span>
-                        <span className="text-[10px] uppercase font-semibold tracking-wider text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
+                        <span className={`text-[13px] truncate ${isSelected ? 'font-semibold text-slate-900' : 'font-medium text-slate-800'}`}>
+                          {cmd.title}
+                        </span>
+                        <span className="text-[10px] text-slate-600 bg-slate-200/70 px-1.5 py-0.2 rounded font-medium shrink-0">
                           {cmd.category}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 truncate mt-0.5 font-normal">
+                      <p className="text-[11px] text-slate-600 truncate mt-0.5 font-normal">
                         {cmd.description}
                       </p>
                     </div>
                   </div>
 
                   {isSelected && (
-                    <div className="flex items-center gap-1 text-[11px] text-slate-400 shrink-0">
+                    <div className="flex items-center gap-1 text-[11px] font-medium text-slate-700 shrink-0">
                       <span>Ir</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </div>
@@ -387,20 +391,20 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
           )}
         </div>
 
-        {/* Footer shortcuts helper */}
-        <div className="h-9 px-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+        {/* Footer minimalista */}
+        <div className="h-8 px-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
           <div className="flex items-center gap-3">
-            <span>
-              <kbd className="bg-white border border-slate-200 px-1 py-0.5 rounded text-[10px] font-sans font-medium">↑</kbd>{' '}
-              <kbd className="bg-white border border-slate-200 px-1 py-0.5 rounded text-[10px] font-sans font-medium">↓</kbd>{' '}
-              para navegar
+            <span className="flex items-center gap-1">
+              <kbd className="bg-white border border-slate-200 px-1 py-0.2 rounded text-[10px] font-sans">↑</kbd>
+              <kbd className="bg-white border border-slate-200 px-1 py-0.2 rounded text-[10px] font-sans">↓</kbd>
+              <span className="ml-0.5">navegar</span>
             </span>
-            <span>
-              <kbd className="bg-white border border-slate-200 px-1.5 py-0.5 rounded text-[10px] font-sans font-medium">↵</kbd>{' '}
-              para seleccionar
+            <span className="flex items-center gap-1">
+              <kbd className="bg-white border border-slate-200 px-1.5 py-0.2 rounded text-[10px] font-sans">↵</kbd>
+              <span className="ml-0.5">seleccionar</span>
             </span>
           </div>
-          <span>Búsqueda global</span>
+          <span className="text-[10px] font-medium text-slate-600">Búsqueda rápida</span>
         </div>
       </div>
     </div>
