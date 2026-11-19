@@ -17,18 +17,37 @@ export class SupabaseContactRepository implements IContactRepository {
     // Fetch sales grouped by customer to calculate metrics
     const { data: salesData, error: salesErr } = await this.supabase
       .from('sales')
-      .select('customer_id, total_amount, created_at')
+      .select('customer_id, total_amount, payment_method, created_at')
       .eq('company_id', companyId)
       .not('customer_id', 'is', null);
 
     if (salesErr) console.warn('Warning fetching customer sales metrics:', salesErr);
 
+    // Fetch customer payments to calculate current account balance
+    const { data: paymentsData, error: payErr } = await this.supabase
+      .from('customer_payments')
+      .select('customer_id, amount')
+      .eq('company_id', companyId);
+
+    if (payErr) console.warn('Warning fetching customer payments:', payErr);
+
     const salesList = salesData || [];
+    const paymentsList = paymentsData || [];
 
     return (customersData || []).map((c: any) => {
       const customerSales = salesList.filter((s: any) => s.customer_id === c.id);
+      const customerPayments = paymentsList.filter((p: any) => p.customer_id === c.id);
+
       const totalOrdersCount = customerSales.length;
       const totalSpent = customerSales.reduce((acc: number, s: any) => acc + Number(s.total_amount || 0), 0);
+      
+      const totalCreditDebt = customerSales
+        .filter((s: any) => s.payment_method === 'CUENTA_CORRIENTE')
+        .reduce((acc: number, s: any) => acc + Number(s.total_amount || 0), 0);
+
+      const totalPaid = customerPayments.reduce((acc: number, p: any) => acc + Number(p.amount || 0), 0);
+      const currentBalance = totalCreditDebt - totalPaid;
+
       const lastPurchaseDate = customerSales.length > 0
         ? customerSales.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at
         : undefined;
@@ -46,6 +65,9 @@ export class SupabaseContactRepository implements IContactRepository {
         createdAt: c.created_at,
         totalOrdersCount,
         totalSpent,
+        totalCreditDebt,
+        totalPaid,
+        currentBalance,
         lastPurchaseDate,
       };
     });

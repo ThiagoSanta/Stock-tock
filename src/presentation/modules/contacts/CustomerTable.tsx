@@ -1,15 +1,16 @@
 import React from 'react';
 import { CustomerWithMetrics } from '@/core/domain/contacts/types';
-import { Users, Mail, Phone, MapPin, ShoppingCart, CheckCircle2, XCircle, DollarSign } from 'lucide-react';
+import { Users, Mail, Phone, MapPin, ShoppingCart, CheckCircle2, XCircle, DollarSign, FileSpreadsheet } from 'lucide-react';
 
 interface CustomerTableProps {
   customers: CustomerWithMetrics[];
   loading: boolean;
   onToggleStatus: (id: string, newStatus: boolean) => void;
   onOpenPayment?: (customer: CustomerWithMetrics) => void;
+  onOpenStatement?: (customer: CustomerWithMetrics) => void;
 }
 
-export function CustomerTable({ customers, loading, onToggleStatus, onOpenPayment }: CustomerTableProps) {
+export function CustomerTable({ customers, loading, onToggleStatus, onOpenPayment, onOpenStatement }: CustomerTableProps) {
   if (loading) {
     return (
       <div
@@ -51,6 +52,7 @@ export function CustomerTable({ customers, loading, onToggleStatus, onOpenPaymen
               <th scope="col" className="py-3 px-3">Dirección</th>
               <th scope="col" className="py-3 px-3 text-center">Compras</th>
               <th scope="col" className="py-3 px-3 text-right">Total Facturado</th>
+              <th scope="col" className="py-3 px-3 text-right">Saldo Cta. Cte.</th>
               <th scope="col" className="py-3 px-3 text-center">Estado</th>
               <th scope="col" className="py-3 px-3 text-right">Acción</th>
             </tr>
@@ -103,6 +105,15 @@ export function CustomerTable({ customers, loading, onToggleStatus, onOpenPaymen
                 <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 tabular-nums">
                   ${c.totalSpent.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                 </td>
+                <td className="py-2.5 px-3 text-right font-mono tabular-nums">
+                  {typeof c.currentBalance === 'number' && c.currentBalance > 0 ? (
+                    <span className="font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">
+                      ${c.currentBalance.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                    </span>
+                  ) : (
+                    <span className="text-slate-400 font-medium">$0,00</span>
+                  )}
+                </td>
                 <td className="py-2.5 px-3 text-center">
                   <span
                     className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-semibold border ${
@@ -124,6 +135,17 @@ export function CustomerTable({ customers, loading, onToggleStatus, onOpenPaymen
                 </td>
                 <td className="py-2.5 px-3 text-right">
                   <div className="flex items-center justify-end gap-1.5">
+                    {onOpenStatement && (
+                      <button
+                        type="button"
+                        onClick={() => onOpenStatement(c)}
+                        title="Ver e imprimir estado de cuenta corriente A4"
+                        className="px-2 py-1 text-xs font-semibold rounded bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-colors cursor-pointer flex items-center gap-1"
+                      >
+                        <FileSpreadsheet className="w-3 h-3 text-slate-600" />
+                        <span>Cta. Cte.</span>
+                      </button>
+                    )}
                     {onOpenPayment && (
                       <button
                         type="button"

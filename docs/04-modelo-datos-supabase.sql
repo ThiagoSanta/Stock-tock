@@ -162,6 +162,18 @@ CREATE TABLE IF NOT EXISTS customers (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS customer_payments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    receipt_number VARCHAR(50) NOT NULL,
+    amount NUMERIC(14, 2) NOT NULL,
+    payment_method VARCHAR(30) NOT NULL DEFAULT 'EFECTIVO', -- EFECTIVO, TRANSFERENCIA, CHEQUE, OTRO
+    notes TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT unique_receipt_number_per_company UNIQUE (company_id, receipt_number)
+);
+
 CREATE TABLE IF NOT EXISTS suppliers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,

@@ -19,8 +19,10 @@ import { AlertCard } from '@/presentation/modules/alerts/AlertCard';
 import { PhysicalAuditSheetModal } from '@/presentation/modules/alerts/PhysicalAuditSheetModal';
 import { InventoryReconciliationModal } from '@/presentation/modules/alerts/InventoryReconciliationModal';
 import { RestockSuggestionsCard } from '@/presentation/modules/alerts/RestockSuggestionsCard';
+import { ProfitabilityReport } from '@/presentation/modules/alerts/ProfitabilityReport';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
+import { TrendingUp } from 'lucide-react';
 
 export function AlertsPage() {
   const [alerts, setAlerts] = useState<SystemAlert[]>([]);
@@ -29,6 +31,7 @@ export function AlertsPage() {
   const [companyId, setCompanyId] = useState<string>('');
   const [defaultWarehouseId, setDefaultWarehouseId] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [activePageTab, setActivePageTab] = useState<'AUDIT' | 'PROFITABILITY'>('AUDIT');
   const [severityFilter, setSeverityFilter] = useState<'ALL' | 'CRITICAL' | 'WARNING' | 'INFO'>('ALL');
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isReconcileModalOpen, setIsReconcileModalOpen] = useState(false);
@@ -139,107 +142,142 @@ export function AlertsPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <MetricCard
-          title="Alertas Críticas"
-          value={criticalCount.toString()}
-          subtitle="Quiebres y reservas urgentes"
-          icon={ShieldAlert}
-          isAlert={criticalCount > 0}
-        />
-        <MetricCard
-          title="Stock por Debajo del Mínimo"
-          value={warningCount.toString()}
-          subtitle="Requieren reposición"
-          icon={AlertTriangle}
-          isAlert={warningCount > 0}
-        />
-        <MetricCard
-          title="Avisos Informativos"
-          value={infoCount.toString()}
-          subtitle="Sobrestock / avisos"
-          icon={Info}
-        />
-        <MetricCard
-          title="Artículos Auditados"
-          value={exportRows.length.toString()}
-          subtitle="En el catálogo activo"
-          icon={FileSpreadsheet}
-        />
-      </div>
+      {/* Pestañas Principales: Auditoría vs Rentabilidad */}
+      <div className="flex items-center gap-1.5 border-b border-slate-200 pb-2">
+        <button
+          type="button"
+          onClick={() => setActivePageTab('AUDIT')}
+          className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+            activePageTab === 'AUDIT'
+              ? 'bg-slate-900 text-white shadow-2xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <ClipboardCheck className="w-3.5 h-3.5" />
+          <span>Control de Stock & Auditoría</span>
+        </button>
 
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-md text-xs w-fit overflow-x-auto border border-slate-200">
         <button
-          onClick={() => setSeverityFilter('ALL')}
-          className={`px-3 py-1 rounded font-medium transition-all cursor-pointer ${
-            severityFilter === 'ALL'
-              ? 'bg-white text-slate-900 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900'
+          type="button"
+          onClick={() => setActivePageTab('PROFITABILITY')}
+          className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+            activePageTab === 'PROFITABILITY'
+              ? 'bg-slate-900 text-white shadow-2xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
-          Todas ({alerts.length})
-        </button>
-        <button
-          onClick={() => setSeverityFilter('CRITICAL')}
-          className={`px-3 py-1 rounded font-medium transition-all cursor-pointer ${
-            severityFilter === 'CRITICAL'
-              ? 'bg-rose-50 text-rose-700 border border-rose-200'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Críticas ({criticalCount})
-        </button>
-        <button
-          onClick={() => setSeverityFilter('WARNING')}
-          className={`px-3 py-1 rounded font-medium transition-all cursor-pointer ${
-            severityFilter === 'WARNING'
-              ? 'bg-amber-50 text-amber-700 border border-amber-200'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Advertencias ({warningCount})
-        </button>
-        <button
-          onClick={() => setSeverityFilter('INFO')}
-          className={`px-3 py-1 rounded font-medium transition-all cursor-pointer ${
-            severityFilter === 'INFO'
-              ? 'bg-sky-50 text-sky-700 border border-sky-200'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Informativas ({infoCount})
+          <TrendingUp className="w-3.5 h-3.5" />
+          <span>Rentabilidad & Productos Estrella</span>
         </button>
       </div>
 
-      {/* Sugerencias de Reabastecimiento Automatizadas */}
-      <RestockSuggestionsCard products={exportRows} />
-
-      {/* Alerts Feed */}
-      {loading ? (
-        <div className="p-8 text-center rounded-lg bg-white border border-slate-200 shadow-xs">
-          <div className="w-5 h-5 border-2 border-slate-800 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-          <p className="text-xs text-slate-500">Analizando umbrales y reservas...</p>
-        </div>
-      ) : filteredAlerts.length === 0 ? (
-        <div className="p-8 text-center rounded-lg bg-white border border-slate-200 space-y-1 shadow-xs">
-          <CheckCircle2 className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
-          <h4 className="text-xs font-semibold text-slate-900">
-            {severityFilter === 'ALL'
-              ? 'No hay alertas operativas activas'
-              : 'No hay alertas en esta categoría'}
-          </h4>
-          <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
-            El stock disponible supera los umbrales mínimos y no hay pedidos con retención demorada.
-          </p>
-        </div>
+      {activePageTab === 'PROFITABILITY' ? (
+        <ProfitabilityReport companyId={companyId} />
       ) : (
-        <div className="space-y-2.5">
-          {filteredAlerts.map((alert) => (
-            <AlertCard key={alert.id} alert={alert} />
-          ))}
-        </div>
+        <>
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <MetricCard
+              title="Alertas Críticas"
+              value={criticalCount.toString()}
+              subtitle="Quiebres y reservas urgentes"
+              icon={ShieldAlert}
+              isAlert={criticalCount > 0}
+            />
+            <MetricCard
+              title="Stock por Debajo del Mínimo"
+              value={warningCount.toString()}
+              subtitle="Requieren reposición"
+              icon={AlertTriangle}
+              isAlert={warningCount > 0}
+            />
+            <MetricCard
+              title="Avisos Informativos"
+              value={infoCount.toString()}
+              subtitle="Sobrestock / avisos"
+              icon={Info}
+            />
+            <MetricCard
+              title="Artículos Auditados"
+              value={exportRows.length.toString()}
+              subtitle="En el catálogo activo"
+              icon={FileSpreadsheet}
+            />
+          </div>
+
+          {/* Filter Tabs */}
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-md text-xs w-fit overflow-x-auto border border-slate-200">
+            <button
+              onClick={() => setSeverityFilter('ALL')}
+              className={`px-3 py-1 rounded font-medium transition-all cursor-pointer ${
+                severityFilter === 'ALL'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Todas ({alerts.length})
+            </button>
+            <button
+              onClick={() => setSeverityFilter('CRITICAL')}
+              className={`px-3 py-1 rounded font-medium transition-all cursor-pointer ${
+                severityFilter === 'CRITICAL'
+                  ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Críticas ({criticalCount})
+            </button>
+            <button
+              onClick={() => setSeverityFilter('WARNING')}
+              className={`px-3 py-1 rounded font-medium transition-all cursor-pointer ${
+                severityFilter === 'WARNING'
+                  ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Advertencias ({warningCount})
+            </button>
+            <button
+              onClick={() => setSeverityFilter('INFO')}
+              className={`px-3 py-1 rounded font-medium transition-all cursor-pointer ${
+                severityFilter === 'INFO'
+                  ? 'bg-sky-50 text-sky-700 border border-sky-200'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Informativas ({infoCount})
+            </button>
+          </div>
+
+          {/* Sugerencias de Reabastecimiento Automatizadas */}
+          <RestockSuggestionsCard products={exportRows} />
+
+          {/* Alerts Feed */}
+          {loading ? (
+            <div className="p-8 text-center rounded-lg bg-white border border-slate-200 shadow-xs">
+              <div className="w-5 h-5 border-2 border-slate-800 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-xs text-slate-500">Analizando umbrales y reservas...</p>
+            </div>
+          ) : filteredAlerts.length === 0 ? (
+            <div className="p-8 text-center rounded-lg bg-white border border-slate-200 space-y-1 shadow-xs">
+              <CheckCircle2 className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
+              <h4 className="text-xs font-semibold text-slate-900">
+                {severityFilter === 'ALL'
+                  ? 'No hay alertas operativas activas'
+                  : 'No hay alertas en esta categoría'}
+              </h4>
+              <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+                El stock disponible supera los umbrales mínimos y no hay pedidos con retención demorada.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {filteredAlerts.map((alert) => (
+                <AlertCard key={alert.id} alert={alert} />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {/* Audit Sheet Modal */}

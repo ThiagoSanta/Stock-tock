@@ -11,6 +11,7 @@ import { CustomerTable } from '@/presentation/modules/contacts/CustomerTable';
 import { SupplierTable } from '@/presentation/modules/contacts/SupplierTable';
 import { ContactModal } from '@/presentation/modules/contacts/ContactModal';
 import { CustomerPaymentModal } from '@/presentation/modules/contacts/CustomerPaymentModal';
+import { CustomerAccountStatementModal } from '@/presentation/modules/contacts/CustomerAccountStatementModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 
@@ -23,6 +24,7 @@ export function ContactsPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [payingCustomer, setPayingCustomer] = useState<CustomerWithMetrics | null>(null);
+  const [statementCustomer, setStatementCustomer] = useState<CustomerWithMetrics | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const contactRepo = useMemo(() => new SupabaseContactRepository(), []);
@@ -220,6 +222,7 @@ export function ContactsPage() {
           loading={loading}
           onToggleStatus={handleToggleCustomer}
           onOpenPayment={(c) => setPayingCustomer(c)}
+          onOpenStatement={(c) => setStatementCustomer(c)}
         />
       ) : (
         <SupplierTable
@@ -248,6 +251,21 @@ export function ContactsPage() {
           onClose={() => setPayingCustomer(null)}
           customer={payingCustomer}
           companyName={companyName}
+          onPaymentSuccess={loadData}
+        />
+      )}
+
+      {/* Modal de Estado de Cuenta Corriente A4 */}
+      {statementCustomer && (
+        <CustomerAccountStatementModal
+          isOpen={!!statementCustomer}
+          onClose={() => setStatementCustomer(null)}
+          customer={statementCustomer}
+          companyName={companyName}
+          onOpenPayment={(c) => {
+            setStatementCustomer(null);
+            setPayingCustomer(c);
+          }}
         />
       )}
     </div>

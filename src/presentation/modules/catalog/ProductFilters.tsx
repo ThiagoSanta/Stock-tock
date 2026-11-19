@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, Printer, Upload } from 'lucide-react';
 
 interface ProductFiltersProps {
   searchTerm: string;
@@ -7,6 +7,8 @@ interface ProductFiltersProps {
   stockFilter: 'ALL' | 'NORMAL' | 'LOW' | 'OUT';
   onFilterChange: (filter: 'ALL' | 'NORMAL' | 'LOW' | 'OUT') => void;
   onOpenCreateModal: () => void;
+  onOpenPriceList?: () => void;
+  onOpenImportModal?: () => void;
 }
 
 export function ProductFilters({
@@ -15,6 +17,8 @@ export function ProductFilters({
   stockFilter,
   onFilterChange,
   onOpenCreateModal,
+  onOpenPriceList,
+  onOpenImportModal,
 }: ProductFiltersProps) {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -97,6 +101,30 @@ export function ProductFilters({
             Quiebre (0)
           </button>
         </div>
+
+        {onOpenPriceList && (
+          <button
+            type="button"
+            onClick={onOpenPriceList}
+            title="Generar e imprimir Lista de Precios en A4"
+            className="h-8 px-2.5 rounded bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
+          >
+            <Printer className="w-3.5 h-3.5 text-slate-500" />
+            <span>Lista de Precios A4</span>
+          </button>
+        )}
+
+        {onOpenImportModal && (
+          <button
+            type="button"
+            onClick={onOpenImportModal}
+            title="Importar catálogo masivo desde planilla CSV"
+            className="h-8 px-2.5 rounded bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
+          >
+            <Upload className="w-3.5 h-3.5 text-slate-500" />
+            <span>Importar CSV</span>
+          </button>
+        )}
 
         <button
           type="button"

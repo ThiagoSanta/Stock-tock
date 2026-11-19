@@ -19,6 +19,9 @@ export interface CustomerWithMetrics extends Customer {
   totalOrdersCount: number;
   totalSpent: number;
   lastPurchaseDate?: string;
+  currentBalance?: number;
+  totalCreditDebt?: number;
+  totalPaid?: number;
 }
 
 export interface Supplier {

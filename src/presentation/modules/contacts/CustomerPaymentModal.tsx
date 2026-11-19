@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { X, DollarSign, Printer, CheckCircle2, Building2, User, Banknote } from 'lucide-react';
+import { X, DollarSign, Printer, CheckCircle2, Building2, User, Banknote, Loader2 } from 'lucide-react';
 import { CustomerWithMetrics } from '@/core/domain/contacts/types';
+import { createClient } from '@/utils/supabase/client';
 
 interface CustomerPaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   customer: CustomerWithMetrics | null;
   companyName: string;
+  onPaymentSuccess?: () => void;
 }
 
 export function CustomerPaymentModal({
@@ -14,10 +16,13 @@ export function CustomerPaymentModal({
   onClose,
   customer,
   companyName,
+  onPaymentSuccess,
 }: CustomerPaymentModalProps) {
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'EFECTIVO' | 'TRANSFERENCIA'>('EFECTIVO');
   const [notes, setNotes] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [receiptGenerated, setReceiptGenerated] = useState<{
     receiptNumber: string;
     amount: number;
@@ -28,15 +33,47 @@ export function CustomerPaymentModal({
 
   const numAmount = parseFloat(amount) || 0;
 
-  const handleGenerateReceipt = (e: React.FormEvent) => {
+  const handleGenerateReceipt = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (numAmount <= 0) return;
+    if (numAmount <= 0) {
+      setError('El monto a cobrar debe ser mayor a 0');
+      return;
+    }
 
-    setReceiptGenerated({
-      receiptNumber: `REC-${Math.floor(100000 + Math.random() * 900000)}`,
-      amount: numAmount,
-      date: new Date().toLocaleString('es-AR'),
-    });
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const supabase = createClient();
+      const receiptNumber = `REC-${Math.floor(100000 + Math.random() * 900000)}`;
+
+      const { error: insertErr } = await supabase.from('customer_payments').insert({
+        company_id: customer.companyId,
+        customer_id: customer.id,
+        receipt_number: receiptNumber,
+        amount: numAmount,
+        payment_method: paymentMethod,
+        notes: notes.trim() || null,
+      });
+
+      if (insertErr) {
+        throw new Error(insertErr.message);
+      }
+
+      setReceiptGenerated({
+        receiptNumber,
+        amount: numAmount,
+        date: new Date().toLocaleString('es-AR'),
+      });
+
+      if (onPaymentSuccess) {
+        onPaymentSuccess();
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Error al registrar la cobranza en base de datos');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handlePrint = () => {
@@ -219,20 +256,28 @@ export function CustomerPaymentModal({
               />
             </div>
 
+            {error && (
+              <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700">
+                {error}
+              </div>
+            )}
+
             <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={onClose}
+                disabled={submitting}
                 className="h-8 px-3.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                disabled={numAmount <= 0}
-                className="h-8 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                disabled={numAmount <= 0 || submitting}
+                className="h-8 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white text-xs font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
               >
-                Emitir Recibo de Pago A4
+                {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                <span>{submitting ? 'Registrando...' : 'Confirmar Cobranza y Emitir Recibo A4'}</span>
               </button>
             </div>
           </form>

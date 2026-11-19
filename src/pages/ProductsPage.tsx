@@ -8,13 +8,19 @@ import { GetProductsWithStockUseCase } from '@/core/application/use-cases/catalo
 import { ProductFilters } from '@/presentation/modules/catalog/ProductFilters';
 import { ProductTable } from '@/presentation/modules/catalog/ProductTable';
 import { ProductModal } from '@/presentation/modules/catalog/ProductModal';
+import { PriceListModal } from '@/presentation/modules/catalog/PriceListModal';
+import { ProductImportModal } from '@/presentation/modules/catalog/ProductImportModal';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function ProductsPage() {
   const [products, setProducts] = useState<ProductWithStock[]>([]);
   const [companyId, setCompanyId] = useState<string>('');
+  const [companyName, setCompanyName] = useState<string>('Stock·tock');
+  const [defaultWarehouseId, setDefaultWarehouseId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPriceListOpen, setIsPriceListOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [stockFilter, setStockFilter] = useState<'ALL' | 'NORMAL' | 'LOW' | 'OUT'>('ALL');
 
@@ -28,6 +34,8 @@ export function ProductsPage() {
       const context = await getCompanyContext();
       if (context) {
         setCompanyId(context.companyId);
+        if (context.companyName) setCompanyName(context.companyName);
+        if (context.defaultWarehouseId) setDefaultWarehouseId(context.defaultWarehouseId);
         const data = await getProductsUseCase.execute(context.companyId);
         setProducts(data);
       }
@@ -106,6 +114,8 @@ export function ProductsPage() {
         stockFilter={stockFilter}
         onFilterChange={setStockFilter}
         onOpenCreateModal={() => setIsModalOpen(true)}
+        onOpenPriceList={() => setIsPriceListOpen(true)}
+        onOpenImportModal={() => setIsImportOpen(true)}
       />
 
       {/* Tabla de Productos */}
@@ -116,6 +126,23 @@ export function ProductsPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleCreateProduct as any}
+      />
+
+      {/* Modal de Lista de Precios A4 */}
+      <PriceListModal
+        isOpen={isPriceListOpen}
+        onClose={() => setIsPriceListOpen(false)}
+        products={products}
+        companyName={companyName}
+      />
+
+      {/* Modal de Importación Masiva CSV */}
+      <ProductImportModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        companyId={companyId}
+        defaultWarehouseId={defaultWarehouseId}
+        onImportComplete={loadData}
       />
     </div>
   );
