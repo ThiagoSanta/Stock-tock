@@ -26,16 +26,29 @@ export function CashShiftModal({
   sales,
   companyName,
 }: CashShiftModalProps) {
-  // Filtro de fecha: por defecto hoy
-  const todayStr = new Date().toISOString().slice(0, 10);
+  // Helper para fecha local (YYYY-MM-DD) sin desfasaje UTC
+  const formatLocalDate = (d: Date = new Date()) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  const todayStr = formatLocalDate();
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [countedCash, setCountedCash] = useState<string>('');
   const [notes, setNotes] = useState('');
 
   if (!isOpen) return null;
 
-  // Filtrar ventas del día seleccionado
-  const dailySales = sales.filter((s) => s.createdAt.slice(0, 10) === selectedDate);
+  // Filtrar ventas del día seleccionado comparando fecha local
+  const dailySales = sales.filter((s) => {
+    try {
+      return formatLocalDate(new Date(s.createdAt)) === selectedDate;
+    } catch {
+      return s.createdAt.slice(0, 10) === selectedDate;
+    }
+  });
 
   // Totales por medio de pago
   const cashTotal = dailySales

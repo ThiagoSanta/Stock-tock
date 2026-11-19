@@ -169,6 +169,7 @@ export class SupabaseSaleRepository implements ISaleRepository {
         ...this.mapRowToSale(row),
         marginPercentage: Math.round(marginPct * 10) / 10,
         warehouseName: row.warehouse?.name || 'Depósito Central',
+        warehouseId: row.warehouse_id,
       };
     });
   }
@@ -191,6 +192,7 @@ export class SupabaseSaleRepository implements ISaleRepository {
       ...this.mapRowToSale(data),
       marginPercentage: Math.round(marginPct * 10) / 10,
       warehouseName: data.warehouse?.name || 'Depósito Central',
+      warehouseId: data.warehouse_id,
     };
   }
 

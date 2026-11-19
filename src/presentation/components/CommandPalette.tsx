@@ -14,7 +14,7 @@ import {
   Plus,
   SlidersHorizontal,
   FileSpreadsheet,
-  ArrowRight,
+  CornerDownLeft,
   LucideIcon,
 } from 'lucide-react';
 
@@ -46,7 +46,7 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       {
         id: 'nav-dashboard',
         title: 'Dashboard General',
-        description: 'Control de operaciones, métricas comerciales y Kardex auditado',
+        description: 'Métricas comerciales, movimientos recientes y estado del negocio',
         category: 'Módulos',
         icon: LayoutDashboard,
         keywords: ['inicio', 'home', 'kpi', 'panel', 'resumen', 'métricas'],
@@ -142,7 +142,7 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       {
         id: 'nav-settings',
         title: 'Configuración del Sistema',
-        description: 'Datos fiscales de la empresa, depósitos y reglas inviolables V1',
+        description: 'Datos de la empresa, depósitos y copias de seguridad',
         category: 'Módulos',
         icon: Settings,
         keywords: ['configuración', 'empresa', 'depósitos', 'sucursales', 'reglas', 'ajustes'],
@@ -156,7 +156,7 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       {
         id: 'action-pos',
         title: 'Nueva Venta Rápida (POS)',
-        description: 'Abrir mostrador de cobro con pistola de código de barras',
+        description: 'Abrir mostrador de cobro con lector de código de barras',
         category: 'Acciones Rápidas',
         icon: Plus,
         keywords: ['cobrar', 'vender', 'mostrador', 'caja', 'ticket', 'pos'],
@@ -172,7 +172,7 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       {
         id: 'action-cash-shift',
         title: 'Arqueo y Cierre de Caja Diario',
-        description: 'Control de cobros en efectivo, transferencias y tarjetas del turno',
+        description: 'Control de cobros en efectivo, transferencias y rendición de turno',
         category: 'Acciones Rápidas',
         icon: Receipt,
         keywords: ['caja', 'cierre', 'arqueo', 'efectivo', 'turno', 'rendición'],
@@ -245,8 +245,8 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       // Reportes & Auditoría
       {
         id: 'report-reconcile',
-        title: 'Conciliación y Cierre de Inventario Físico',
-        description: 'Cargar conteo real y asentar diferencias en Kardex en lote',
+        title: 'Conciliación y Conteo Físico',
+        description: 'Cargar conteo real y asentar diferencias de stock en lote',
         category: 'Reportes & Auditoría',
         icon: FileSpreadsheet,
         keywords: ['conciliación', 'conteo', 'auditoría', 'sobrantes', 'faltantes', 'cierre', 'kardex'],
@@ -269,8 +269,8 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       },
       {
         id: 'report-backup',
-        title: 'Copia de Seguridad / Backup Completo (JSON)',
-        description: 'Descargar respaldo íntegro de productos, kardex, ventas y clientes',
+        title: 'Copia de Seguridad Completa (JSON)',
+        description: 'Descargar respaldo íntegro de catálogo, kardex, ventas y clientes',
         category: 'Reportes & Auditoría',
         icon: Settings,
         keywords: ['backup', 'copia de seguridad', 'respaldo', 'guardar', 'json', 'descargar'],
@@ -349,113 +349,129 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
 
   if (!isOpen) return null;
 
+  // Agrupar comandos manteniendo el orden para renderizar con encabezados limpios
+  let currentCategory = '';
+
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-label="Búsqueda rápida y comandos del sistema"
-      className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-[14vh] px-4 bg-slate-900/30 backdrop-blur-[2px] animate-in fade-in duration-100"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl rounded-xl bg-white border border-slate-200/90 shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
+        className="w-full max-w-[560px] rounded-xl bg-white border border-slate-200 shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-98 duration-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Barra del input de búsqueda */}
-        <div className="h-12 px-3.5 border-b border-slate-100 flex items-center gap-2.5 bg-white">
+        <div className="h-11 px-3.5 border-b border-slate-100 flex items-center gap-2.5 bg-white">
           <Search className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar módulo, función o acción rápida..."
-            className="w-full h-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none border-none ring-0 shadow-none px-0"
+            placeholder="Escribí para buscar módulos, opciones o acciones..."
+            className="w-full bg-transparent text-[13px] text-slate-900 placeholder:text-slate-400 border-0 outline-none focus:outline-none focus:ring-0 p-0 shadow-none"
           />
           <button
             type="button"
             onClick={onClose}
             aria-label="Cerrar buscador"
-            className="text-[11px] font-sans font-medium text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-1.5 py-0.5 rounded transition-colors cursor-pointer shrink-0"
+            className="text-[10px] font-sans font-medium text-slate-400 hover:text-slate-700 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded transition-colors cursor-pointer shrink-0"
           >
             Esc
           </button>
         </div>
 
         {/* Lista de comandos */}
-        <div className="max-h-[360px] overflow-y-auto p-1.5 space-y-0.5">
+        <div className="max-h-[380px] overflow-y-auto p-1.5 space-y-0.5">
           {filteredCommands.length === 0 ? (
-            <div className="py-10 text-center text-xs text-slate-500">
-              No se encontraron resultados para <span className="font-semibold text-slate-800">"{query}"</span>
+            <div className="py-12 text-center text-xs text-slate-400">
+              No se encontraron resultados para <span className="font-semibold text-slate-700">"{query}"</span>
             </div>
           ) : (
             filteredCommands.map((cmd, idx) => {
               const Icon = cmd.icon;
               const isSelected = idx === selectedIndex;
+              const showCategoryHeader = !query.trim() && cmd.category !== currentCategory;
+              if (showCategoryHeader) {
+                currentCategory = cmd.category;
+              }
 
               return (
-                <button
-                  key={cmd.id}
-                  type="button"
-                  onClick={cmd.action}
-                  onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`w-full px-3 py-2 rounded-lg text-left text-xs flex items-center justify-between gap-3 transition-colors cursor-pointer ${
-                    isSelected
-                      ? 'bg-slate-100 text-slate-900'
-                      : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${
-                        isSelected
-                          ? 'text-slate-900'
-                          : 'text-slate-400'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" aria-hidden="true" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[13px] truncate ${isSelected ? 'font-semibold text-slate-900' : 'font-medium text-slate-800'}`}>
-                          {cmd.title}
-                        </span>
-                        <span className="text-[10px] text-slate-600 bg-slate-200/70 px-1.5 py-0.2 rounded font-medium shrink-0">
-                          {cmd.category}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-600 truncate mt-0.5 font-normal">
-                        {cmd.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {isSelected && (
-                    <div className="flex items-center gap-1 text-[11px] font-medium text-slate-700 shrink-0">
-                      <span>Ir</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                <React.Fragment key={cmd.id}>
+                  {showCategoryHeader && (
+                    <div className="px-2.5 pt-2 pb-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                      {cmd.category}
                     </div>
                   )}
-                </button>
+
+                  <button
+                    type="button"
+                    onClick={cmd.action}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                    className={`w-full px-2.5 py-2 rounded-lg text-left flex items-center justify-between gap-3 transition-colors cursor-pointer ${
+                      isSelected
+                        ? 'bg-slate-100 text-slate-900'
+                        : 'text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className={`w-6 h-6 rounded flex items-center justify-center shrink-0 ${
+                          isSelected
+                            ? 'text-slate-900 bg-white border border-slate-200 shadow-2xs'
+                            : 'text-slate-400 bg-slate-50 border border-slate-100'
+                        }`}
+                      >
+                        <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[12px] truncate ${isSelected ? 'font-semibold text-slate-900' : 'font-medium text-slate-800'}`}>
+                            {cmd.title}
+                          </span>
+                          {query.trim() && (
+                            <span className="text-[9px] text-slate-400 bg-slate-100 px-1 py-0.2 rounded font-normal">
+                              {cmd.category}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-400 truncate leading-snug">
+                          {cmd.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {isSelected && (
+                      <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400 shrink-0 pr-1">
+                        <span>Ir</span>
+                        <CornerDownLeft className="w-3 h-3" />
+                      </div>
+                    )}
+                  </button>
+                </React.Fragment>
               );
             })
           )}
         </div>
 
         {/* Footer minimalista */}
-        <div className="h-8 px-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+        <div className="h-7 px-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
-              <kbd className="bg-white border border-slate-200 px-1 py-0.2 rounded text-[10px] font-sans">↑</kbd>
-              <kbd className="bg-white border border-slate-200 px-1 py-0.2 rounded text-[10px] font-sans">↓</kbd>
-              <span className="ml-0.5">navegar</span>
+              <kbd className="bg-white border border-slate-200 px-1 py-px rounded font-sans leading-none">↑</kbd>
+              <kbd className="bg-white border border-slate-200 px-1 py-px rounded font-sans leading-none">↓</kbd>
+              <span className="ml-0.5">para navegar</span>
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="bg-white border border-slate-200 px-1.5 py-0.2 rounded text-[10px] font-sans">↵</kbd>
-              <span className="ml-0.5">seleccionar</span>
+              <kbd className="bg-white border border-slate-200 px-1 py-px rounded font-sans leading-none">↵</kbd>
+              <span className="ml-0.5">para seleccionar</span>
             </span>
           </div>
-          <span className="text-[10px] font-medium text-slate-600">Búsqueda rápida</span>
+          <span className="font-medium text-slate-400">Búsqueda global</span>
         </div>
       </div>
     </div>

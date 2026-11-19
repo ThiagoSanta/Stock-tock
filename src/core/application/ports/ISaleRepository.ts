@@ -22,6 +22,7 @@ export interface CreateDirectSaleDTO {
 export interface SaleWithDetails extends Sale {
   marginPercentage: number;
   warehouseName?: string;
+  warehouseId?: string;
 }
 
 export interface ISaleRepository {

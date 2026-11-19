@@ -73,13 +73,34 @@ export function SaleReturnModal({
       const supabase = createClient();
       const returnNumber = `DEV-${Math.floor(100000 + Math.random() * 900000)}`;
 
+      // Resolver ID del depósito de la venta
+      let effectiveWarehouseId = sale.warehouseId || (sale as any).warehouse_id;
+      if (!effectiveWarehouseId) {
+        const { data: wh } = await supabase
+          .from('warehouses')
+          .select('id')
+          .eq('company_id', sale.companyId)
+          .eq('is_default', true)
+          .maybeSingle();
+        effectiveWarehouseId = wh?.id;
+      }
+      if (!effectiveWarehouseId) {
+        const { data: anyWh } = await supabase
+          .from('warehouses')
+          .select('id')
+          .eq('company_id', sale.companyId)
+          .limit(1)
+          .maybeSingle();
+        effectiveWarehouseId = anyWh?.id || '';
+      }
+
       for (const item of itemsToReturn) {
         // 1. Obtener stock actual en el depósito
         const { data: stockRow } = await supabase
           .from('inventory_stock')
           .select('id, physical_stock, reserved_stock')
           .eq('company_id', sale.companyId)
-          .eq('warehouse_id', (sale as any).warehouse_id || sale.warehouseName || '')
+          .eq('warehouse_id', effectiveWarehouseId)
           .eq('product_id', item.productId)
           .maybeSingle();
 
@@ -97,12 +118,21 @@ export function SaleReturnModal({
               updated_at: new Date().toISOString(),
             })
             .eq('id', stockRow.id);
+        } else if (effectiveWarehouseId) {
+          await supabase.from('inventory_stock').insert({
+            company_id: sale.companyId,
+            warehouse_id: effectiveWarehouseId,
+            product_id: item.productId,
+            variant_id: item.variantId || null,
+            physical_stock: newPhysical,
+            reserved_stock: 0,
+          });
         }
 
         // 3. Asentar movimiento DEVOLUCION_CLIENTE en Kardex
         await supabase.from('stock_movements').insert({
           company_id: sale.companyId,
-          warehouse_id: (sale as any).warehouse_id,
+          warehouse_id: effectiveWarehouseId || null,
           product_id: item.productId,
           variant_id: item.variantId || null,
           movement_type: 'DEVOLUCION_CLIENTE',

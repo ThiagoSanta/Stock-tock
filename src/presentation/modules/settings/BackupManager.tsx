@@ -16,18 +16,17 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
     try {
       const supabase = createClient();
 
+      // 1. Tablas de la empresa
       const [
         companiesRes,
         warehousesRes,
         categoriesRes,
         productsRes,
-        variantsRes,
         stockRes,
         movementsRes,
         customersRes,
         suppliersRes,
         salesRes,
-        saleItemsRes,
         purchasesRes,
         ordersRes,
       ] = await Promise.all([
@@ -35,15 +34,26 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
         supabase.from('warehouses').select('*').eq('company_id', companyId),
         supabase.from('categories').select('*').eq('company_id', companyId),
         supabase.from('products').select('*').eq('company_id', companyId),
-        supabase.from('product_variants').select('*'),
         supabase.from('inventory_stock').select('*').eq('company_id', companyId),
         supabase.from('stock_movements').select('*').eq('company_id', companyId),
         supabase.from('customers').select('*').eq('company_id', companyId),
         supabase.from('suppliers').select('*').eq('company_id', companyId),
         supabase.from('sales').select('*').eq('company_id', companyId),
-        supabase.from('sale_items').select('*'),
         supabase.from('purchases').select('*').eq('company_id', companyId),
         supabase.from('orders').select('*').eq('company_id', companyId),
+      ]);
+
+      const productIds = (productsRes.data || []).map((p: any) => p.id);
+      const saleIds = (salesRes.data || []).map((s: any) => s.id);
+
+      // 2. Tablas dependientes filtradas por la empresa
+      const [variantsRes, saleItemsRes] = await Promise.all([
+        productIds.length > 0
+          ? supabase.from('product_variants').select('*').in('product_id', productIds)
+          : Promise.resolve({ data: [] }),
+        saleIds.length > 0
+          ? supabase.from('sale_items').select('*').in('sale_id', saleIds)
+          : Promise.resolve({ data: [] }),
       ]);
 
       const backupData = {
