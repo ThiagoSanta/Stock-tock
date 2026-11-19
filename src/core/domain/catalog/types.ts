@@ -35,6 +35,7 @@ export interface Product {
   wholesalePrice?: number;
   minStockAlert: number;
   maxStock?: number;
+  storageLocation?: string; // Ej: "Pasillo 2 / Est. B / Nivel 4"
   tracksLotsAndExpiry: boolean; // Flag para lotes/vencimientos
   hasVariants: boolean;
   variants?: ProductVariant[];

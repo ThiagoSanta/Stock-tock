@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, Printer, Upload } from 'lucide-react';
+import { Search, Plus, Printer, Upload, Tag } from 'lucide-react';
 
 interface ProductFiltersProps {
   searchTerm: string;
@@ -9,6 +9,7 @@ interface ProductFiltersProps {
   onOpenCreateModal: () => void;
   onOpenPriceList?: () => void;
   onOpenImportModal?: () => void;
+  onOpenLabels?: () => void;
 }
 
 export function ProductFilters({
@@ -19,6 +20,7 @@ export function ProductFilters({
   onOpenCreateModal,
   onOpenPriceList,
   onOpenImportModal,
+  onOpenLabels,
 }: ProductFiltersProps) {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -123,6 +125,18 @@ export function ProductFilters({
           >
             <Upload className="w-3.5 h-3.5 text-slate-500" />
             <span>Importar CSV</span>
+          </button>
+        )}
+
+        {onOpenLabels && (
+          <button
+            type="button"
+            onClick={onOpenLabels}
+            title="Generar etiquetas de código de barras para imprimir en A4"
+            className="h-8 px-2.5 rounded bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
+          >
+            <Tag className="w-3.5 h-3.5 text-slate-500" />
+            <span>Etiquetas A4</span>
           </button>
         )}
 

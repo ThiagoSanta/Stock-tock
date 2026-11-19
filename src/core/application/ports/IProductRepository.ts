@@ -17,6 +17,7 @@ export interface CreateProductWithStockDTO {
   costPrice: number;
   salePrice: number;
   minStockAlert: number;
+  storageLocation?: string;
   tracksLotsAndExpiry?: boolean;
   initialStock?: number;
   warehouseId?: string;

@@ -377,3 +377,36 @@ BEGIN
         45000.0000, 'Inventario inicial de apertura del sistema'
     );
 END $$;
+
+
+-- ==============================================================================
+-- ACTUALIZACIÓN: PUNTO 3 - DEPÓSITO, LOGÍSTICA & ETIQUETAS
+-- ==============================================================================
+
+-- 1. Ubicación física en almacén
+ALTER TABLE products 
+  ADD COLUMN IF NOT EXISTS storage_location VARCHAR(200);
+
+-- 2. Tabla de Lotes y Fechas de Vencimiento (FIFO)
+CREATE TABLE IF NOT EXISTS stock_lots (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    warehouse_id UUID NOT NULL REFERENCES warehouses(id),
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    lot_number VARCHAR(100) NOT NULL,
+    expiry_date DATE,
+    initial_quantity NUMERIC(12,2) NOT NULL DEFAULT 0,
+    current_quantity NUMERIC(12,2) NOT NULL DEFAULT 0,
+    unit_cost NUMERIC(14,4) NOT NULL DEFAULT 0,
+    notes TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE stock_lots ENABLE ROW LEVEL SECURITY;
+CREATE POLICY allow_all_stock_lots ON stock_lots FOR ALL USING (true) WITH CHECK (true);
+GRANT ALL ON stock_lots TO anon, authenticated, service_role;
+
+CREATE INDEX IF NOT EXISTS idx_stock_lots_product ON stock_lots(product_id);
+CREATE INDEX IF NOT EXISTS idx_stock_lots_company ON stock_lots(company_id);
+CREATE INDEX IF NOT EXISTS idx_stock_lots_expiry ON stock_lots(expiry_date) WHERE expiry_date IS NOT NULL;

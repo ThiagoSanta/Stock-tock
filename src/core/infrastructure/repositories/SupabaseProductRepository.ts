@@ -93,6 +93,7 @@ export class SupabaseProductRepository implements IProductRepository {
         cost_price: dto.costPrice,
         sale_price: dto.salePrice,
         min_stock_alert: dto.minStockAlert,
+        storage_location: dto.storageLocation?.trim() || null,
         tracks_lots_and_expiry: dto.tracksLotsAndExpiry ?? false,
       })
       .select()
@@ -153,6 +154,7 @@ export class SupabaseProductRepository implements IProductRepository {
       wholesalePrice: row.wholesale_price ? Number(row.wholesale_price) : undefined,
       minStockAlert: Number(row.min_stock_alert),
       maxStock: row.max_stock ? Number(row.max_stock) : undefined,
+      storageLocation: row.storage_location || undefined,
       tracksLotsAndExpiry: row.tracks_lots_and_expiry,
       hasVariants: row.has_variants,
       imageUrl: row.image_url,

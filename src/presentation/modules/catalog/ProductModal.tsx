@@ -17,6 +17,7 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
   const [salePrice, setSalePrice] = useState('0');
   const [initialStock, setInitialStock] = useState('0');
   const [minStockAlert, setMinStockAlert] = useState('5');
+  const [storageLocation, setStorageLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,11 +47,13 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
         salePrice: parseFloat(salePrice) || 0,
         initialStock: parseFloat(initialStock) || 0,
         minStockAlert: parseFloat(minStockAlert) || 0,
+        storageLocation: storageLocation.trim() || undefined,
       });
 
       setName('');
       setSku('');
       setBarcode('');
+      setStorageLocation('');
       setCostPrice('0');
       setSalePrice('0');
       setInitialStock('0');
@@ -152,6 +155,20 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
                 className="w-full h-8 px-2.5 rounded bg-white border border-slate-300 text-xs font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
               />
             </div>
+          </div>
+
+          <div>
+            <label htmlFor="prod-storage-location" className="block text-xs font-semibold text-slate-700 mb-1">
+              Ubicación Física en Almacén
+            </label>
+            <input
+              id="prod-storage-location"
+              type="text"
+              value={storageLocation}
+              onChange={(e) => setStorageLocation(e.target.value)}
+              placeholder="Ej: Pasillo 2 / Estantería B / Nivel 3"
+              className="w-full h-8 px-2.5 rounded bg-white border border-slate-300 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3">

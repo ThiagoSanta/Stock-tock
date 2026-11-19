@@ -19,6 +19,7 @@ import { AlertCard } from '@/presentation/modules/alerts/AlertCard';
 import { PhysicalAuditSheetModal } from '@/presentation/modules/alerts/PhysicalAuditSheetModal';
 import { InventoryReconciliationModal } from '@/presentation/modules/alerts/InventoryReconciliationModal';
 import { RestockSuggestionsCard } from '@/presentation/modules/alerts/RestockSuggestionsCard';
+import { ExpiryAlertCard } from '@/presentation/modules/alerts/ExpiryAlertCard';
 import { ProfitabilityReport } from '@/presentation/modules/alerts/ProfitabilityReport';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
@@ -248,6 +249,9 @@ export function AlertsPage() {
               Informativas ({infoCount})
             </button>
           </div>
+
+          {/* Control Preventivo de Vencimientos (FIFO) */}
+          <ExpiryAlertCard companyId={companyId} />
 
           {/* Sugerencias de Reabastecimiento Automatizadas */}
           <RestockSuggestionsCard products={exportRows} />

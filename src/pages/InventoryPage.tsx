@@ -14,6 +14,7 @@ import { InventoryStockTable } from '@/presentation/modules/inventory/InventoryS
 import { KardexTable } from '@/presentation/modules/inventory/KardexTable';
 import { StockAdjustmentModal } from '@/presentation/modules/inventory/StockAdjustmentModal';
 import { TransferStockModal } from '@/presentation/modules/inventory/TransferStockModal';
+import { TransferHistoryModal } from '@/presentation/modules/inventory/TransferHistoryModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 import { createClient } from '@/utils/supabase/client';
@@ -25,11 +26,13 @@ export function InventoryPage() {
   const [warehouses, setWarehouses] = useState<WarehouseSettings[]>([]);
   const [selectedWarehouseFilter, setSelectedWarehouseFilter] = useState<string>('ALL');
   const [companyId, setCompanyId] = useState<string>('');
+  const [companyName, setCompanyName] = useState<string>('Stock·tock');
   const [warehouseId, setWarehouseId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'STOCK' | 'KARDEX'>('STOCK');
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [selectedStockItem, setSelectedStockItem] = useState<InventoryStockDetailed | undefined>();
 
   const repo = useMemo(() => new SupabaseInventoryRepository(), []);
@@ -44,6 +47,7 @@ export function InventoryPage() {
       const context = await getCompanyContext();
       if (context) {
         setCompanyId(context.companyId);
+        if (context.companyName) setCompanyName(context.companyName);
         setWarehouseId(context.defaultWarehouseId);
 
         const supabase = createClient();
@@ -190,6 +194,16 @@ export function InventoryPage() {
 
           <button
             type="button"
+            onClick={() => setIsHistoryModalOpen(true)}
+            title="Ver e imprimir historial de remitos de transferencia interna en A4"
+            className="h-8 px-3 rounded bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
+          >
+            <History className="w-3.5 h-3.5 text-slate-500" />
+            <span>Historial Remitos</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => handleOpenAdjust()}
             className="h-8 px-3 rounded bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
           >
@@ -289,6 +303,13 @@ export function InventoryPage() {
         warehouses={warehouses}
         companyId={companyId}
         onConfirmTransfer={handleConfirmTransfer}
+      />
+
+      {/* Modal de Historial de Remitos de Transferencia */}
+      <TransferHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        companyName={companyName}
       />
     </div>
   );

@@ -10,6 +10,8 @@ import { ProductTable } from '@/presentation/modules/catalog/ProductTable';
 import { ProductModal } from '@/presentation/modules/catalog/ProductModal';
 import { PriceListModal } from '@/presentation/modules/catalog/PriceListModal';
 import { ProductImportModal } from '@/presentation/modules/catalog/ProductImportModal';
+import { LabelGeneratorModal } from '@/presentation/modules/catalog/LabelGeneratorModal';
+import { LotManagementModal } from '@/presentation/modules/inventory/LotManagementModal';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function ProductsPage() {
@@ -21,6 +23,8 @@ export function ProductsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPriceListOpen, setIsPriceListOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isLabelsOpen, setIsLabelsOpen] = useState(false);
+  const [selectedProductForLots, setSelectedProductForLots] = useState<ProductWithStock | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [stockFilter, setStockFilter] = useState<'ALL' | 'NORMAL' | 'LOW' | 'OUT'>('ALL');
 
@@ -116,10 +120,15 @@ export function ProductsPage() {
         onOpenCreateModal={() => setIsModalOpen(true)}
         onOpenPriceList={() => setIsPriceListOpen(true)}
         onOpenImportModal={() => setIsImportOpen(true)}
+        onOpenLabels={() => setIsLabelsOpen(true)}
       />
 
       {/* Tabla de Productos */}
-      <ProductTable products={filteredProducts} loading={loading} />
+      <ProductTable
+        products={filteredProducts}
+        loading={loading}
+        onOpenLots={(prod) => setSelectedProductForLots(prod)}
+      />
 
       {/* Modal de Alta de Producto */}
       <ProductModal
@@ -144,6 +153,25 @@ export function ProductsPage() {
         defaultWarehouseId={defaultWarehouseId}
         onImportComplete={loadData}
       />
+
+      {/* Modal de Generador de Etiquetas A4 */}
+      <LabelGeneratorModal
+        isOpen={isLabelsOpen}
+        onClose={() => setIsLabelsOpen(false)}
+        products={products}
+        companyName={companyName}
+      />
+
+      {/* Modal de Control de Lotes y Vencimientos */}
+      {selectedProductForLots && (
+        <LotManagementModal
+          isOpen={!!selectedProductForLots}
+          onClose={() => setSelectedProductForLots(null)}
+          productId={selectedProductForLots.id}
+          productName={selectedProductForLots.name}
+          productSku={selectedProductForLots.sku}
+        />
+      )}
     </div>
   );
 }

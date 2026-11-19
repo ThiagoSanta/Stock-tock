@@ -1,13 +1,14 @@
 import React from 'react';
 import { ProductWithStock } from '@/core/application/ports/IProductRepository';
-import { AlertTriangle, CheckCircle, PackageX } from 'lucide-react';
+import { AlertTriangle, CheckCircle, PackageX, MapPin, Layers } from 'lucide-react';
 
 interface ProductTableProps {
   products: ProductWithStock[];
   loading: boolean;
+  onOpenLots?: (product: ProductWithStock) => void;
 }
 
-export function ProductTable({ products, loading }: ProductTableProps) {
+export function ProductTable({ products, loading, onOpenLots }: ProductTableProps) {
   if (loading) {
     return (
       <div
@@ -44,6 +45,7 @@ export function ProductTable({ products, loading }: ProductTableProps) {
           <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase tracking-wider text-[11px] font-bold">
             <tr>
               <th scope="col" className="py-3 px-3">Producto & SKU</th>
+              <th scope="col" className="py-3 px-3">Ubicación</th>
               <th scope="col" className="py-3 px-3">Unidad</th>
               <th scope="col" className="py-3 px-3 text-right">Costo PPP</th>
               <th scope="col" className="py-3 px-3 text-right">Precio Venta</th>
@@ -52,6 +54,7 @@ export function ProductTable({ products, loading }: ProductTableProps) {
               <th scope="col" className="py-3 px-3 text-center">Disponible</th>
               <th scope="col" className="py-3 px-3 text-center">Mínimo</th>
               <th scope="col" className="py-3 px-3 text-center">Estado</th>
+              <th scope="col" className="py-3 px-3 text-center">Lotes</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -67,6 +70,16 @@ export function ProductTable({ products, loading }: ProductTableProps) {
                       SKU: {item.sku}
                       {item.barcode && ` • ${item.barcode}`}
                     </span>
+                  </td>
+                  <td className="py-2.5 px-3 text-slate-700 text-xs">
+                    {item.storageLocation ? (
+                      <span className="inline-flex items-center gap-1 text-slate-800 font-medium">
+                        <MapPin className="w-3 h-3 text-slate-500 shrink-0" />
+                        {item.storageLocation}
+                      </span>
+                    ) : (
+                      <span className="text-slate-400">—</span>
+                    )}
                   </td>
                   <td className="py-2.5 px-3 text-slate-700 font-mono text-xs">
                     {item.unitOfMeasure}
@@ -113,6 +126,19 @@ export function ProductTable({ products, loading }: ProductTableProps) {
                         </>
                       )}
                     </span>
+                  </td>
+                  <td className="py-2.5 px-3 text-center">
+                    {onOpenLots && (
+                      <button
+                        type="button"
+                        onClick={() => onOpenLots(item)}
+                        title="Gestionar lotes y vencimientos FIFO"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                      >
+                        <Layers className="w-3 h-3 text-slate-500" />
+                        <span>Lotes</span>
+                      </button>
+                    )}
                   </td>
                 </tr>
               );
