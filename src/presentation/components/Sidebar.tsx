@@ -33,9 +33,30 @@ const navigationItems: NavItem[] = [
   { name: 'Configuración', href: '/configuracion', icon: Settings },
 ];
 
+// Mapeo para pre-cargar el chunk JS en hover antes de que el usuario haga click
+const prefetchMap: Record<string, () => Promise<unknown>> = {
+  '/': () => import('@/pages/DashboardPage'),
+  '/productos': () => import('@/pages/ProductsPage'),
+  '/inventario': () => import('@/pages/InventoryPage'),
+  '/pedidos': () => import('@/pages/OrdersPage'),
+  '/ventas': () => import('@/pages/SalesPage'),
+  '/compras': () => import('@/pages/PurchasesPage'),
+  '/contactos': () => import('@/pages/ContactsPage'),
+  '/alertas': () => import('@/pages/AlertsPage'),
+  '/configuracion': () => import('@/pages/SettingsPage'),
+};
+
 export function Sidebar() {
   const location = useLocation();
   const pathname = location.pathname;
+
+  const handlePrefetch = (href: string) => {
+    try {
+      prefetchMap[href]?.();
+    } catch {
+      // Silencioso si falla la precarga
+    }
+  };
 
   return (
     <aside
@@ -92,6 +113,8 @@ export function Sidebar() {
                 key={item.name}
                 to={item.href}
                 aria-current={isActive ? 'page' : undefined}
+                onMouseEnter={() => handlePrefetch(item.href)}
+                onFocus={() => handlePrefetch(item.href)}
                 className={`flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
                   isActive
                     ? 'bg-slate-100 text-slate-900 font-semibold shadow-xs'

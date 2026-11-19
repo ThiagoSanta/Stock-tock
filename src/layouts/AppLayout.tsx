@@ -1,6 +1,22 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from '@/presentation/components/Sidebar';
+
+function PageLoadingFallback() {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="p-12 text-center rounded-lg bg-white border border-slate-200 shadow-xs max-w-sm mx-auto mt-8 animate-in fade-in duration-200"
+    >
+      <div
+        aria-hidden="true"
+        className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto mb-2"
+      />
+      <p className="text-xs font-semibold text-slate-700">Cargando módulo...</p>
+    </div>
+  );
+}
 
 export function AppLayout() {
   return (
@@ -22,7 +38,9 @@ export function AppLayout() {
         tabIndex={-1}
       >
         <div className="max-w-7xl mx-auto">
-          <Outlet />
+          <Suspense fallback={<PageLoadingFallback />}>
+            <Outlet />
+          </Suspense>
         </div>
       </main>
     </div>

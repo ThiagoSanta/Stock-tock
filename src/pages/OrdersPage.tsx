@@ -12,7 +12,7 @@ import { CancelOrderUseCase } from '@/core/application/use-cases/orders/CancelOr
 import { OrderTable } from '@/presentation/modules/orders/OrderTable';
 import { OrderModal } from '@/presentation/modules/orders/OrderModal';
 import { OrderDetailModal } from '@/presentation/modules/orders/OrderDetailModal';
-import { createClient } from '@/utils/supabase/client';
+import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -35,24 +35,14 @@ export function OrdersPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { data: companies } = await supabase.from('companies').select('id').limit(1);
-
-      if (companies && companies.length > 0) {
-        const cId = companies[0].id;
-        setCompanyId(cId);
-
-        const { data: wh } = await supabase
-          .from('warehouses')
-          .select('id')
-          .eq('company_id', cId)
-          .eq('is_default', true)
-          .single();
-        if (wh) setWarehouseId(wh.id);
+      const context = await getCompanyContext();
+      if (context) {
+        setCompanyId(context.companyId);
+        setWarehouseId(context.defaultWarehouseId);
 
         const [ordersList, prods] = await Promise.all([
-          orderRepo.findOrders(cId),
-          productRepo.getProductsWithStock(cId),
+          orderRepo.findOrders(context.companyId),
+          productRepo.getProductsWithStock(context.companyId),
         ]);
 
         setOrders(ordersList);

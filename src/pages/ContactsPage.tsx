@@ -11,7 +11,7 @@ import { CustomerTable } from '@/presentation/modules/contacts/CustomerTable';
 import { SupplierTable } from '@/presentation/modules/contacts/SupplierTable';
 import { ContactModal } from '@/presentation/modules/contacts/ContactModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
-import { createClient } from '@/utils/supabase/client';
+import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function ContactsPage() {
   const [activeTab, setActiveTab] = useState<'CUSTOMERS' | 'SUPPLIERS'>('CUSTOMERS');
@@ -31,16 +31,13 @@ export function ContactsPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { data: companies } = await supabase.from('companies').select('id').limit(1);
-
-      if (companies && companies.length > 0) {
-        const cId = companies[0].id;
-        setCompanyId(cId);
+      const context = await getCompanyContext();
+      if (context) {
+        setCompanyId(context.companyId);
 
         const [custs, supps] = await Promise.all([
-          getContactsUseCase.executeCustomers(cId),
-          getContactsUseCase.executeSuppliers(cId),
+          getContactsUseCase.executeCustomers(context.companyId),
+          getContactsUseCase.executeSuppliers(context.companyId),
         ]);
 
         setCustomers(custs);

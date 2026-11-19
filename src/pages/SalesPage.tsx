@@ -7,7 +7,7 @@ import { GetSalesHistoryUseCase } from '@/core/application/use-cases/sales/GetSa
 import { SalesTable } from '@/presentation/modules/sales/SalesTable';
 import { SaleReceiptModal } from '@/presentation/modules/sales/SaleReceiptModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
-import { createClient } from '@/utils/supabase/client';
+import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function SalesPage() {
   const [sales, setSales] = useState<SaleWithDetails[]>([]);
@@ -23,14 +23,11 @@ export function SalesPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { data: companies } = await supabase.from('companies').select('id').limit(1);
+      const context = await getCompanyContext();
+      if (context) {
+        setCompanyId(context.companyId);
 
-      if (companies && companies.length > 0) {
-        const cId = companies[0].id;
-        setCompanyId(cId);
-
-        const salesList = await getSalesUseCase.execute(cId, {
+        const salesList = await getSalesUseCase.execute(context.companyId, {
           origin: originFilter !== 'ALL' ? originFilter : undefined,
         });
 

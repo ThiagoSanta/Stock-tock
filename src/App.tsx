@@ -1,15 +1,35 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/layouts/AppLayout';
-import { DashboardPage } from '@/pages/DashboardPage';
-import { ProductsPage } from '@/pages/ProductsPage';
-import { InventoryPage } from '@/pages/InventoryPage';
-import { OrdersPage } from '@/pages/OrdersPage';
-import { SalesPage } from '@/pages/SalesPage';
-import { PurchasesPage } from '@/pages/PurchasesPage';
-import { ContactsPage } from '@/pages/ContactsPage';
-import { AlertsPage } from '@/pages/AlertsPage';
-import { SettingsPage } from '@/pages/SettingsPage';
+
+// Code-splitting por ruta con React.lazy para carga inicial ultrarrápida
+const DashboardPage = lazy(() =>
+  import('@/pages/DashboardPage').then((m) => ({ default: m.DashboardPage }))
+);
+const ProductsPage = lazy(() =>
+  import('@/pages/ProductsPage').then((m) => ({ default: m.ProductsPage }))
+);
+const InventoryPage = lazy(() =>
+  import('@/pages/InventoryPage').then((m) => ({ default: m.InventoryPage }))
+);
+const OrdersPage = lazy(() =>
+  import('@/pages/OrdersPage').then((m) => ({ default: m.OrdersPage }))
+);
+const SalesPage = lazy(() =>
+  import('@/pages/SalesPage').then((m) => ({ default: m.SalesPage }))
+);
+const PurchasesPage = lazy(() =>
+  import('@/pages/PurchasesPage').then((m) => ({ default: m.PurchasesPage }))
+);
+const ContactsPage = lazy(() =>
+  import('@/pages/ContactsPage').then((m) => ({ default: m.ContactsPage }))
+);
+const AlertsPage = lazy(() =>
+  import('@/pages/AlertsPage').then((m) => ({ default: m.AlertsPage }))
+);
+const SettingsPage = lazy(() =>
+  import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage }))
+);
 
 export function App() {
   return (

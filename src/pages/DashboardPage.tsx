@@ -14,6 +14,7 @@ import {
 import { Link } from 'react-router-dom';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { createClient } from '@/utils/supabase/client';
+import { getCompanyContext } from '@/utils/supabase/companyContext';
 import { PosModal } from '@/presentation/modules/pos/PosModal';
 import { SupabaseProductRepository } from '@/core/infrastructure/repositories/SupabaseProductRepository';
 import { SupabaseSaleRepository } from '@/core/infrastructure/repositories/SupabaseSaleRepository';
@@ -52,45 +53,40 @@ export function DashboardPage() {
 
   const loadData = async () => {
     try {
+      const context = await getCompanyContext();
+      if (!context) return;
+
+      setCompany({
+        id: context.companyId,
+        name: context.companyName,
+        primary_currency: 'ARS',
+      });
+      setDefaultWarehouseId(context.defaultWarehouseId);
+
       const supabase = createClient();
 
-      const { data: companies } = await supabase.from('companies').select('*').limit(1);
-      if (companies && companies.length > 0) {
-        const c = companies[0];
-        setCompany(c);
-
-        const { data: wh } = await supabase
-          .from('warehouses')
-          .select('id')
-          .eq('company_id', c.id)
-          .eq('is_default', true)
-          .limit(1);
-
-        if (wh && wh.length > 0) {
-          setDefaultWarehouseId(wh[0].id);
-        }
-
-        const prods = await productRepo.getProductsWithStock(c.id);
-        setProducts(prods);
-
-        const { data: salesData } = await supabase
+      // Carga paralela por HTTP/2 de todos los datos del dashboard en un solo roundtrip
+      const [prods, salesRes, movsRes] = await Promise.all([
+        productRepo.getProductsWithStock(context.companyId),
+        supabase
           .from('sales')
           .select('*')
-          .eq('company_id', c.id)
+          .eq('company_id', context.companyId)
           .order('created_at', { ascending: false })
-          .limit(10);
-
-        setRecentSales((salesData as any) || []);
-
-        const { data: movsData } = await supabase
+          .limit(10),
+        supabase
           .from('stock_movements')
-          .select('id, movement_type, quantity, balance_physical_after, created_at, notes, product:products(name)')
-          .eq('company_id', c.id)
+          .select(
+            'id, movement_type, quantity, balance_physical_after, created_at, notes, product:products(name)'
+          )
+          .eq('company_id', context.companyId)
           .order('created_at', { ascending: false })
-          .limit(6);
+          .limit(6),
+      ]);
 
-        setRecentMovements((movsData as any) || []);
-      }
+      setProducts(prods);
+      setRecentSales((salesRes.data as any) || []);
+      setRecentMovements((movsRes.data as any) || []);
     } catch (err) {
       console.error('Error cargando dashboard:', err);
     }

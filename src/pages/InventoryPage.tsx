@@ -13,7 +13,7 @@ import { InventoryStockTable } from '@/presentation/modules/inventory/InventoryS
 import { KardexTable } from '@/presentation/modules/inventory/KardexTable';
 import { StockAdjustmentModal } from '@/presentation/modules/inventory/StockAdjustmentModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
-import { createClient } from '@/utils/supabase/client';
+import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function InventoryPage() {
   const [stockList, setStockList] = useState<InventoryStockDetailed[]>([]);
@@ -33,25 +33,14 @@ export function InventoryPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { data: companies } = await supabase.from('companies').select('id').limit(1);
-
-      if (companies && companies.length > 0) {
-        const cId = companies[0].id;
-        setCompanyId(cId);
-
-        const { data: wh } = await supabase
-          .from('warehouses')
-          .select('id')
-          .eq('company_id', cId)
-          .eq('is_default', true)
-          .single();
-
-        if (wh) setWarehouseId(wh.id);
+      const context = await getCompanyContext();
+      if (context) {
+        setCompanyId(context.companyId);
+        setWarehouseId(context.defaultWarehouseId);
 
         const [stocks, movs] = await Promise.all([
-          getBalanceUseCase.execute(cId),
-          getKardexUseCase.execute(cId, { limit: 100 }),
+          getBalanceUseCase.execute(context.companyId),
+          getKardexUseCase.execute(context.companyId, { limit: 100 }),
         ]);
 
         setStockList(stocks);

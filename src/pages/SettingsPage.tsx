@@ -9,6 +9,7 @@ import { ManageWarehousesUseCase, CreateWarehouseDTO } from '@/core/application/
 import { CompanyForm } from '@/presentation/modules/settings/CompanyForm';
 import { WarehouseManager } from '@/presentation/modules/settings/WarehouseManager';
 import { BusinessRulesViewer } from '@/presentation/modules/settings/BusinessRulesViewer';
+import { invalidateCompanyContext } from '@/utils/supabase/companyContext';
 
 export function SettingsPage() {
   const [company, setCompany] = useState<CompanySettings | null>(null);
@@ -39,17 +40,20 @@ export function SettingsPage() {
 
   const handleUpdateCompany = async (dto: UpdateCompanyDTO) => {
     const updated = await updateCompanyUseCase.execute(dto);
+    invalidateCompanyContext();
     setCompany(updated);
   };
 
   const handleCreateWarehouse = async (dto: CreateWarehouseDTO) => {
     await manageWhUseCase.create(dto);
+    invalidateCompanyContext();
     await loadData();
   };
 
   const handleSetDefaultWarehouse = async (warehouseId: string) => {
     if (!company) return;
     await manageWhUseCase.setDefault(company.id, warehouseId);
+    invalidateCompanyContext();
     await loadData();
   };
 

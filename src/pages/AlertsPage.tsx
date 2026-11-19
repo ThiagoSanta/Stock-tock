@@ -17,7 +17,7 @@ import { ExportInventoryReportUseCase } from '@/core/application/use-cases/alert
 import { AlertCard } from '@/presentation/modules/alerts/AlertCard';
 import { PhysicalAuditSheetModal } from '@/presentation/modules/alerts/PhysicalAuditSheetModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
-import { createClient } from '@/utils/supabase/client';
+import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function AlertsPage() {
   const [alerts, setAlerts] = useState<SystemAlert[]>([]);
@@ -34,16 +34,13 @@ export function AlertsPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { data: companies } = await supabase.from('companies').select('id, name').limit(1);
-
-      if (companies && companies.length > 0) {
-        const c = companies[0];
-        setCompanyName(c.name);
+      const context = await getCompanyContext();
+      if (context) {
+        setCompanyName(context.companyName);
 
         const [alertsList, rows] = await Promise.all([
-          getAlertsUseCase.execute(c.id),
-          exportUseCase.getExportData(c.id),
+          getAlertsUseCase.execute(context.companyId),
+          exportUseCase.getExportData(context.companyId),
         ]);
 
         setAlerts(alertsList);

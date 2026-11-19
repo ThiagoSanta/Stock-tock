@@ -8,7 +8,7 @@ import { GetProductsWithStockUseCase } from '@/core/application/use-cases/catalo
 import { ProductFilters } from '@/presentation/modules/catalog/ProductFilters';
 import { ProductTable } from '@/presentation/modules/catalog/ProductTable';
 import { ProductModal } from '@/presentation/modules/catalog/ProductModal';
-import { createClient } from '@/utils/supabase/client';
+import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function ProductsPage() {
   const [products, setProducts] = useState<ProductWithStock[]>([]);
@@ -25,13 +25,10 @@ export function ProductsPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { data: companies } = await supabase.from('companies').select('id').limit(1);
-
-      if (companies && companies.length > 0) {
-        const cId = companies[0].id;
-        setCompanyId(cId);
-        const data = await getProductsUseCase.execute(cId);
+      const context = await getCompanyContext();
+      if (context) {
+        setCompanyId(context.companyId);
+        const data = await getProductsUseCase.execute(context.companyId);
         setProducts(data);
       }
     } catch (err) {

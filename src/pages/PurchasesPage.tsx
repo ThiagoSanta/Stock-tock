@@ -10,7 +10,7 @@ import { ReceivePurchaseUseCase } from '@/core/application/use-cases/purchases/R
 import { PurchaseTable } from '@/presentation/modules/purchases/PurchaseTable';
 import { PurchaseModal } from '@/presentation/modules/purchases/PurchaseModal';
 import { PurchaseDetailModal } from '@/presentation/modules/purchases/PurchaseDetailModal';
-import { createClient } from '@/utils/supabase/client';
+import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function PurchasesPage() {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
@@ -32,25 +32,15 @@ export function PurchasesPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { data: companies } = await supabase.from('companies').select('id').limit(1);
-
-      if (companies && companies.length > 0) {
-        const cId = companies[0].id;
-        setCompanyId(cId);
-
-        const { data: wh } = await supabase
-          .from('warehouses')
-          .select('id')
-          .eq('company_id', cId)
-          .eq('is_default', true)
-          .single();
-        if (wh) setWarehouseId(wh.id);
+      const context = await getCompanyContext();
+      if (context) {
+        setCompanyId(context.companyId);
+        setWarehouseId(context.defaultWarehouseId);
 
         const [purchasesList, prods, sups] = await Promise.all([
-          purchaseRepo.findPurchases(cId),
-          productRepo.getProductsWithStock(cId),
-          purchaseRepo.findSuppliers(cId),
+          purchaseRepo.findPurchases(context.companyId),
+          productRepo.getProductsWithStock(context.companyId),
+          purchaseRepo.findSuppliers(context.companyId),
         ]);
 
         setPurchases(purchasesList);
