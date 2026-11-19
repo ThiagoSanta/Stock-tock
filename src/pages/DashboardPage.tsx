@@ -9,7 +9,6 @@ import {
   Building2,
   Calendar,
   PackageCheck,
-  Database,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { MetricCard } from '@/presentation/components/MetricCard';
@@ -151,10 +150,6 @@ export function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 border border-slate-300 text-xs font-mono text-slate-700 font-medium">
-            <Database className="w-3.5 h-3.5 text-slate-600" aria-hidden="true" />
-            <span>PostgreSQL Conectado</span>
-          </div>
           <button
             type="button"
             onClick={() => setIsPosOpen(true)}

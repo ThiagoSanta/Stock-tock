@@ -26,7 +26,8 @@ body {
 }
 
 code, kbd, samp, pre, .font-mono {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-feature-settings: 'tnum';
 }
 
 /* Enfoque accesible global (WCAG 2.1 AA) */

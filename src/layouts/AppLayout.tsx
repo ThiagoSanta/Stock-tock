@@ -1,6 +1,7 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from '@/presentation/components/Sidebar';
+import { CommandPalette } from '@/presentation/components/CommandPalette';
 
 function PageLoadingFallback() {
   return (
@@ -19,6 +20,41 @@ function PageLoadingFallback() {
 }
 
 export function AppLayout() {
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('stocktock_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const handleToggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('stocktock_sidebar_collapsed', String(next));
+      } catch {
+        // Silencioso
+      }
+      return next;
+    });
+  };
+
+  // Atajo global Ctrl+K / Cmd+K para abrir el buscador
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
       {/* Enlace de accesibilidad para saltar al contenido principal con teclado */}
@@ -29,7 +65,11 @@ export function AppLayout() {
         Saltar al contenido principal
       </a>
 
-      <Sidebar />
+      <Sidebar
+        isCollapsed={isCollapsed}
+        onToggleCollapse={handleToggleCollapse}
+        onOpenSearch={() => setIsSearchOpen(true)}
+      />
 
       <main
         id="main-content"
@@ -43,6 +83,12 @@ export function AppLayout() {
           </Suspense>
         </div>
       </main>
+
+      {/* Buscador de Comandos y Menús Global */}
+      <CommandPalette
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
     </div>
   );
 }
