@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Printer, Receipt } from 'lucide-react';
+import { X, Printer } from 'lucide-react';
 import { SaleWithDetails } from '@/core/application/ports/ISaleRepository';
 
 interface SaleReceiptModalProps {
@@ -15,23 +15,33 @@ export function SaleReceiptModal({ sale, onClose }: SaleReceiptModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-      <div className="w-full max-w-lg rounded-lg bg-white border border-slate-200 shadow-xl overflow-hidden flex flex-col">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="receipt-modal-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xs"
+    >
+      <div className="w-full max-w-lg rounded-lg bg-white border border-slate-300 shadow-xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
         {/* Modal Header */}
-        <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between shrink-0 print:hidden">
+        <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between shrink-0 print:hidden bg-slate-50">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
+            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-900 border border-slate-300">
               {sale.saleNumber}
             </span>
-            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+            <h3
+              id="receipt-modal-title"
+              className="text-xs font-bold text-slate-900 uppercase tracking-wider"
+            >
               Comprobante de Venta
             </h3>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors cursor-pointer"
+            aria-label="Cerrar comprobante"
+            className="text-slate-500 hover:text-slate-800 p-1.5 rounded hover:bg-slate-200 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-900"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
 
@@ -41,10 +51,10 @@ export function SaleReceiptModal({ sale, onClose }: SaleReceiptModalProps) {
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
               Stock-tock Casa Central
             </h2>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-xs text-slate-600 font-medium">
               Comprobante Interno de Operación Comercial
             </p>
-            <p className="text-[11px] font-mono text-slate-600">
+            <p className="text-xs font-mono text-slate-700 tabular-nums">
               {sale.saleNumber} • {new Date(sale.createdAt).toLocaleString('es-AR')}
             </p>
           </div>
@@ -52,35 +62,41 @@ export function SaleReceiptModal({ sale, onClose }: SaleReceiptModalProps) {
           {/* Client & Payment Details */}
           <div className="grid grid-cols-2 gap-3 p-3 rounded bg-slate-50 border border-slate-200">
             <div>
-              <span className="text-[10px] text-slate-500 uppercase block font-semibold">Cliente</span>
-              <span className="font-medium text-slate-900">{sale.customerName}</span>
+              <span className="text-[11px] text-slate-600 uppercase block font-bold tracking-wider">
+                Cliente
+              </span>
+              <span className="font-semibold text-slate-900">{sale.customerName}</span>
             </div>
             <div>
-              <span className="text-[10px] text-slate-500 uppercase block font-semibold">Medio de Cobro</span>
-              <span className="font-mono font-medium text-slate-900">{sale.paymentMethod}</span>
+              <span className="text-[11px] text-slate-600 uppercase block font-bold tracking-wider">
+                Medio de Cobro
+              </span>
+              <span className="font-mono font-bold text-slate-900">{sale.paymentMethod}</span>
             </div>
           </div>
 
           {/* Items */}
           <div className="border border-slate-200 rounded overflow-hidden">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 text-[10px] uppercase font-semibold">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 text-[11px] uppercase font-bold">
                 <tr>
-                  <th className="py-2 px-3">Producto</th>
-                  <th className="py-2 px-3 text-center">Cant.</th>
-                  <th className="py-2 px-3 text-right">Precio Unit.</th>
-                  <th className="py-2 px-3 text-right">Subtotal</th>
+                  <th scope="col" className="py-2.5 px-3">Producto</th>
+                  <th scope="col" className="py-2.5 px-3 text-center">Cant.</th>
+                  <th scope="col" className="py-2.5 px-3 text-right">Precio Unit.</th>
+                  <th scope="col" className="py-2.5 px-3 text-right">Subtotal</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {sale.items.map((it) => (
                   <tr key={it.id}>
-                    <td className="py-2 px-3 font-medium text-slate-900">{it.productName}</td>
-                    <td className="py-2 px-3 text-center font-mono text-slate-700">{it.quantity}</td>
-                    <td className="py-2 px-3 text-right font-mono text-slate-600">
+                    <td className="py-2.5 px-3 font-semibold text-slate-900">{it.productName}</td>
+                    <td className="py-2.5 px-3 text-center font-mono text-slate-800 tabular-nums font-medium">
+                      {it.quantity}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono text-slate-700 tabular-nums">
                       ${it.unitPrice.toFixed(2)}
                     </td>
-                    <td className="py-2 px-3 text-right font-mono font-bold text-slate-900">
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 tabular-nums">
                       ${it.subtotal.toFixed(2)}
                     </td>
                   </tr>
@@ -90,18 +106,20 @@ export function SaleReceiptModal({ sale, onClose }: SaleReceiptModalProps) {
           </div>
 
           {/* Totals & Margin */}
-          <div className="space-y-1 pt-2 border-t border-slate-200">
-            <div className="flex items-center justify-between text-xs text-slate-600">
-              <span>Costo Histórico de Mercadería (CMV):</span>
-              <span className="font-mono">${sale.totalCost.toFixed(2)}</span>
+          <div className="space-y-1.5 pt-2 border-t border-slate-200">
+            <div className="flex items-center justify-between text-xs text-slate-700">
+              <span className="font-medium">Costo Histórico de Mercadería (CMV):</span>
+              <span className="font-mono tabular-nums">${sale.totalCost.toFixed(2)}</span>
             </div>
-            <div className="flex items-center justify-between text-xs text-emerald-700 font-medium">
+            <div className="flex items-center justify-between text-xs text-emerald-800 font-semibold">
               <span>Margen Bruto Obtenido:</span>
-              <span className="font-mono font-bold">+${sale.estimatedGrossMargin.toFixed(2)}</span>
+              <span className="font-mono font-bold tabular-nums">
+                +${sale.estimatedGrossMargin.toFixed(2)}
+              </span>
             </div>
             <div className="flex items-center justify-between text-base font-bold pt-2 border-t border-slate-200">
               <span className="text-slate-900">Total Cobrado:</span>
-              <span className="font-mono text-slate-900">
+              <span className="font-mono text-slate-900 tabular-nums">
                 ${sale.totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
               </span>
             </div>
@@ -110,16 +128,18 @@ export function SaleReceiptModal({ sale, onClose }: SaleReceiptModalProps) {
           {/* Action Footer */}
           <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 print:hidden">
             <button
+              type="button"
               onClick={onClose}
-              className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
+              className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
             >
               Cerrar
             </button>
             <button
+              type="button"
               onClick={handlePrint}
-              className="h-8 px-4 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="h-8 px-4 rounded bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs focus-visible:ring-2 focus-visible:ring-slate-900"
             >
-              <Printer className="w-3.5 h-3.5" />
+              <Printer className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Imprimir Ticket</span>
             </button>
           </div>

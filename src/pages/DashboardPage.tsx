@@ -140,14 +140,14 @@ export function DashboardPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
-            <Building2 className="w-3.5 h-3.5 text-slate-600" />
-            <span className="font-medium text-slate-700">
+          <div className="flex items-center gap-2 text-xs text-slate-600 mb-1">
+            <Building2 className="w-3.5 h-3.5 text-slate-700" aria-hidden="true" />
+            <span className="font-semibold text-slate-800">
               {company ? company.name : 'Stock-tock Casa Central'}
             </span>
-            <span>•</span>
-            <Calendar className="w-3.5 h-3.5" />
-            <span className="capitalize">{currentDate}</span>
+            <span aria-hidden="true">•</span>
+            <Calendar className="w-3.5 h-3.5 text-slate-600" aria-hidden="true" />
+            <span className="capitalize font-medium text-slate-700">{currentDate}</span>
           </div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900">
             Control de Operaciones
@@ -155,15 +155,16 @@ export function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 border border-slate-200 text-[11px] font-mono text-slate-600">
-            <Database className="w-3.5 h-3.5 text-slate-500" />
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 border border-slate-300 text-xs font-mono text-slate-700 font-medium">
+            <Database className="w-3.5 h-3.5 text-slate-600" aria-hidden="true" />
             <span>PostgreSQL Conectado</span>
           </div>
           <button
+            type="button"
             onClick={() => setIsPosOpen(true)}
-            className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+            className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs focus-visible:ring-2 focus-visible:ring-slate-900"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4" aria-hidden="true" />
             <span>Venta Rápida (POS)</span>
           </button>
         </div>
@@ -172,19 +173,19 @@ export function DashboardPage() {
       {/* Reglas de Negocio V1 Status Banner */}
       <div className="p-3.5 rounded-lg bg-white border border-slate-200 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-700">
+          <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-800 shrink-0" aria-hidden="true">
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div>
             <h4 className="text-xs font-semibold text-slate-900">
               Políticas de Integridad V1 Activas
             </h4>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-xs text-slate-600">
               Bloqueo automático de stock negativo • Costos históricos inmutables • Kardex auditado
             </p>
           </div>
         </div>
-        <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-900 border border-emerald-300">
           PROTEGIDO
         </span>
       </div>
@@ -228,21 +229,21 @@ export function DashboardPage() {
       {/* Main Grid: Products & Movements */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left Column: Catálogo */}
-        <div className="lg:col-span-2 rounded-lg bg-white border border-slate-200 p-4 space-y-3 shadow-xs">
+        <section aria-label="Productos destacados del catálogo" className="lg:col-span-2 rounded-lg bg-white border border-slate-200 p-4 space-y-3 shadow-xs">
           <div className="flex items-center justify-between pb-2.5 border-b border-slate-200">
             <div>
-              <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
                 Productos en Catálogo
               </h3>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-xs text-slate-600 font-medium">
                 Existencia física real y precios de lista
               </p>
             </div>
             <Link
               to="/productos"
-              className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium"
+              className="text-xs text-blue-700 hover:text-blue-900 flex items-center gap-1 font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-slate-900"
             >
-              Ver todos <ArrowUpRight className="w-3.5 h-3.5" />
+              Ver todos <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>
           </div>
 
@@ -254,26 +255,28 @@ export function DashboardPage() {
               >
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-semibold text-slate-700">
+                    <span className="font-mono text-xs font-semibold text-slate-800">
                       {prod.sku}
                     </span>
-                    <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-300">
                       {prod.availableStock} un. disp.
                     </span>
                   </div>
-                  <p className="text-xs text-slate-900 font-medium">{prod.name}</p>
-                  <p className="text-[11px] text-slate-500 font-mono">
+                  <p className="text-xs text-slate-900 font-semibold">{prod.name}</p>
+                  <p className="text-xs text-slate-600 font-mono">
                     Costo: ${prod.costPrice.toLocaleString('es-AR')} • Venta: ${prod.salePrice.toLocaleString('es-AR')}
                   </p>
                 </div>
 
                 <div className="text-right space-y-1">
-                  <p className="text-xs font-bold font-mono text-slate-900">
+                  <p className="text-xs font-bold font-mono text-slate-900 tabular-nums">
                     ${prod.salePrice.toLocaleString('es-AR')}
                   </p>
                   <button
+                    type="button"
                     onClick={() => setIsPosOpen(true)}
-                    className="text-[11px] font-medium px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
+                    aria-label={`Vender ${prod.name}`}
+                    className="text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 border border-slate-300 transition-colors cursor-pointer"
                   >
                     Vender
                   </button>
@@ -281,41 +284,41 @@ export function DashboardPage() {
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Right Column: Movimientos Kardex */}
-        <div className="rounded-lg bg-white border border-slate-200 p-4 space-y-3 shadow-xs">
+        <section aria-label="Últimos movimientos del Kardex" className="rounded-lg bg-white border border-slate-200 p-4 space-y-3 shadow-xs">
           <div className="pb-2.5 border-b border-slate-200">
-            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
               Kardex de Inventario
             </h3>
-            <p className="text-[11px] text-slate-500">Últimos movimientos auditados</p>
+            <p className="text-xs text-slate-600 font-medium">Últimos movimientos auditados</p>
           </div>
 
           <div className="divide-y divide-slate-100">
             {recentMovements.length === 0 ? (
-              <p className="text-xs text-slate-500 text-center py-4">
+              <p className="text-xs text-slate-600 text-center py-4 font-medium">
                 No hay movimientos registrados aún.
               </p>
             ) : (
               recentMovements.map((mov) => {
                 const isNegative = Number(mov.quantity) < 0;
                 return (
-                  <div key={mov.id} className="py-2 flex items-start justify-between gap-2">
+                  <div key={mov.id} className="py-2.5 flex items-start justify-between gap-2">
                     <div>
                       <span
-                        className={`text-[9px] font-mono px-1 py-0.2 rounded border ${
+                        className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded border ${
                           isNegative
-                            ? 'bg-rose-50 text-rose-700 border-rose-200'
-                            : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            ? 'bg-rose-50 text-rose-800 border-rose-300'
+                            : 'bg-emerald-50 text-emerald-800 border-emerald-300'
                         }`}
                       >
                         {mov.movement_type}
                       </span>
-                      <p className="text-xs font-medium text-slate-800 mt-0.5 line-clamp-1">
+                      <p className="text-xs font-semibold text-slate-900 mt-1 line-clamp-1">
                         {mov.product?.name || mov.notes || 'Movimiento'}
                       </p>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-xs text-slate-500 font-mono">
                         {new Date(mov.created_at).toLocaleTimeString('es-AR', {
                           hour: '2-digit',
                           minute: '2-digit',
@@ -324,13 +327,13 @@ export function DashboardPage() {
                     </div>
                     <div className="text-right shrink-0">
                       <span
-                        className={`text-xs font-mono font-semibold ${
-                          isNegative ? 'text-rose-600' : 'text-emerald-600'
+                        className={`text-xs font-mono font-bold tabular-nums ${
+                          isNegative ? 'text-rose-700' : 'text-emerald-700'
                         }`}
                       >
                         {isNegative ? '' : '+'}{mov.quantity} un.
                       </span>
-                      <p className="text-[10px] text-slate-400 font-mono">
+                      <p className="text-xs text-slate-600 font-mono tabular-nums">
                         Saldo: {mov.balance_physical_after}
                       </p>
                     </div>
@@ -339,7 +342,7 @@ export function DashboardPage() {
               })
             )}
           </div>
-        </div>
+        </section>
       </div>
 
       {/* Modal POS */}
