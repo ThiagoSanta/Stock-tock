@@ -163,6 +163,9 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
         action: () => {
           navigate('/');
           onClose();
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('stocktock:open-pos'));
+          }, 100);
           if (onOpenPos) onOpenPos();
         },
       },

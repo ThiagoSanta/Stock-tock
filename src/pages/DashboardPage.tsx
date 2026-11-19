@@ -101,6 +101,10 @@ export function DashboardPage() {
         month: 'short',
       })
     );
+
+    const handleOpenPos = () => setIsPosOpen(true);
+    window.addEventListener('stocktock:open-pos', handleOpenPos);
+    return () => window.removeEventListener('stocktock:open-pos', handleOpenPos);
   }, [productRepo]);
 
   const handleCompleteSale = async (items: any[], paymentMethod: any, notes?: string) => {
@@ -124,11 +128,14 @@ export function DashboardPage() {
     return sale;
   };
 
-  const totalPhysicalStock = products.reduce((acc, curr) => acc + curr.physicalStock, 0);
-  const totalAvailableStock = products.reduce((acc, curr) => acc + curr.availableStock, 0);
-  const totalReservedStock = products.reduce((acc, curr) => acc + curr.reservedStock, 0);
-  const totalSalesAmount = recentSales.reduce((acc, curr) => acc + curr.totalAmount, 0);
-  const stockValuation = products.reduce((acc, p) => acc + p.physicalStock * p.costPrice, 0);
+  const totalPhysicalStock = products.reduce((acc, curr) => acc + (Number(curr.physicalStock) || 0), 0);
+  const totalAvailableStock = products.reduce((acc, curr) => acc + (Number(curr.availableStock) || 0), 0);
+  const totalReservedStock = products.reduce((acc, curr) => acc + (Number(curr.reservedStock) || 0), 0);
+  const totalSalesAmount = recentSales.reduce(
+    (acc, curr: any) => acc + (Number(curr.total_amount ?? curr.totalAmount) || 0),
+    0
+  );
+  const stockValuation = products.reduce((acc, p) => acc + (Number(p.physicalStock) || 0) * (Number(p.costPrice) || 0), 0);
 
   return (
     <div className="space-y-6">
