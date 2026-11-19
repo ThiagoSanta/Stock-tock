@@ -182,6 +182,18 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
         },
       },
       {
+        id: 'action-cash-movement',
+        title: 'Nuevo Gasto / Movimiento de Caja Chica',
+        description: 'Asentar egresos de mostrador (flete, viáticos, limpieza) o aportes',
+        category: 'Acciones Rápidas',
+        icon: Receipt,
+        keywords: ['gasto', 'caja chica', 'egreso', 'flete', 'viático', 'salida dinero'],
+        action: () => {
+          navigate('/ventas');
+          onClose();
+        },
+      },
+      {
         id: 'action-adjust-stock',
         title: 'Ajuste Manual de Inventario',
         description: 'Asentar sobrantes, roturas o mermas con justificación de auditoría',

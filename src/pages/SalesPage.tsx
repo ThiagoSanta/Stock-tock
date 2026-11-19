@@ -7,9 +7,13 @@ import { GetSalesHistoryUseCase } from '@/core/application/use-cases/sales/GetSa
 import { SalesTable } from '@/presentation/modules/sales/SalesTable';
 import { SaleA4InvoiceModal } from '@/presentation/modules/sales/SaleA4InvoiceModal';
 import { CashShiftModal } from '@/presentation/modules/sales/CashShiftModal';
+import { CashShiftOpenModal, CashShift } from '@/presentation/modules/sales/CashShiftOpenModal';
+import { CashMovementModal } from '@/presentation/modules/sales/CashMovementModal';
 import { SaleReturnModal } from '@/presentation/modules/sales/SaleReturnModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
+import { createClient } from '@/utils/supabase/client';
+import { ArrowDownRight, Clock } from 'lucide-react';
 
 export function SalesPage() {
   const [sales, setSales] = useState<SaleWithDetails[]>([]);
@@ -19,6 +23,9 @@ export function SalesPage() {
   const [selectedSale, setSelectedSale] = useState<SaleWithDetails | null>(null);
   const [returnSale, setReturnSale] = useState<SaleWithDetails | null>(null);
   const [isCashShiftOpen, setIsCashShiftOpen] = useState(false);
+  const [isMovementModalOpen, setIsMovementModalOpen] = useState(false);
+  const [isOpenShiftModalOpen, setIsOpenShiftModalOpen] = useState(false);
+  const [activeShift, setActiveShift] = useState<CashShift | null>(null);
   const [originFilter, setOriginFilter] = useState<'ALL' | 'VENTA_DIRECTA_MOSTRADOR' | 'PEDIDO_DESPACHADO'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -38,6 +45,32 @@ export function SalesPage() {
         });
 
         setSales(salesList);
+
+        // Consultar si hay turno abierto actualmente
+        const supabase = createClient();
+        const { data: shiftData } = await supabase
+          .from('cash_shifts')
+          .select('*')
+          .eq('company_id', context.companyId)
+          .eq('status', 'ABIERTO')
+          .order('opened_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (shiftData) {
+          setActiveShift({
+            id: shiftData.id,
+            companyId: shiftData.company_id,
+            shiftType: shiftData.shift_type,
+            cashierName: shiftData.cashier_name,
+            initialCash: Number(shiftData.initial_cash || 0),
+            status: shiftData.status,
+            notes: shiftData.notes,
+            openedAt: shiftData.opened_at,
+          });
+        } else {
+          setActiveShift(null);
+        }
       }
     } catch (err) {
       console.error('Error cargando ventas:', err);
@@ -91,14 +124,47 @@ export function SalesPage() {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsCashShiftOpen(true)}
-          className="h-8 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
-        >
-          <Calculator className="w-3.5 h-3.5" />
-          <span>Arqueo / Cierre de Caja</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          {activeShift ? (
+            <div className="h-8 px-2.5 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center gap-1.5 shadow-2xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
+              </span>
+              <span>
+                Caja Abierta: {activeShift.shiftType.replace('TURNO_', '')} (Fondo: ${activeShift.initialCash.toLocaleString('es-AR')})
+              </span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsOpenShiftModalOpen(true)}
+              className="h-8 px-3 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>Abrir Turno Caja</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setIsMovementModalOpen(true)}
+            className="h-8 px-3 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+            title="Asentar gasto menor, flete o aporte en efectivo"
+          >
+            <ArrowDownRight className="w-3.5 h-3.5 text-rose-600" />
+            <span>+ Gasto / Mov. Caja</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsCashShiftOpen(true)}
+            className="h-8 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+          >
+            <Calculator className="w-3.5 h-3.5" />
+            <span>Arqueo / Cierre de Caja</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -186,12 +252,42 @@ export function SalesPage() {
         onClose={() => setSelectedSale(null)}
       />
 
+      {/* Modal de Apertura de Turno */}
+      {isOpenShiftModalOpen && (
+        <CashShiftOpenModal
+          isOpen={isOpenShiftModalOpen}
+          onClose={() => setIsOpenShiftModalOpen(false)}
+          companyId={companyId}
+          onShiftOpened={(shift) => {
+            setActiveShift(shift);
+            loadData();
+          }}
+        />
+      )}
+
+      {/* Modal de Movimiento de Caja Chica (Gastos / Aportes) */}
+      {isMovementModalOpen && (
+        <CashMovementModal
+          isOpen={isMovementModalOpen}
+          onClose={() => setIsMovementModalOpen(false)}
+          companyId={companyId}
+          companyName={companyName}
+          onMovementCreated={loadData}
+        />
+      )}
+
       {/* Modal de Arqueo y Cierre de Caja Diario */}
       <CashShiftModal
         isOpen={isCashShiftOpen}
         onClose={() => setIsCashShiftOpen(false)}
         sales={sales}
+        companyId={companyId}
         companyName={companyName}
+        activeShift={activeShift}
+        onShiftClosed={() => {
+          setActiveShift(null);
+          loadData();
+        }}
       />
 
       {/* Modal de Devolución / Cambio de Mercadería */}

@@ -252,6 +252,37 @@ CREATE TABLE IF NOT EXISTS sale_items (
 );
 
 -- ==============================================================================
+-- 7b. TESORERÍA, GASTOS Y ARQUEOS DE CAJA
+-- ==============================================================================
+
+CREATE TABLE IF NOT EXISTS cash_movements (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    movement_type VARCHAR(20) NOT NULL, -- INGRESO, EGRESO
+    category VARCHAR(50) NOT NULL, -- GASTO_LIMPIEZA, FLETE, VIATICOS, RETIRO_DUENO, APORTE_CAPITAL, VARIOS
+    amount NUMERIC(14, 2) NOT NULL,
+    description TEXT NOT NULL,
+    voucher_number VARCHAR(50) NOT NULL,
+    responsible_name VARCHAR(100),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS cash_shifts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    shift_type VARCHAR(30) NOT NULL DEFAULT 'TURNO_UNICO', -- TURNO_MANANA, TURNO_TARDE, TURNO_UNICO
+    cashier_name VARCHAR(100) NOT NULL,
+    initial_cash NUMERIC(14, 2) NOT NULL DEFAULT 0.00,
+    counted_cash NUMERIC(14, 2),
+    expected_cash NUMERIC(14, 2),
+    cash_difference NUMERIC(14, 2),
+    status VARCHAR(20) NOT NULL DEFAULT 'ABIERTO', -- ABIERTO, CERRADO
+    notes TEXT,
+    opened_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    closed_at TIMESTAMPTZ
+);
+
+-- ==============================================================================
 -- 8. COMPRAS (ÓRDENES DE COMPRA Y RECEPCIÓN)
 -- ==============================================================================
 

@@ -52,6 +52,8 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
         purchasesRes,
         ordersRes,
         paymentsRes,
+        cashMovementsRes,
+        cashShiftsRes,
       ] = await Promise.all([
         supabase.from('companies').select('*').eq('id', companyId),
         supabase.from('warehouses').select('*').eq('company_id', companyId),
@@ -65,6 +67,8 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
         supabase.from('purchases').select('*').eq('company_id', companyId),
         supabase.from('orders').select('*').eq('company_id', companyId),
         supabase.from('customer_payments').select('*').eq('company_id', companyId),
+        supabase.from('cash_movements').select('*').eq('company_id', companyId),
+        supabase.from('cash_shifts').select('*').eq('company_id', companyId),
       ]);
 
       const productIds = (productsRes.data || []).map((p: any) => p.id);
@@ -111,6 +115,8 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
           saleItems: saleItemsRes.data || [],
           purchases: purchasesRes.data || [],
           orders: ordersRes.data || [],
+          cashMovements: cashMovementsRes.data || [],
+          cashShifts: cashShiftsRes.data || [],
         },
       };
 
@@ -207,6 +213,14 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
 
       if (db.saleItems?.length > 0) {
         await supabase.from('sale_items').upsert(db.saleItems, { onConflict: 'id' });
+      }
+
+      if (db.cashMovements?.length > 0) {
+        await supabase.from('cash_movements').upsert(db.cashMovements, { onConflict: 'id' });
+      }
+
+      if (db.cashShifts?.length > 0) {
+        await supabase.from('cash_shifts').upsert(db.cashShifts, { onConflict: 'id' });
       }
 
       setRestoreSuccess(
