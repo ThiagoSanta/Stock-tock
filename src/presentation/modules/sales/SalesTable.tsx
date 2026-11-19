@@ -96,7 +96,8 @@ export function SalesTable({ sales, loading, onSelectSale }: SalesTableProps) {
                   <td className="py-2.5 px-3 text-right">
                     <button
                       type="button"
-                      aria-label={`Ver detalle del comprobante ${sale.saleNumber}`}
+                      aria-label={`Ver comprobante A4 de la venta ${sale.saleNumber}`}
+                      title="Ver e imprimir comprobante A4"
                       onClick={(e) => {
                         e.stopPropagation();
                         onSelectSale(sale);

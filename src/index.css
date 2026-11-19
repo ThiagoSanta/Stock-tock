@@ -77,3 +77,34 @@ select:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+
+/* Reglas de Impresión A4 Estándar para Comprobantes y Remitos */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt !important;
+  }
+
+  /* Ocultar barra lateral, botones y overlays normales */
+  aside,
+  header,
+  nav,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  #printable-a4-voucher {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+  }
+}

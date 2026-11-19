@@ -12,9 +12,11 @@ import {
   CreditCard,
   Banknote,
   ArrowRightLeft,
+  Printer,
 } from 'lucide-react';
 import { ProductWithStock } from '@/core/application/ports/IProductRepository';
 import { PaymentMethod, Sale } from '@/core/domain/sales/types';
+import { SaleA4InvoiceModal } from '@/presentation/modules/sales/SaleA4InvoiceModal';
 
 interface CartItem {
   product: ProductWithStock;
@@ -52,6 +54,7 @@ export function PosModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [completedSale, setCompletedSale] = useState<Sale | null>(null);
+  const [showA4Receipt, setShowA4Receipt] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -59,6 +62,7 @@ export function PosModal({
       setSearchTerm('');
       setCompletedSale(null);
       setError(null);
+      setShowA4Receipt(false);
     }
   }, [isOpen]);
 
@@ -224,12 +228,21 @@ export function PosModal({
               </div>
             </div>
 
-            <div className="flex items-center justify-center gap-2 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowA4Receipt(true)}
+                className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer border border-slate-300"
+              >
+                <Printer className="w-3.5 h-3.5 text-slate-700" aria-hidden="true" />
+                <span>Imprimir Comprobante A4</span>
+              </button>
               <button
                 type="button"
                 onClick={() => {
                   setCompletedSale(null);
                   setCart([]);
+                  setShowA4Receipt(false);
                 }}
                 className="h-8 px-3.5 rounded bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs focus-visible:ring-2 focus-visible:ring-slate-900"
               >
@@ -243,6 +256,13 @@ export function PosModal({
                 Cerrar
               </button>
             </div>
+
+            {showA4Receipt && (
+              <SaleA4InvoiceModal
+                sale={completedSale}
+                onClose={() => setShowA4Receipt(false)}
+              />
+            )}
           </div>
         ) : (
           <div className="p-4 overflow-y-auto space-y-3.5 flex-1">

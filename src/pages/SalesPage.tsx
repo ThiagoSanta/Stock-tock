@@ -5,7 +5,7 @@ import { SaleWithDetails } from '@/core/application/ports/ISaleRepository';
 import { SupabaseSaleRepository } from '@/core/infrastructure/repositories/SupabaseSaleRepository';
 import { GetSalesHistoryUseCase } from '@/core/application/use-cases/sales/GetSalesHistoryUseCase';
 import { SalesTable } from '@/presentation/modules/sales/SalesTable';
-import { SaleReceiptModal } from '@/presentation/modules/sales/SaleReceiptModal';
+import { SaleA4InvoiceModal } from '@/presentation/modules/sales/SaleA4InvoiceModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 
@@ -164,8 +164,8 @@ export function SalesPage() {
         onSelectSale={setSelectedSale}
       />
 
-      {/* Modal de Comprobante / Ticket */}
-      <SaleReceiptModal
+      {/* Modal de Comprobante A4 */}
+      <SaleA4InvoiceModal
         sale={selectedSale}
         onClose={() => setSelectedSale(null)}
       />
