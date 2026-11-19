@@ -11,6 +11,8 @@ export interface Customer {
   phone?: string;
   address?: string;
   notes?: string;
+  creditLimit?: number; // Límite de crédito asignado para cta. cte. (0 = sin límite o no permitido)
+  priceList?: 'MINORISTA' | 'MAYORISTA' | 'GREMIO'; // Lista de precios asignada
   active: boolean;
   createdAt: string;
 }

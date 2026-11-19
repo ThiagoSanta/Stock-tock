@@ -87,8 +87,14 @@ export function ProductTable({ products, loading, onOpenLots }: ProductTableProp
                   <td className="py-2.5 px-3 text-right font-mono text-slate-700 tabular-nums">
                     ${item.costPrice.toFixed(2)}
                   </td>
-                  <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 tabular-nums">
-                    ${item.salePrice.toFixed(2)}
+                  <td className="py-2.5 px-3 text-right font-mono tabular-nums">
+                    <span className="font-bold text-slate-900 block">${item.salePrice.toFixed(2)}</span>
+                    {(item.wholesalePrice || item.specialPrice) ? (
+                      <div className="text-[10px] text-slate-500 space-y-0.5 mt-0.5">
+                        {item.wholesalePrice ? <div>May: ${item.wholesalePrice.toFixed(2)}</div> : null}
+                        {item.specialPrice ? <div>Grem: ${item.specialPrice.toFixed(2)}</div> : null}
+                      </div>
+                    ) : null}
                   </td>
                   <td className="py-2.5 px-3 text-center font-mono text-slate-800 tabular-nums font-medium">
                     {item.physicalStock}

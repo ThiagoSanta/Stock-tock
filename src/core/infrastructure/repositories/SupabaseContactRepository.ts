@@ -61,6 +61,8 @@ export class SupabaseContactRepository implements IContactRepository {
         phone: c.phone || undefined,
         address: c.address || undefined,
         notes: c.notes || undefined,
+        creditLimit: Number(c.credit_limit || 0),
+        priceList: c.price_list || 'MINORISTA',
         active: c.active ?? true,
         createdAt: c.created_at,
         totalOrdersCount,
@@ -152,6 +154,8 @@ export class SupabaseContactRepository implements IContactRepository {
         phone: customer.phone || null,
         address: customer.address || null,
         notes: customer.notes || null,
+        credit_limit: customer.creditLimit || 0,
+        price_list: customer.priceList || 'MINORISTA',
         active: customer.active,
       })
       .select()
@@ -168,6 +172,8 @@ export class SupabaseContactRepository implements IContactRepository {
       phone: data.phone || undefined,
       address: data.address || undefined,
       notes: data.notes || undefined,
+      creditLimit: Number(data.credit_limit || 0),
+      priceList: data.price_list || 'MINORISTA',
       active: data.active,
       createdAt: data.created_at,
     };

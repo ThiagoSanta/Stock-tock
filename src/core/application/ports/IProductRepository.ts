@@ -16,6 +16,8 @@ export interface CreateProductWithStockDTO {
   unitOfMeasure: 'UNIDAD' | 'KG' | 'LITRO' | 'METRO' | 'PACK';
   costPrice: number;
   salePrice: number;
+  wholesalePrice?: number;
+  specialPrice?: number;
   minStockAlert: number;
   storageLocation?: string;
   tracksLotsAndExpiry?: boolean;

@@ -11,7 +11,7 @@ interface BulkPriceUpdateModalProps {
   onUpdateComplete: () => Promise<void>;
 }
 
-type UpdateTarget = 'SALE_PRICE_PERCENT' | 'COST_PRICE_PERCENT' | 'MARKUP_ON_COST';
+type UpdateTarget = 'SALE_PRICE_PERCENT' | 'ALL_PRICES_PERCENT' | 'COST_PRICE_PERCENT' | 'MARKUP_ON_COST';
 type RoundingMode = 'NONE' | 'INTEGER' | 'DECADE' | 'HUNDRED' | 'PSYCHOLOGICAL_90' | 'PSYCHOLOGICAL_99';
 
 export function BulkPriceUpdateModal({
@@ -55,7 +55,7 @@ export function BulkPriceUpdateModal({
       let newSalePrice = p.salePrice;
       let newCostPrice = p.costPrice;
 
-      if (target === 'SALE_PRICE_PERCENT') {
+      if (target === 'SALE_PRICE_PERCENT' || target === 'ALL_PRICES_PERCENT') {
         const factor = 1 + numPercent / 100;
         newSalePrice = roundPrice(p.salePrice * factor, rounding);
       } else if (target === 'COST_PRICE_PERCENT') {
@@ -67,6 +67,9 @@ export function BulkPriceUpdateModal({
         newSalePrice = roundPrice(p.costPrice * factor, rounding);
       }
 
+      const newWholesalePrice = p.wholesalePrice ? roundPrice(p.wholesalePrice * (1 + numPercent / 100), rounding) : undefined;
+      const newSpecialPrice = p.specialPrice ? roundPrice(p.specialPrice * (1 + numPercent / 100), rounding) : undefined;
+
       const diffSale = newSalePrice - p.salePrice;
       const diffCost = newCostPrice - p.costPrice;
 
@@ -76,6 +79,8 @@ export function BulkPriceUpdateModal({
         sku: p.sku,
         oldSalePrice: p.salePrice,
         newSalePrice,
+        newWholesalePrice,
+        newSpecialPrice,
         diffSale,
         oldCostPrice: p.costPrice,
         newCostPrice,
@@ -112,6 +117,10 @@ export function BulkPriceUpdateModal({
 
         if (target === 'SALE_PRICE_PERCENT' || target === 'MARKUP_ON_COST') {
           updatePayload.sale_price = item.newSalePrice;
+        } else if (target === 'ALL_PRICES_PERCENT') {
+          updatePayload.sale_price = item.newSalePrice;
+          if (item.newWholesalePrice !== undefined) updatePayload.wholesale_price = item.newWholesalePrice;
+          if (item.newSpecialPrice !== undefined) updatePayload.special_price = item.newSpecialPrice;
         }
         if (target === 'COST_PRICE_PERCENT') {
           updatePayload.cost_price = item.newCostPrice;
@@ -192,7 +201,8 @@ export function BulkPriceUpdateModal({
                 onChange={(e) => setTarget(e.target.value as UpdateTarget)}
                 className="w-full h-8 px-2 rounded bg-white border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-slate-900"
               >
-                <option value="SALE_PRICE_PERCENT">Precio de Venta (+ / - %)</option>
+                <option value="SALE_PRICE_PERCENT">Precio de Venta Minorista (+ / - %)</option>
+                <option value="ALL_PRICES_PERCENT">Todas las Listas (Minorista + Mayorista + Gremio) (+ / - %)</option>
                 <option value="COST_PRICE_PERCENT">Costo de Reposición (+ / - %)</option>
                 <option value="MARKUP_ON_COST">Margen sobre Costo (%)</option>
               </select>

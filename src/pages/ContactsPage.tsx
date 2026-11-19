@@ -12,6 +12,7 @@ import { SupplierTable } from '@/presentation/modules/contacts/SupplierTable';
 import { ContactModal } from '@/presentation/modules/contacts/ContactModal';
 import { CustomerPaymentModal } from '@/presentation/modules/contacts/CustomerPaymentModal';
 import { CustomerAccountStatementModal } from '@/presentation/modules/contacts/CustomerAccountStatementModal';
+import { CustomerProfileModal } from '@/presentation/modules/contacts/CustomerProfileModal';
 import { SupplierPaymentModal } from '@/presentation/modules/contacts/SupplierPaymentModal';
 import { SupplierAccountStatementModal } from '@/presentation/modules/contacts/SupplierAccountStatementModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
@@ -27,6 +28,7 @@ export function ContactsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [payingCustomer, setPayingCustomer] = useState<CustomerWithMetrics | null>(null);
   const [statementCustomer, setStatementCustomer] = useState<CustomerWithMetrics | null>(null);
+  const [profileCustomer, setProfileCustomer] = useState<CustomerWithMetrics | null>(null);
   const [payingSupplier, setPayingSupplier] = useState<SupplierWithMetrics | null>(null);
   const [statementSupplier, setStatementSupplier] = useState<SupplierWithMetrics | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -227,6 +229,7 @@ export function ContactsPage() {
           onToggleStatus={handleToggleCustomer}
           onOpenPayment={(c) => setPayingCustomer(c)}
           onOpenStatement={(c) => setStatementCustomer(c)}
+          onOpenProfile={(c) => setProfileCustomer(c)}
         />
       ) : (
         <SupplierTable
@@ -271,6 +274,24 @@ export function ContactsPage() {
           onOpenPayment={(c) => {
             setStatementCustomer(null);
             setPayingCustomer(c);
+          }}
+        />
+      )}
+
+      {/* Modal de Ficha del Cliente */}
+      {profileCustomer && (
+        <CustomerProfileModal
+          isOpen={!!profileCustomer}
+          onClose={() => setProfileCustomer(null)}
+          customer={profileCustomer}
+          companyName={companyName}
+          onOpenPayment={(c) => {
+            setProfileCustomer(null);
+            setPayingCustomer(c);
+          }}
+          onOpenStatement={(c) => {
+            setProfileCustomer(null);
+            setStatementCustomer(c);
           }}
         />
       )}

@@ -107,11 +107,18 @@ export function DashboardPage() {
     return () => window.removeEventListener('stocktock:open-pos', handleOpenPos);
   }, [productRepo]);
 
-  const handleCompleteSale = async (items: any[], paymentMethod: any, notes?: string) => {
+  const handleCompleteSale = async (dataOrItems: any, maybePaymentMethod?: any, maybeNotes?: string) => {
     if (!company) return;
 
+    const isObject = !Array.isArray(dataOrItems);
+    const items = isObject ? dataOrItems.items : dataOrItems;
+    const paymentMethod = isObject ? dataOrItems.paymentMethod : maybePaymentMethod;
+    const notes = isObject ? dataOrItems.notes : maybeNotes;
+    const customerName = isObject ? dataOrItems.customerName : undefined;
+    const customerId = isObject ? dataOrItems.customerId : undefined;
+
     const sale = await processSaleUseCase.execute({
-      items: items.map((it) => ({
+      items: items.map((it: any) => ({
         productId: it.productId,
         quantity: it.quantity,
         unitPrice: it.unitPrice,
@@ -119,6 +126,8 @@ export function DashboardPage() {
         productName: it.productName,
       })),
       paymentMethod,
+      customerName,
+      customerId,
       notes,
       companyId: company.id,
       warehouseId: defaultWarehouseId,

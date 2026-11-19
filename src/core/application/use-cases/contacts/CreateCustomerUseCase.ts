@@ -9,6 +9,8 @@ export interface CreateCustomerDTO {
   phone?: string;
   address?: string;
   notes?: string;
+  creditLimit?: number;
+  priceList?: 'MINORISTA' | 'MAYORISTA' | 'GREMIO';
   active?: boolean;
 }
 
@@ -28,6 +30,8 @@ export class CreateCustomerUseCase {
       phone: dto.phone?.trim() || undefined,
       address: dto.address?.trim() || undefined,
       notes: dto.notes?.trim() || undefined,
+      creditLimit: dto.creditLimit ?? 0,
+      priceList: dto.priceList ?? 'MINORISTA',
       active: dto.active ?? true,
     });
   }

@@ -55,6 +55,7 @@ interface PosModalProps {
   onCompleteSale: (saleData: {
     paymentMethod: PaymentMethod;
     customerName: string;
+    customerId?: string;
     notes?: string;
     items: Array<{
       productId: string;
@@ -78,6 +79,15 @@ export function PosModal({
   const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState('Consumidor Final');
+  const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  const [activePriceList, setActivePriceList] = useState<'MINORISTA' | 'MAYORISTA' | 'GREMIO'>('MINORISTA');
+  const [availableCustomers, setAvailableCustomers] = useState<Array<{
+    id: string;
+    name: string;
+    creditLimit: number;
+    priceList: 'MINORISTA' | 'MAYORISTA' | 'GREMIO';
+    currentBalance: number;
+  }>>([]);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('EFECTIVO');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -147,6 +157,59 @@ export function PosModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, cart, customerName, adjustmentType, adjustmentValue, paymentMethod, saleNotes, showA4Receipt, activeQuote]);
 
+  // Cargar clientes de la empresa con sus saldos y límites
+  useEffect(() => {
+    if (!isOpen || !companyId) return;
+
+    const fetchCustomers = async () => {
+      try {
+        const supabase = createClient();
+        const { data: custs } = await supabase
+          .from('customers')
+          .select('id, name, credit_limit, price_list')
+          .eq('company_id', companyId)
+          .eq('active', true)
+          .order('name');
+
+        if (custs) {
+          const { data: salesData } = await supabase
+            .from('sales')
+            .select('customer_id, total_amount')
+            .eq('company_id', companyId)
+            .eq('payment_method', 'CUENTA_CORRIENTE')
+            .not('customer_id', 'is', null);
+
+          const { data: payData } = await supabase
+            .from('customer_payments')
+            .select('customer_id, amount')
+            .eq('company_id', companyId);
+
+          const debtMap = new Map<string, number>();
+          (salesData || []).forEach((s: any) => {
+            debtMap.set(s.customer_id, (debtMap.get(s.customer_id) || 0) + Number(s.total_amount || 0));
+          });
+          (payData || []).forEach((p: any) => {
+            debtMap.set(p.customer_id, (debtMap.get(p.customer_id) || 0) - Number(p.amount || 0));
+          });
+
+          setAvailableCustomers(
+            custs.map((c) => ({
+              id: c.id,
+              name: c.name,
+              creditLimit: Number(c.credit_limit || 0),
+              priceList: (c.price_list as any) || 'MINORISTA',
+              currentBalance: Math.max(0, debtMap.get(c.id) || 0),
+            }))
+          );
+        }
+      } catch (err) {
+        console.warn('Error fetching customers in POS:', err);
+      }
+    };
+
+    fetchCustomers();
+  }, [isOpen, companyId]);
+
   useEffect(() => {
     if (!isOpen) {
       setCart([]);
@@ -159,6 +222,9 @@ export function PosModal({
       setAdjustmentValue('');
       setSaleNotes('');
       setShowPausedList(false);
+      setSelectedCustomerId('');
+      setActivePriceList('MINORISTA');
+      setCustomerName('Consumidor Final');
     }
   }, [isOpen]);
 
@@ -209,8 +275,19 @@ export function PosModal({
     setCart((prev) => prev.filter((item) => item.product.id !== productId));
   };
 
+  // Resolución de precio dinámico según la lista activa
+  const getProductPrice = (product: ProductWithStock, list: 'MINORISTA' | 'MAYORISTA' | 'GREMIO') => {
+    if (list === 'MAYORISTA' && product.wholesalePrice && product.wholesalePrice > 0) {
+      return product.wholesalePrice;
+    }
+    if (list === 'GREMIO' && product.specialPrice && product.specialPrice > 0) {
+      return product.specialPrice;
+    }
+    return product.salePrice;
+  };
+
   // Cálculos de Totales y Ajustes (Descuentos y Recargos)
-  const rawSubtotal = cart.reduce((sum, item) => sum + item.quantity * item.product.salePrice, 0);
+  const rawSubtotal = cart.reduce((sum, item) => sum + item.quantity * getProductPrice(item.product, activePriceList), 0);
   const totalCost = cart.reduce((sum, item) => sum + item.quantity * item.product.costPrice, 0);
 
   const numAdj = parseFloat(adjustmentValue) || 0;
@@ -313,14 +390,18 @@ export function PosModal({
       const result = await onCompleteSale({
         paymentMethod,
         customerName: customerName.trim() || 'Consumidor Final',
+        customerId: selectedCustomerId || undefined,
         notes: fullNotes || undefined,
-        items: cart.map((item) => ({
-          productId: item.product.id,
-          productName: item.product.name,
-          quantity: item.quantity,
-          unitPrice: Math.round(item.product.salePrice * factor * 100) / 100,
-          costPrice: item.product.costPrice,
-        })),
+        items: cart.map((item) => {
+          const unitPrice = getProductPrice(item.product, activePriceList);
+          return {
+            productId: item.product.id,
+            productName: item.product.name,
+            quantity: item.quantity,
+            unitPrice: Math.round(unitPrice * factor * 100) / 100,
+            costPrice: item.product.costPrice,
+          };
+        }),
       });
 
       setCompletedSale(result);
@@ -349,12 +430,15 @@ export function PosModal({
       validUntil: validUntilDate.toLocaleDateString('es-AR'),
       customerName: customerName.trim() || 'Consumidor / Cliente Solicitante',
       companyName,
-      items: cart.map((item) => ({
-        name: item.product.name,
-        quantity: item.quantity,
-        unitPrice: item.product.salePrice,
-        subtotal: item.quantity * item.product.salePrice,
-      })),
+      items: cart.map((item) => {
+        const unitPrice = getProductPrice(item.product, activePriceList);
+        return {
+          name: item.product.name,
+          quantity: item.quantity,
+          unitPrice,
+          subtotal: item.quantity * unitPrice,
+        };
+      }),
       totalAmount: finalTotalAmount,
       notes: saleNotes || undefined,
     };
@@ -384,7 +468,7 @@ export function PosModal({
     if (!completedSale) return;
 
     const itemsText = cart
-      .map((it) => `• ${it.quantity}x ${it.product.name} ($${it.product.salePrice.toLocaleString('es-AR')})`)
+      .map((it) => `• ${it.quantity}x ${it.product.name} ($${getProductPrice(it.product, activePriceList).toLocaleString('es-AR')})`)
       .join('\n');
 
     const message =
@@ -657,7 +741,7 @@ export function PosModal({
                           </span>
                         </div>
                         <span className="font-mono font-bold text-slate-900 tabular-nums">
-                          ${p.salePrice.toLocaleString('es-AR')}
+                          ${getProductPrice(p, activePriceList).toLocaleString('es-AR')}
                         </span>
                       </button>
                     );
@@ -693,7 +777,7 @@ export function PosModal({
                           <p className="font-semibold text-slate-900 truncate">{product.name}</p>
                           <div className="flex items-center gap-2 mt-0.5">
                             <span className="text-[11px] font-mono text-slate-500">
-                              ${product.salePrice.toLocaleString('es-AR')} c/u
+                              ${getProductPrice(product, activePriceList).toLocaleString('es-AR')} c/u
                             </span>
                             {isInsufficient && (
                               <span className="text-[10px] font-semibold text-rose-700 bg-rose-50 px-1 rounded border border-rose-200">
@@ -728,7 +812,7 @@ export function PosModal({
                         </div>
 
                         <span className="w-20 text-right font-mono font-bold text-slate-900 tabular-nums">
-                          ${(quantity * product.salePrice).toLocaleString('es-AR')}
+                          ${(quantity * getProductPrice(product, activePriceList)).toLocaleString('es-AR')}
                         </span>
 
                         <button
@@ -791,17 +875,62 @@ export function PosModal({
             {/* Cliente y Medio de Cobro */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div>
-                <label htmlFor="pos-customer" className="block text-xs font-semibold text-slate-700 mb-1">
-                  Cliente (Opcional)
-                </label>
-                <input
+                <div className="flex items-center justify-between mb-1">
+                  <label htmlFor="pos-customer" className="text-xs font-semibold text-slate-700">
+                    Cliente Comercial
+                  </label>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[10px] text-slate-400 font-medium">Lista:</span>
+                    <div className="flex bg-slate-100 p-0.5 rounded border border-slate-200 text-[10px]">
+                      {(['MINORISTA', 'MAYORISTA', 'GREMIO'] as const).map((tier) => (
+                        <button
+                          key={tier}
+                          type="button"
+                          onClick={() => setActivePriceList(tier)}
+                          className={`px-1.5 py-0.5 rounded font-bold transition-all cursor-pointer ${
+                            activePriceList === tier
+                              ? tier === 'MAYORISTA'
+                                ? 'bg-purple-600 text-white shadow-2xs'
+                                : tier === 'GREMIO'
+                                ? 'bg-blue-600 text-white shadow-2xs'
+                                : 'bg-slate-900 text-white shadow-2xs'
+                              : 'text-slate-600 hover:text-slate-900'
+                          }`}
+                          title={`Cambiar a Lista ${tier}`}
+                        >
+                          {tier === 'MINORISTA' ? 'L1 Minorista' : tier === 'MAYORISTA' ? 'L2 Mayorista' : 'L3 Gremio'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <select
                   id="pos-customer"
-                  type="text"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="Consumidor Final"
-                  className="w-full h-8 px-2.5 rounded-lg bg-white border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-slate-900"
-                />
+                  value={selectedCustomerId}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    setSelectedCustomerId(id);
+                    if (!id) {
+                      setCustomerName('Consumidor Final');
+                      setActivePriceList('MINORISTA');
+                    } else {
+                      const found = availableCustomers.find((c) => c.id === id);
+                      if (found) {
+                        setCustomerName(found.name);
+                        setActivePriceList(found.priceList || 'MINORISTA');
+                      }
+                    }
+                  }}
+                  className="w-full h-8 px-2 rounded-lg bg-white border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-slate-900 font-medium"
+                >
+                  <option value="">Consumidor Final (Venta mostrador al paso)</option>
+                  {availableCustomers.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} {c.priceList !== 'MINORISTA' ? `[${c.priceList}]` : ''} {c.creditLimit > 0 ? `• Límite: $${c.creditLimit.toLocaleString('es-AR')}` : ''}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -838,6 +967,30 @@ export function PosModal({
                 </div>
               </div>
             </div>
+
+            {/* Alerta de Límite de Crédito Excedido en Cta Cte */}
+            {(() => {
+              const cust = availableCustomers.find((c) => c.id === selectedCustomerId);
+              if (
+                paymentMethod === 'CUENTA_CORRIENTE' &&
+                cust &&
+                cust.creditLimit > 0 &&
+                cust.currentBalance + finalTotalAmount > cust.creditLimit
+              ) {
+                return (
+                  <div
+                    role="alert"
+                    className="p-2.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center gap-2 font-medium"
+                  >
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600" />
+                    <span>
+                      <strong>Aviso de Límite de Crédito:</strong> Esta venta a Cta. Cte. superará el límite comercial asignado (${cust.creditLimit.toLocaleString('es-AR')}). Saldo actual: ${cust.currentBalance.toLocaleString('es-AR')} • Saldo proyectado: ${(cust.currentBalance + finalTotalAmount).toLocaleString('es-AR')}.
+                    </span>
+                  </div>
+                );
+              }
+              return null;
+            })()}
 
             {/* Footer y Totales */}
             <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">

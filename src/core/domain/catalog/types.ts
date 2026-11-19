@@ -33,6 +33,7 @@ export interface Product {
   costPrice: number; // Costo promedio ponderado a nivel empresa
   salePrice: number;
   wholesalePrice?: number;
+  specialPrice?: number; // Precio Gremio / Especial / Técnico
   minStockAlert: number;
   maxStock?: number;
   storageLocation?: string; // Ej: "Pasillo 2 / Est. B / Nivel 4"

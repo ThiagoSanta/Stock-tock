@@ -28,6 +28,8 @@ export function ContactModal({
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [notes, setNotes] = useState('');
+  const [creditLimit, setCreditLimit] = useState('0');
+  const [priceList, setPriceList] = useState<'MINORISTA' | 'MAYORISTA' | 'GREMIO'>('MINORISTA');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,6 +55,8 @@ export function ContactModal({
           phone,
           address,
           notes,
+          creditLimit: parseFloat(creditLimit) || 0,
+          priceList,
           active: true,
         });
       } else {
@@ -70,6 +74,15 @@ export function ContactModal({
       }
 
       onClose();
+      setName('');
+      setTaxId('');
+      setContactName('');
+      setEmail('');
+      setPhone('');
+      setAddress('');
+      setNotes('');
+      setCreditLimit('0');
+      setPriceList('MINORISTA');
     } catch (err: any) {
       setError(err.message || 'Error al guardar el contacto.');
     } finally {
@@ -227,6 +240,41 @@ export function ContactModal({
               </div>
             )}
           </div>
+
+          {contactType === 'CUSTOMER' && (
+            <div className="grid grid-cols-2 gap-3 p-2.5 rounded bg-slate-50 border border-slate-200">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  Límite de Crédito ($)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1000"
+                  value={creditLimit}
+                  onChange={(e) => setCreditLimit(e.target.value)}
+                  placeholder="0 = Sin límite"
+                  className="w-full h-8 px-2.5 rounded bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-slate-900"
+                />
+                <span className="text-[10px] text-slate-500 block mt-0.5">0 = Sin límite fijado</span>
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  Lista de Precios Asignada
+                </label>
+                <select
+                  value={priceList}
+                  onChange={(e) => setPriceList(e.target.value as any)}
+                  className="w-full h-8 px-2 rounded bg-white border border-slate-300 text-xs text-slate-900 font-semibold focus:outline-none focus:border-slate-900"
+                >
+                  <option value="MINORISTA">Lista 1: Minorista / Mostrador</option>
+                  <option value="MAYORISTA">Lista 2: Mayorista / Distribuidor</option>
+                  <option value="GREMIO">Lista 3: Gremio / Técnico</option>
+                </select>
+                <span className="text-[10px] text-slate-500 block mt-0.5">Se aplica por defecto en POS</span>
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-[11px] font-medium text-slate-600 mb-1">

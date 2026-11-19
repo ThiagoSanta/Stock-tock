@@ -15,6 +15,8 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
   const [unitOfMeasure, setUnitOfMeasure] = useState<'UNIDAD' | 'KG' | 'LITRO' | 'METRO' | 'PACK'>('UNIDAD');
   const [costPrice, setCostPrice] = useState('0');
   const [salePrice, setSalePrice] = useState('0');
+  const [wholesalePrice, setWholesalePrice] = useState('0');
+  const [specialPrice, setSpecialPrice] = useState('0');
   const [initialStock, setInitialStock] = useState('0');
   const [minStockAlert, setMinStockAlert] = useState('5');
   const [storageLocation, setStorageLocation] = useState('');
@@ -45,6 +47,8 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
         unitOfMeasure,
         costPrice: parseFloat(costPrice) || 0,
         salePrice: parseFloat(salePrice) || 0,
+        wholesalePrice: parseFloat(wholesalePrice) || undefined,
+        specialPrice: parseFloat(specialPrice) || undefined,
         initialStock: parseFloat(initialStock) || 0,
         minStockAlert: parseFloat(minStockAlert) || 0,
         storageLocation: storageLocation.trim() || undefined,
@@ -56,6 +60,8 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
       setStorageLocation('');
       setCostPrice('0');
       setSalePrice('0');
+      setWholesalePrice('0');
+      setSpecialPrice('0');
       setInitialStock('0');
       onClose();
     } catch (err: any) {
@@ -221,7 +227,7 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
             </div>
             <div>
               <label htmlFor="prod-price" className="block text-xs font-semibold text-slate-700 mb-1">
-                Precio de Venta ($) *
+                Precio Minorista ($) *
               </label>
               <input
                 id="prod-price"
@@ -234,6 +240,41 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
                 onChange={(e) => setSalePrice(e.target.value)}
                 className="w-full h-8 px-2.5 rounded bg-white border border-slate-300 text-xs font-mono text-slate-900 font-bold focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 p-2.5 rounded bg-slate-50 border border-slate-200">
+            <div>
+              <label htmlFor="prod-wholesale-price" className="block text-[11px] font-semibold text-slate-700 mb-1">
+                Precio Mayorista ($)
+              </label>
+              <input
+                id="prod-wholesale-price"
+                type="number"
+                step="0.01"
+                min="0"
+                value={wholesalePrice}
+                onChange={(e) => setWholesalePrice(e.target.value)}
+                placeholder="0 = usa minorista"
+                className="w-full h-8 px-2.5 rounded bg-white border border-slate-300 text-xs font-mono text-slate-900 focus:outline-none focus:border-slate-900"
+              />
+              <span className="text-[10px] text-slate-500 block mt-0.5">Lista 2 para distribuidores</span>
+            </div>
+            <div>
+              <label htmlFor="prod-special-price" className="block text-[11px] font-semibold text-slate-700 mb-1">
+                Precio Gremio / Especial ($)
+              </label>
+              <input
+                id="prod-special-price"
+                type="number"
+                step="0.01"
+                min="0"
+                value={specialPrice}
+                onChange={(e) => setSpecialPrice(e.target.value)}
+                placeholder="0 = usa minorista"
+                className="w-full h-8 px-2.5 rounded bg-white border border-slate-300 text-xs font-mono text-slate-900 focus:outline-none focus:border-slate-900"
+              />
+              <span className="text-[10px] text-slate-500 block mt-0.5">Lista 3 para técnicos/gremios</span>
             </div>
           </div>
 

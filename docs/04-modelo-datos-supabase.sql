@@ -434,3 +434,18 @@ CREATE INDEX IF NOT EXISTS idx_supplier_payments_lookup ON supplier_payments(com
 ALTER TABLE supplier_payments ENABLE ROW LEVEL SECURITY;
 CREATE POLICY allow_all_supplier_payments ON supplier_payments FOR ALL USING (true) WITH CHECK (true);
 GRANT ALL ON supplier_payments TO anon, authenticated, service_role;
+
+-- ==============================================================================
+-- ACTUALIZACIÓN: PUNTO 5 - CLIENTES & POLÍTICAS COMERCIALES (LISTAS Y LÍMITES)
+-- ==============================================================================
+
+-- 1. Políticas comerciales en Clientes: límite de crédito y lista de precios asignada
+ALTER TABLE customers 
+  ADD COLUMN IF NOT EXISTS credit_limit NUMERIC(14,2) DEFAULT 0.00,
+  ADD COLUMN IF NOT EXISTS price_list VARCHAR(50) DEFAULT 'MINORISTA';
+
+-- 2. Precios diferenciales multi-lista en Catálogo de Productos
+ALTER TABLE products 
+  ADD COLUMN IF NOT EXISTS wholesale_price NUMERIC(14,2),
+  ADD COLUMN IF NOT EXISTS special_price NUMERIC(14,2);
+
