@@ -18,6 +18,7 @@ import { ExportInventoryReportUseCase } from '@/core/application/use-cases/alert
 import { AlertCard } from '@/presentation/modules/alerts/AlertCard';
 import { PhysicalAuditSheetModal } from '@/presentation/modules/alerts/PhysicalAuditSheetModal';
 import { InventoryReconciliationModal } from '@/presentation/modules/alerts/InventoryReconciliationModal';
+import { RestockSuggestionsCard } from '@/presentation/modules/alerts/RestockSuggestionsCard';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 
@@ -211,6 +212,9 @@ export function AlertsPage() {
           Informativas ({infoCount})
         </button>
       </div>
+
+      {/* Sugerencias de Reabastecimiento Automatizadas */}
+      <RestockSuggestionsCard products={exportRows} />
 
       {/* Alerts Feed */}
       {loading ? (

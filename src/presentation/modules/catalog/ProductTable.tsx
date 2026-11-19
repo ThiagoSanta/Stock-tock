@@ -50,6 +50,7 @@ export function ProductTable({ products, loading }: ProductTableProps) {
               <th scope="col" className="py-3 px-3 text-center">Físico</th>
               <th scope="col" className="py-3 px-3 text-center">Reservado</th>
               <th scope="col" className="py-3 px-3 text-center">Disponible</th>
+              <th scope="col" className="py-3 px-3 text-center">Mínimo</th>
               <th scope="col" className="py-3 px-3 text-center">Estado</th>
             </tr>
           </thead>
@@ -84,6 +85,9 @@ export function ProductTable({ products, loading }: ProductTableProps) {
                   </td>
                   <td className="py-2.5 px-3 text-center font-mono font-bold text-slate-900 tabular-nums">
                     {item.availableStock}
+                  </td>
+                  <td className="py-2.5 px-3 text-center font-mono text-slate-500 tabular-nums">
+                    {item.minStockAlert ? `${item.minStockAlert} un.` : '—'}
                   </td>
                   <td className="py-2.5 px-3 text-center">
                     <span
