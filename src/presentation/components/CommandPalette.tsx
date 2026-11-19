@@ -170,6 +170,18 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
         },
       },
       {
+        id: 'action-cash-shift',
+        title: 'Arqueo y Cierre de Caja Diario',
+        description: 'Control de cobros en efectivo, transferencias y tarjetas del turno',
+        category: 'Acciones Rápidas',
+        icon: Receipt,
+        keywords: ['caja', 'cierre', 'arqueo', 'efectivo', 'turno', 'rendición'],
+        action: () => {
+          navigate('/ventas');
+          onClose();
+        },
+      },
+      {
         id: 'action-adjust-stock',
         title: 'Ajuste Manual de Inventario',
         description: 'Asentar sobrantes, roturas o mermas con justificación de auditoría',
@@ -252,6 +264,18 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
         keywords: ['planilla', 'conteo', 'imprimir', 'papel', 'inventario ciego'],
         action: () => {
           navigate('/alertas');
+          onClose();
+        },
+      },
+      {
+        id: 'report-backup',
+        title: 'Copia de Seguridad / Backup Completo (JSON)',
+        description: 'Descargar respaldo íntegro de productos, kardex, ventas y clientes',
+        category: 'Reportes & Auditoría',
+        icon: Settings,
+        keywords: ['backup', 'copia de seguridad', 'respaldo', 'guardar', 'json', 'descargar'],
+        action: () => {
+          navigate('/configuracion');
           onClose();
         },
       },

@@ -8,6 +8,7 @@ import { UpdateCompanySettingsUseCase, UpdateCompanyDTO } from '@/core/applicati
 import { ManageWarehousesUseCase, CreateWarehouseDTO } from '@/core/application/use-cases/settings/ManageWarehousesUseCase';
 import { CompanyForm } from '@/presentation/modules/settings/CompanyForm';
 import { WarehouseManager } from '@/presentation/modules/settings/WarehouseManager';
+import { BackupManager } from '@/presentation/modules/settings/BackupManager';
 import { BusinessRulesViewer } from '@/presentation/modules/settings/BusinessRulesViewer';
 import { invalidateCompanyContext } from '@/utils/supabase/companyContext';
 
@@ -101,6 +102,11 @@ export function SettingsPage() {
             warehouses={warehouses}
             onCreateWarehouse={handleCreateWarehouse}
             onSetDefault={handleSetDefaultWarehouse}
+          />
+
+          <BackupManager
+            companyId={company.id}
+            companyName={company.name}
           />
 
           <BusinessRulesViewer />

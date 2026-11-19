@@ -13,6 +13,7 @@ import {
   Banknote,
   ArrowRightLeft,
   Printer,
+  BookOpen,
 } from 'lucide-react';
 import { ProductWithStock } from '@/core/application/ports/IProductRepository';
 import { PaymentMethod, Sale } from '@/core/domain/sales/types';
@@ -131,6 +132,14 @@ export function PosModal({
     if (cart.length === 0) return;
     if (hasInsufficientStock) {
       setError('Hay productos en el carrito con cantidad superior al stock disponible.');
+      return;
+    }
+
+    if (
+      paymentMethod === 'CUENTA_CORRIENTE' &&
+      (!customerName || customerName.trim() === 'Consumidor Final')
+    ) {
+      setError('Para vender a Cuenta Corriente debés ingresar el nombre específico del cliente.');
       return;
     }
 
@@ -434,12 +443,13 @@ export function PosModal({
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Medio de Cobro
                 </label>
-                <div className="grid grid-cols-2 gap-1.5" role="group" aria-label="Medio de cobro">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5" role="group" aria-label="Medio de cobro">
                   {[
                     { id: 'EFECTIVO', label: 'Efectivo', icon: Banknote },
                     { id: 'TRANSFERENCIA', label: 'Transfer.', icon: ArrowRightLeft },
                     { id: 'TARJETA_DEBITO', label: 'Débito', icon: CreditCard },
                     { id: 'TARJETA_CREDITO', label: 'Crédito', icon: CreditCard },
+                    { id: 'CUENTA_CORRIENTE', label: 'Cta. Cte.', icon: BookOpen },
                   ].map((m) => {
                     const Icon = m.icon;
                     const isSelected = paymentMethod === m.id;

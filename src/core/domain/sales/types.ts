@@ -7,6 +7,7 @@ export type PaymentMethod =
   | 'TRANSFERENCIA'
   | 'TARJETA_DEBITO'
   | 'TARJETA_CREDITO'
+  | 'CUENTA_CORRIENTE'
   | 'CHEQUE'
   | 'OTRO';
 

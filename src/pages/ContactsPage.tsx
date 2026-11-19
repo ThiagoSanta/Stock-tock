@@ -10,6 +10,7 @@ import { ToggleContactStatusUseCase } from '@/core/application/use-cases/contact
 import { CustomerTable } from '@/presentation/modules/contacts/CustomerTable';
 import { SupplierTable } from '@/presentation/modules/contacts/SupplierTable';
 import { ContactModal } from '@/presentation/modules/contacts/ContactModal';
+import { CustomerPaymentModal } from '@/presentation/modules/contacts/CustomerPaymentModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 
@@ -18,8 +19,10 @@ export function ContactsPage() {
   const [customers, setCustomers] = useState<CustomerWithMetrics[]>([]);
   const [suppliers, setSuppliers] = useState<SupplierWithMetrics[]>([]);
   const [companyId, setCompanyId] = useState<string>('');
+  const [companyName, setCompanyName] = useState<string>('Stock·tock');
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [payingCustomer, setPayingCustomer] = useState<CustomerWithMetrics | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const contactRepo = useMemo(() => new SupabaseContactRepository(), []);
@@ -34,6 +37,7 @@ export function ContactsPage() {
       const context = await getCompanyContext();
       if (context) {
         setCompanyId(context.companyId);
+        if (context.companyName) setCompanyName(context.companyName);
 
         const [custs, supps] = await Promise.all([
           getContactsUseCase.executeCustomers(context.companyId),
@@ -215,6 +219,7 @@ export function ContactsPage() {
           customers={filteredCustomers}
           loading={loading}
           onToggleStatus={handleToggleCustomer}
+          onOpenPayment={(c) => setPayingCustomer(c)}
         />
       ) : (
         <SupplierTable
@@ -233,6 +238,16 @@ export function ContactsPage() {
           companyId={companyId}
           onCreateCustomer={handleCreateCustomer}
           onCreateSupplier={handleCreateSupplier}
+        />
+      )}
+
+      {/* Modal de Cobranza y Recibo A4 */}
+      {payingCustomer && (
+        <CustomerPaymentModal
+          isOpen={!!payingCustomer}
+          onClose={() => setPayingCustomer(null)}
+          customer={payingCustomer}
+          companyName={companyName}
         />
       )}
     </div>

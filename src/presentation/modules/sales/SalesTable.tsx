@@ -1,14 +1,15 @@
 import React from 'react';
 import { SaleWithDetails } from '@/core/application/ports/ISaleRepository';
-import { Receipt, Eye } from 'lucide-react';
+import { Receipt, Eye, Undo2 } from 'lucide-react';
 
 interface SalesTableProps {
   sales: SaleWithDetails[];
   loading: boolean;
   onSelectSale: (sale: SaleWithDetails) => void;
+  onOpenReturn?: (sale: SaleWithDetails) => void;
 }
 
-export function SalesTable({ sales, loading, onSelectSale }: SalesTableProps) {
+export function SalesTable({ sales, loading, onSelectSale, onOpenReturn }: SalesTableProps) {
   if (loading) {
     return (
       <div
@@ -94,18 +95,34 @@ export function SalesTable({ sales, loading, onSelectSale }: SalesTableProps) {
                     +${sale.estimatedGrossMargin.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                   </td>
                   <td className="py-2.5 px-3 text-right">
-                    <button
-                      type="button"
-                      aria-label={`Ver comprobante A4 de la venta ${sale.saleNumber}`}
-                      title="Ver e imprimir comprobante A4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectSale(sale);
-                      }}
-                      className="p-1.5 rounded text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-900"
-                    >
-                      <Eye className="w-4 h-4" aria-hidden="true" />
-                    </button>
+                    <div className="flex items-center justify-end gap-1">
+                      {onOpenReturn && (
+                        <button
+                          type="button"
+                          aria-label={`Devolución / cambio de la venta ${sale.saleNumber}`}
+                          title="Devolución / Cambio de mercadería"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenReturn(sale);
+                          }}
+                          className="p-1.5 rounded text-slate-400 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                        >
+                          <Undo2 className="w-3.5 h-3.5" aria-hidden="true" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        aria-label={`Ver comprobante A4 de la venta ${sale.saleNumber}`}
+                        title="Ver e imprimir comprobante A4"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectSale(sale);
+                        }}
+                        className="p-1.5 rounded text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-900"
+                      >
+                        <Eye className="w-4 h-4" aria-hidden="true" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );

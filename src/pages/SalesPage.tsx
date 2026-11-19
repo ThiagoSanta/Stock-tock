@@ -1,19 +1,24 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Receipt, DollarSign, TrendingUp, ShoppingBag, Search } from 'lucide-react';
+import { ArrowLeft, Receipt, DollarSign, TrendingUp, ShoppingBag, Search, Calculator } from 'lucide-react';
 import { SaleWithDetails } from '@/core/application/ports/ISaleRepository';
 import { SupabaseSaleRepository } from '@/core/infrastructure/repositories/SupabaseSaleRepository';
 import { GetSalesHistoryUseCase } from '@/core/application/use-cases/sales/GetSalesHistoryUseCase';
 import { SalesTable } from '@/presentation/modules/sales/SalesTable';
 import { SaleA4InvoiceModal } from '@/presentation/modules/sales/SaleA4InvoiceModal';
+import { CashShiftModal } from '@/presentation/modules/sales/CashShiftModal';
+import { SaleReturnModal } from '@/presentation/modules/sales/SaleReturnModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 
 export function SalesPage() {
   const [sales, setSales] = useState<SaleWithDetails[]>([]);
   const [companyId, setCompanyId] = useState<string>('');
+  const [companyName, setCompanyName] = useState<string>('Stock·tock');
   const [loading, setLoading] = useState(true);
   const [selectedSale, setSelectedSale] = useState<SaleWithDetails | null>(null);
+  const [returnSale, setReturnSale] = useState<SaleWithDetails | null>(null);
+  const [isCashShiftOpen, setIsCashShiftOpen] = useState(false);
   const [originFilter, setOriginFilter] = useState<'ALL' | 'VENTA_DIRECTA_MOSTRADOR' | 'PEDIDO_DESPACHADO'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -26,6 +31,7 @@ export function SalesPage() {
       const context = await getCompanyContext();
       if (context) {
         setCompanyId(context.companyId);
+        if (context.companyName) setCompanyName(context.companyName);
 
         const salesList = await getSalesUseCase.execute(context.companyId, {
           origin: originFilter !== 'ALL' ? originFilter : undefined,
@@ -84,6 +90,15 @@ export function SalesPage() {
             </h1>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setIsCashShiftOpen(true)}
+          className="h-8 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+        >
+          <Calculator className="w-3.5 h-3.5" />
+          <span>Arqueo / Cierre de Caja</span>
+        </button>
       </div>
 
       {/* KPI Cards */}
@@ -162,6 +177,7 @@ export function SalesPage() {
         sales={filteredSales}
         loading={loading}
         onSelectSale={setSelectedSale}
+        onOpenReturn={(s) => setReturnSale(s)}
       />
 
       {/* Modal de Comprobante A4 */}
@@ -169,6 +185,25 @@ export function SalesPage() {
         sale={selectedSale}
         onClose={() => setSelectedSale(null)}
       />
+
+      {/* Modal de Arqueo y Cierre de Caja Diario */}
+      <CashShiftModal
+        isOpen={isCashShiftOpen}
+        onClose={() => setIsCashShiftOpen(false)}
+        sales={sales}
+        companyName={companyName}
+      />
+
+      {/* Modal de Devolución / Cambio de Mercadería */}
+      {returnSale && (
+        <SaleReturnModal
+          isOpen={!!returnSale}
+          onClose={() => setReturnSale(null)}
+          sale={returnSale}
+          companyName={companyName}
+          onReturnComplete={loadData}
+        />
+      )}
     </div>
   );
 }
