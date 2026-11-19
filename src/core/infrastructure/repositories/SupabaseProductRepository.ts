@@ -51,6 +51,10 @@ export class SupabaseProductRepository implements IProductRepository {
     });
   }
 
+  async getProductsWithStock(companyId: string): Promise<ProductWithStock[]> {
+    return this.findAllWithStock(companyId);
+  }
+
   async findById(id: string): Promise<Product | null> {
     const { data, error } = await this.supabase
       .from('products')

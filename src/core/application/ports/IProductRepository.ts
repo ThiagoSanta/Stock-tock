@@ -25,6 +25,7 @@ export interface CreateProductWithStockDTO {
 export interface IProductRepository {
   findAll(companyId: string): Promise<Product[]>;
   findAllWithStock(companyId: string): Promise<ProductWithStock[]>;
+  getProductsWithStock(companyId: string): Promise<ProductWithStock[]>;
   findById(id: string): Promise<Product | null>;
   create(data: CreateProductWithStockDTO): Promise<Product>;
 }
