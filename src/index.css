@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* ── Tema Claro (por defecto) ─────────────────────────── */
 :root {
   --background: #f8fafc;
   --surface: #ffffff;
@@ -15,11 +16,88 @@
   --success: #15803d;
   --danger: #b91c1c;
   --warning: #b45309;
+  /* Sidebar */
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e2e8f0;
+  --sidebar-item-active: #0f172a;
+  --sidebar-item-active-text: #ffffff;
+  --sidebar-item-hover: #f1f5f9;
+  /* Inputs */
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-text: #0f172a;
+  --input-placeholder: #94a3b8;
+  /* Cards */
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  /* Table */
+  --table-header-bg: #f8fafc;
+  --table-row-hover: #f8fafc;
+  --table-border: #e2e8f0;
+  /* Badge chips */
+  --badge-bg: #f1f5f9;
+  --badge-text: #334155;
+  /* Modal overlay */
+  --modal-overlay: rgba(15, 23, 42, 0.5);
+  --modal-bg: #ffffff;
+  --modal-border: #cbd5e1;
+}
+
+/* ── Tema Oscuro ──────────────────────────────────────── */
+[data-theme="dark"] {
+  --background: #0f172a;
+  --surface: #1e293b;
+  --surface-hover: #293548;
+  --surface-muted: #172033;
+  --border: #334155;
+  --border-strong: #475569;
+  --foreground: #f1f5f9;
+  --foreground-muted: #94a3b8;
+  --primary: #e2e8f0;
+  --primary-hover: #f1f5f9;
+  --primary-text: #0f172a;
+  --success: #22c55e;
+  --danger: #f87171;
+  --warning: #fbbf24;
+  /* Sidebar */
+  --sidebar-bg: #1e293b;
+  --sidebar-border: #334155;
+  --sidebar-item-active: #e2e8f0;
+  --sidebar-item-active-text: #0f172a;
+  --sidebar-item-hover: #293548;
+  /* Inputs */
+  --input-bg: #0f172a;
+  --input-border: #334155;
+  --input-text: #f1f5f9;
+  --input-placeholder: #64748b;
+  /* Cards */
+  --card-bg: #1e293b;
+  --card-border: #334155;
+  /* Table */
+  --table-header-bg: #172033;
+  --table-row-hover: #172033;
+  --table-border: #334155;
+  /* Badge chips */
+  --badge-bg: #293548;
+  --badge-text: #cbd5e1;
+  /* Modal overlay */
+  --modal-overlay: rgba(0, 0, 0, 0.7);
+  --modal-bg: #1e293b;
+  --modal-border: #334155;
+}
+
+/* ── Aplicar variables al DOM ─────────────────────────── */
+html {
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
+  transition: background-color 0.2s ease, color 0.2s ease;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -68,6 +146,99 @@ select:focus-visible {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+[data-theme="dark"] :focus-visible {
+  outline-color: #e2e8f0;
+}
+
+/* ── Reglas de Inversión y Contraste para Tema Oscuro ──────────── */
+[data-theme="dark"] .bg-white {
+  background-color: var(--surface) !important;
+  color: var(--foreground) !important;
+}
+
+[data-theme="dark"] .bg-slate-50 {
+  background-color: var(--background) !important;
+}
+
+[data-theme="dark"] .bg-slate-100 {
+  background-color: var(--surface-muted) !important;
+}
+
+[data-theme="dark"] .hover\:bg-slate-50:hover,
+[data-theme="dark"] .hover\:bg-slate-100:hover,
+[data-theme="dark"] .hover\:bg-slate-50\/80:hover {
+  background-color: var(--surface-hover) !important;
+}
+
+[data-theme="dark"] .border-slate-100,
+[data-theme="dark"] .border-slate-200,
+[data-theme="dark"] .border-slate-300 {
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .text-slate-800,
+[data-theme="dark"] .text-slate-700 {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .text-slate-600,
+[data-theme="dark"] .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .text-slate-400 {
+  color: #64748b !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--input-border) !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: var(--input-placeholder) !important;
+}
+
+/* Modales y tarjetas con sombras en modo oscuro */
+[data-theme="dark"] .shadow-xs,
+[data-theme="dark"] .shadow-sm,
+[data-theme="dark"] .shadow-md,
+[data-theme="dark"] .shadow-xl {
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Botones de acción principales en modo oscuro */
+[data-theme="dark"] button.bg-slate-900 {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] button.hover\:bg-slate-800:hover {
+  background-color: #2563eb !important;
+}
+
+/* Ítem activo de navegación en el Sidebar en modo oscuro */
+[data-theme="dark"] nav a.bg-slate-900 {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
 }
 
 /* Respeto a preferencia de accesibilidad de movimiento reducido */

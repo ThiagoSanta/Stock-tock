@@ -2,6 +2,7 @@ import React, { lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/layouts/AppLayout';
 import { UserRoleProvider } from '@/utils/security/UserRoleContext';
+import { ThemeProvider } from '@/utils/theme/ThemeContext';
 
 // Code-splitting por ruta con React.lazy para carga inicial ultrarrápida
 const DashboardPage = lazy(() =>
@@ -34,8 +35,9 @@ const SettingsPage = lazy(() =>
 
 export function App() {
   return (
-    <UserRoleProvider>
-      <Routes>
+    <ThemeProvider>
+      <UserRoleProvider>
+        <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="productos" element={<ProductsPage />} />
@@ -50,6 +52,7 @@ export function App() {
         </Route>
       </Routes>
     </UserRoleProvider>
+  </ThemeProvider>
   );
 }
 

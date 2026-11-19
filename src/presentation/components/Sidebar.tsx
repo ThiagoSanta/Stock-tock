@@ -14,10 +14,15 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ArrowRightLeft,
+  Sun,
+  Moon,
+  MonitorDown,
   LucideIcon,
 } from 'lucide-react';
 import { useUserRole } from '@/utils/security/UserRoleContext';
 import { OperatorSwitcherModal } from '@/presentation/components/OperatorSwitcherModal';
+import { useTheme } from '@/utils/theme/ThemeContext';
+import { usePwaInstall } from '@/utils/pwa/usePwaInstall';
 
 interface NavItem {
   name: string;
@@ -60,6 +65,8 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
   const location = useLocation();
   const pathname = location.pathname;
   const { currentUser, permissions } = useUserRole();
+  const { isDark, toggleTheme } = useTheme();
+  const { isInstallable, installApp } = usePwaInstall();
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
 
   const handlePrefetch = (href: string) => {
@@ -98,15 +105,31 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
               <span className="text-[10px] text-slate-400 mt-[3px]">Control Comercial</span>
             </div>
 
-            <button
-              type="button"
-              onClick={onToggleCollapse}
-              aria-label="Colapsar menú"
-              title="Colapsar menú (Ctrl+B)"
-              className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
-            >
-              <PanelLeftClose className="w-3.5 h-3.5" aria-hidden="true" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                {isDark ? (
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                ) : (
+                  <Moon className="w-3.5 h-3.5 text-slate-500" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={onToggleCollapse}
+                aria-label="Colapsar menú"
+                title="Colapsar menú (Ctrl+B)"
+                className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <PanelLeftClose className="w-3.5 h-3.5" aria-hidden="true" />
+              </button>
+            </div>
           </div>
         ) : (
           <div className="w-full flex items-center justify-center">
@@ -252,8 +275,49 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
         )}
       </div>
 
+      {/* ── PWA Install Banner / Button ─────────────────── */}
+      {isInstallable && (
+        <div className="px-2 pb-1 shrink-0">
+          {!isCollapsed ? (
+            <button
+              type="button"
+              onClick={installApp}
+              className="w-full px-2 py-1.5 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+              title="Instalar Stock·tock como aplicación de escritorio nativa"
+            >
+              <MonitorDown className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span>Instalar App</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={installApp}
+              className="w-7 h-7 mx-auto rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 flex items-center justify-center transition-colors cursor-pointer"
+              title="Instalar Stock·tock como aplicación de escritorio"
+            >
+              <MonitorDown className="w-3.5 h-3.5 text-blue-600" />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* ── Footer / Estado ──────────────────────────────── */}
       <div className="px-2 py-2 border-t border-slate-100 shrink-0">
+        {isCollapsed && (
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={isDark ? 'Modo claro' : 'Modo oscuro'}
+            title={isDark ? 'Modo claro' : 'Modo oscuro'}
+            className="w-7 h-7 mx-auto mb-1 rounded flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+          >
+            {isDark ? (
+              <Sun className="w-3.5 h-3.5 text-amber-400" />
+            ) : (
+              <Moon className="w-3.5 h-3.5 text-slate-500" />
+            )}
+          </button>
+        )}
         {!isCollapsed ? (
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2">
