@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { X, Percent, ArrowRight, AlertCircle, CheckCircle2, RefreshCw, Calculator } from 'lucide-react';
 import { ProductWithStock } from '@/core/application/ports/IProductRepository';
 import { createClient } from '@/utils/supabase/client';
+import { AuditService } from '@/core/application/services/AuditService';
+import { useUserRole } from '@/utils/security/UserRoleContext';
 
 interface BulkPriceUpdateModalProps {
   isOpen: boolean;
@@ -29,6 +31,7 @@ export function BulkPriceUpdateModal({
   const [successCount, setSuccessCount] = useState<number | null>(null);
 
   const numPercent = parseFloat(percentage) || 0;
+  const { currentUser } = useUserRole();
 
   const roundPrice = (val: number, mode: RoundingMode): number => {
     if (val <= 0) return 0;
@@ -138,6 +141,15 @@ export function BulkPriceUpdateModal({
 
       setSuccessCount(count);
       await onUpdateComplete();
+      // Audit log — no bloqueante
+      AuditService.logAction({
+        companyId,
+        userName: currentUser.name,
+        userRole: currentUser.role,
+        module: 'CATALOGO',
+        action: 'ACTUALIZACION_MASIVA_PRECIOS',
+        details: `${count} producto(s) actualizados, ajuste ${numPercent > 0 ? '+' : ''}${numPercent}% (${target})`,
+      }).catch(() => {});
     } catch (err: any) {
       console.error('Error actualizando precios:', err);
       setError(err?.message || 'Error durante la actualización masiva.');

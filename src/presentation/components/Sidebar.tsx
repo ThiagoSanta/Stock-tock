@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -13,8 +13,11 @@ import {
   Search,
   PanelLeftClose,
   PanelLeftOpen,
+  ArrowRightLeft,
   LucideIcon,
 } from 'lucide-react';
+import { useUserRole } from '@/utils/security/UserRoleContext';
+import { OperatorSwitcherModal } from '@/presentation/components/OperatorSwitcherModal';
 
 interface NavItem {
   name: string;
@@ -56,12 +59,21 @@ interface SidebarProps {
 export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: SidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
+  const { currentUser, permissions } = useUserRole();
+  const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
 
   const handlePrefetch = (href: string) => {
     try { prefetchMap[href]?.(); } catch { /* silent */ }
   };
 
   const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+
+  const filteredNavItems = navigationItems.filter((item) => {
+    if (item.href === '/compras' && !permissions.canAccessPurchases) return false;
+    if (item.href === '/ventas' && !permissions.canMakeSales) return false;
+    if (item.href === '/configuracion' && !permissions.canAccessSettings) return false;
+    return true;
+  });
 
   return (
     <aside
@@ -143,7 +155,7 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
 
       {/* ── Navegación ───────────────────────────────────── */}
       <nav aria-label="Navegación principal" className="flex-1 px-2 py-1 space-y-px overflow-y-auto">
-        {navigationItems.map((item) => {
+        {filteredNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
 
@@ -202,8 +214,46 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
         })}
       </nav>
 
+      {/* ── Operador & Rol Activo ────────────────────────── */}
+      <div className="p-2 border-t border-slate-100 shrink-0">
+        {!isCollapsed ? (
+          <button
+            type="button"
+            onClick={() => setIsSwitcherOpen(true)}
+            className="w-full p-1.5 rounded-lg border border-slate-200 hover:border-slate-300 bg-slate-50/70 hover:bg-slate-100 flex items-center justify-between transition-all cursor-pointer text-left"
+            title="Cambiar de Operador o Turno"
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <div
+                className={`w-6 h-6 rounded-full ${currentUser.avatarColor} text-white flex items-center justify-center text-[10px] font-bold shrink-0`}
+              >
+                {currentUser.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <span className="text-[11px] font-bold text-slate-900 block truncate leading-tight">
+                  {currentUser.name}
+                </span>
+                <span className="text-[9px] font-semibold text-slate-500 uppercase font-mono block leading-none mt-0.5">
+                  {currentUser.role === 'ADMIN' ? 'Admin' : currentUser.role === 'CASHIER' ? 'Cajero' : 'Depósito'}
+                </span>
+              </div>
+            </div>
+            <ArrowRightLeft className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsSwitcherOpen(true)}
+            className={`w-7 h-7 mx-auto rounded-full ${currentUser.avatarColor} text-white flex items-center justify-center text-[11px] font-bold cursor-pointer hover:ring-2 hover:ring-slate-400 transition-all`}
+            title={`Operador: ${currentUser.name} (${currentUser.role}). Clic para cambiar.`}
+          >
+            {currentUser.name.charAt(0).toUpperCase()}
+          </button>
+        )}
+      </div>
+
       {/* ── Footer / Estado ──────────────────────────────── */}
-      <div className="px-2 py-2.5 border-t border-slate-100 shrink-0">
+      <div className="px-2 py-2 border-t border-slate-100 shrink-0">
         {!isCollapsed ? (
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2">
@@ -227,6 +277,12 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
           </div>
         )}
       </div>
+
+      {/* Modal selector de operador */}
+      <OperatorSwitcherModal
+        isOpen={isSwitcherOpen}
+        onClose={() => setIsSwitcherOpen(false)}
+      />
     </aside>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ProductWithStock } from '@/core/application/ports/IProductRepository';
-import { AlertTriangle, CheckCircle, PackageX, MapPin, Layers } from 'lucide-react';
+import { AlertTriangle, CheckCircle, PackageX, MapPin, Layers, Lock } from 'lucide-react';
+import { useUserRole } from '@/utils/security/UserRoleContext';
 
 interface ProductTableProps {
   products: ProductWithStock[];
@@ -9,6 +10,8 @@ interface ProductTableProps {
 }
 
 export function ProductTable({ products, loading, onOpenLots }: ProductTableProps) {
+  const { permissions } = useUserRole();
+
   if (loading) {
     return (
       <div
@@ -85,7 +88,14 @@ export function ProductTable({ products, loading, onOpenLots }: ProductTableProp
                     {item.unitOfMeasure}
                   </td>
                   <td className="py-2.5 px-3 text-right font-mono text-slate-700 tabular-nums">
-                    ${item.costPrice.toFixed(2)}
+                    {permissions.canViewFinancials ? (
+                      `$${item.costPrice.toFixed(2)}`
+                    ) : (
+                      <span className="text-slate-400 font-mono text-[10px] flex items-center justify-end gap-1" title="Confidencial (Solo Administradores)">
+                        <Lock className="w-2.5 h-2.5 text-slate-400" />
+                        <span>***</span>
+                      </span>
+                    )}
                   </td>
                   <td className="py-2.5 px-3 text-right font-mono tabular-nums">
                     <span className="font-bold text-slate-900 block">${item.salePrice.toFixed(2)}</span>

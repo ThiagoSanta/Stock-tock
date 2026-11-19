@@ -1,6 +1,7 @@
 import React, { lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/layouts/AppLayout';
+import { UserRoleProvider } from '@/utils/security/UserRoleContext';
 
 // Code-splitting por ruta con React.lazy para carga inicial ultrarrápida
 const DashboardPage = lazy(() =>
@@ -33,20 +34,22 @@ const SettingsPage = lazy(() =>
 
 export function App() {
   return (
-    <Routes>
-      <Route path="/" element={<AppLayout />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="productos" element={<ProductsPage />} />
-        <Route path="inventario" element={<InventoryPage />} />
-        <Route path="pedidos" element={<OrdersPage />} />
-        <Route path="ventas" element={<SalesPage />} />
-        <Route path="compras" element={<PurchasesPage />} />
-        <Route path="contactos" element={<ContactsPage />} />
-        <Route path="alertas" element={<AlertsPage />} />
-        <Route path="configuracion" element={<SettingsPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Route>
-    </Routes>
+    <UserRoleProvider>
+      <Routes>
+        <Route path="/" element={<AppLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="productos" element={<ProductsPage />} />
+          <Route path="inventario" element={<InventoryPage />} />
+          <Route path="pedidos" element={<OrdersPage />} />
+          <Route path="ventas" element={<SalesPage />} />
+          <Route path="compras" element={<PurchasesPage />} />
+          <Route path="contactos" element={<ContactsPage />} />
+          <Route path="alertas" element={<AlertsPage />} />
+          <Route path="configuracion" element={<SettingsPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </UserRoleProvider>
   );
 }
 

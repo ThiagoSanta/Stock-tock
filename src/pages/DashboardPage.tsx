@@ -20,6 +20,7 @@ import { SupabaseSaleRepository } from '@/core/infrastructure/repositories/Supab
 import { ProcessDirectSaleUseCase } from '@/core/application/use-cases/sales/ProcessDirectSaleUseCase';
 import { ProductWithStock } from '@/core/application/ports/IProductRepository';
 import { Sale } from '@/core/domain/sales/types';
+import { useUserRole } from '@/utils/security/UserRoleContext';
 
 interface CompanyData {
   id: string;
@@ -45,6 +46,7 @@ export function DashboardPage() {
   const [recentSales, setRecentSales] = useState<Sale[]>([]);
   const [recentMovements, setRecentMovements] = useState<StockMovementRow[]>([]);
   const [isPosOpen, setIsPosOpen] = useState(false);
+  const { permissions } = useUserRole();
 
   const productRepo = useMemo(() => new SupabaseProductRepository(), []);
   const saleRepo = useMemo(() => new SupabaseSaleRepository(), []);
@@ -201,8 +203,12 @@ export function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <MetricCard
           title="Ventas Registradas"
-          value={`$${totalSalesAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`}
-          trend={`${recentSales.length} op.`}
+          value={
+            permissions.canViewFinancials
+              ? `$${totalSalesAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`
+              : `${recentSales.length} op.`
+          }
+          trend={permissions.canViewFinancials ? `${recentSales.length} op.` : '(restringido)'}
           isPositive={true}
           subtitle="Cobrado en mostrador"
           icon={TrendingUp}
@@ -210,7 +216,11 @@ export function DashboardPage() {
         <MetricCard
           title="Stock Físico Real"
           value={`${totalPhysicalStock} un.`}
-          trend={`Valuado $${stockValuation.toLocaleString('es-AR')}`}
+          trend={
+            permissions.canViewFinancials
+              ? `Valuado $${stockValuation.toLocaleString('es-AR')}`
+              : 'Valuación restringida'
+          }
           isPositive={true}
           subtitle="Depósito central"
           icon={Boxes}
@@ -271,7 +281,9 @@ export function DashboardPage() {
                   </div>
                   <p className="text-xs text-slate-900 font-semibold">{prod.name}</p>
                   <p className="text-xs text-slate-600 font-mono">
-                    Costo: ${prod.costPrice.toLocaleString('es-AR')} • Venta: ${prod.salePrice.toLocaleString('es-AR')}
+                    {permissions.canViewFinancials
+                      ? `Costo: $${prod.costPrice.toLocaleString('es-AR')} • Venta: $${prod.salePrice.toLocaleString('es-AR')}`
+                      : `Venta: $${prod.salePrice.toLocaleString('es-AR')}`}
                   </p>
                 </div>
 

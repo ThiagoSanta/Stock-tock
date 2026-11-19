@@ -27,6 +27,8 @@ import { PaymentMethod, Sale } from '@/core/domain/sales/types';
 import { SaleA4InvoiceModal } from '@/presentation/modules/sales/SaleA4InvoiceModal';
 import { QuoteA4Modal, QuoteData } from '@/presentation/modules/orders/QuoteA4Modal';
 import { createClient } from '@/utils/supabase/client';
+import { useUserRole } from '@/utils/security/UserRoleContext';
+import { AuditService } from '@/core/application/services/AuditService';
 
 export interface CartItem {
   product: ProductWithStock;
@@ -76,6 +78,7 @@ export function PosModal({
   defaultWarehouseId,
   onCompleteSale,
 }: PosModalProps) {
+  const { permissions, currentUser } = useUserRole();
   const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState('Consumidor Final');
@@ -405,6 +408,17 @@ export function PosModal({
       });
 
       setCompletedSale(result);
+      // Audit log de venta — no bloqueante
+      AuditService.logAction({
+        companyId,
+        userName: currentUser.name,
+        userRole: currentUser.role,
+        module: 'VENTAS',
+        action: 'VENTA_REGISTRADA',
+        entityId: result.id,
+        entityName: result.saleNumber,
+        details: `Total $${finalTotalAmount.toLocaleString('es-AR')}, Método: ${paymentMethod}, Cliente: ${customerName || 'Consumidor Final'}`,
+      }).catch(() => {});
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al procesar la venta');
     } finally {
@@ -1008,7 +1022,7 @@ export function PosModal({
                     </span>
                   )}
                 </div>
-                {finalTotalAmount > 0 && (
+                {finalTotalAmount > 0 && permissions.canViewFinancials && (
                   <span className="text-[11px] text-emerald-800 block font-semibold">
                     Margen bruto estimado: ${estimatedMargin.toLocaleString('es-AR')}
                   </span>
