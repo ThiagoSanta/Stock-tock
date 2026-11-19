@@ -126,8 +126,8 @@ async function runReset() {
       'DELETE FROM customer_payments',
       'DELETE FROM supplier_payments',
       'DELETE FROM audit_logs',
-      // Resetear stocks en inventario físico y disponible a 0
-      'UPDATE inventory_stock SET physical_stock = 0, reserved_stock = 0, available_stock = 0',
+      // Resetear stocks en inventario físico y reservado a 0 (available_stock se calcula automáticamente)
+      'UPDATE inventory_stock SET physical_stock = 0, reserved_stock = 0',
     ];
 
     for (const sql of cleanupQueries) {
