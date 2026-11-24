@@ -139,61 +139,46 @@ export function SettingsPage() {
               </div>
             </div>
 
-            <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-3.5 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-0.5">
-                <div className="flex items-center gap-2">
-                  {isDark ? (
-                    <span className="p-1.5 rounded-md bg-amber-500/10 text-amber-400">
-                      <Moon className="w-4 h-4" />
-                    </span>
-                  ) : (
-                    <span className="p-1.5 rounded-md bg-blue-50 text-blue-600">
-                      <Sun className="w-4 h-4" />
-                    </span>
-                  )}
-                  <span className="text-xs font-bold text-slate-900">
-                    {isDark ? 'Modo Oscuro Activo' : 'Modo Claro Activo'}
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-500">
+                <span className="text-xs font-bold text-slate-900 dark:text-zinc-100 block">
+                  Tema Visual de la Interfaz
+                </span>
+                <p className="text-[11px] text-slate-500 dark:text-zinc-400">
                   {isDark
-                    ? 'Optimizado para ambientes con poca luz, reduciendo fatiga visual durante turnos nocturnos.'
-                    : 'Contraste alto y descansado para operación continua de mostrador en horario diurno.'}
+                    ? 'Modo Oscuro activo: paleta negro grafito mate para descanso visual en mostrador nocturno.'
+                    : 'Modo Claro activo: contraste diurno nítido para entornos luminosos.'}
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={toggleTheme}
-                className="h-8 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-xs shadow-blue-500/20"
-              >
-                {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-                <span>{isDark ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}</span>
-              </button>
-            </div>
 
-            {/* Banner opcional para PWA si el navegador permite instalar */}
-            {isInstallable && (
-              <div className="p-3 rounded-lg border border-blue-200 bg-blue-50/50 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <MonitorDown className="w-4 h-4 text-blue-600 shrink-0" />
-                  <div>
-                    <span className="text-xs font-semibold text-blue-900 block">
-                      Instalar Stock·tock como App de Escritorio
-                    </span>
-                    <span className="text-[11px] text-blue-700">
-                      Podés instalar el sistema en tu PC para abrirlo directamente sin barra de navegador.
-                    </span>
-                  </div>
-                </div>
+              {/* Segmented Control de Tema */}
+              <div className="inline-flex p-1 rounded-lg bg-slate-200/70 dark:bg-zinc-950 border border-slate-300/70 dark:border-zinc-800 shrink-0">
                 <button
                   type="button"
-                  onClick={installApp}
-                  className="h-7 px-3 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors cursor-pointer shrink-0"
+                  onClick={() => isDark && toggleTheme()}
+                  className={`h-7 px-3 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    !isDark
+                      ? 'bg-white text-slate-900 shadow-2xs border border-slate-300/60'
+                      : 'text-zinc-400 hover:text-zinc-200'
+                  }`}
                 >
-                  Instalar
+                  <Sun className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Claro</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => !isDark && toggleTheme()}
+                  className={`h-7 px-3 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    isDark
+                      ? 'bg-zinc-800 text-zinc-100 shadow-2xs border border-zinc-700 ring-1 ring-lime-500/50'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <Moon className="w-3.5 h-3.5 text-lime-400" />
+                  <span>Oscuro</span>
                 </button>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Seguridad & Auditoría — solo Admin */}

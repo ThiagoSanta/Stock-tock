@@ -88,7 +88,7 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
           <div className="flex items-center justify-between w-full">
             <div className="flex flex-col leading-none">
               <span className="text-[15px] font-extrabold tracking-tight text-slate-900">
-                Stock<span className="text-blue-600 font-black">·</span>tock
+                Stock<span className="text-lime-500 font-black">·</span>tock
               </span>
               <span className="text-[10px] text-slate-400 font-medium mt-1">Control Comercial</span>
             </div>
@@ -128,7 +128,7 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
             className="w-full h-8 px-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-between gap-2 transition-colors cursor-pointer group"
           >
             <span className="flex items-center gap-2 min-w-0">
-              <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 transition-colors shrink-0" aria-hidden="true" />
+              <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 transition-colors shrink-0" aria-hidden="true" />
               <span className="text-[11px] text-slate-400 truncate">Buscar...</span>
             </span>
             <kbd className="text-[9px] bg-white border border-slate-200 text-slate-400 px-1 py-px rounded font-sans font-medium leading-none shrink-0">
@@ -141,7 +141,7 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
             onClick={onOpenSearch}
             aria-label="Buscar"
             title={isMac ? 'Buscar (⌘K)' : 'Buscar (Ctrl+K)'}
-            className="w-8 h-8 mx-auto rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-400 hover:text-blue-600 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 mx-auto rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
           >
             <Search className="w-3.5 h-3.5" aria-hidden="true" />
           </button>
@@ -165,13 +165,16 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
                 onFocus={() => handlePrefetch(item.href)}
                 className={`w-8 h-8 mx-auto rounded-lg flex items-center justify-center transition-all relative ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-xs shadow-blue-500/25'
+                    ? 'bg-slate-900 text-white shadow-2xs ring-1 ring-lime-500/60'
                     : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 <Icon className="w-4 h-4" aria-hidden="true" />
-                {item.badge && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 absolute top-1 right-1" />
+                {isActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-lime-400 absolute top-1 right-1" />
+                )}
+                {!isActive && item.badge && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500 absolute top-1 right-1" />
                 )}
               </Link>
             );
@@ -186,7 +189,7 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
               onFocus={() => handlePrefetch(item.href)}
               className={`h-8 w-full px-2.5 rounded-lg flex items-center justify-between gap-2.5 transition-all ${
                 isActive
-                  ? 'bg-blue-600 text-white font-medium shadow-xs shadow-blue-500/25'
+                  ? 'bg-slate-900 text-white font-medium shadow-2xs border-l-2 border-lime-500 pl-2'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -201,7 +204,7 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
               </div>
               {item.badge && (
                 <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium shrink-0 ${
-                  isActive ? 'bg-blue-500/30 text-white' : 'bg-blue-50 text-blue-700 border border-blue-200'
+                  isActive ? 'bg-slate-800 text-slate-200 border border-slate-700' : 'bg-slate-100 text-slate-700 border border-slate-200'
                 }`}>
                   {item.badge}
                 </span>
@@ -217,7 +220,7 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
           <button
             type="button"
             onClick={() => setIsSwitcherOpen(true)}
-            className="w-full p-1.5 rounded-lg border border-slate-200 hover:border-blue-300 bg-slate-50/70 hover:bg-slate-100 flex items-center justify-between transition-all cursor-pointer text-left group"
+            className="w-full p-1.5 rounded-lg border border-slate-200 hover:border-slate-300 bg-slate-50/70 hover:bg-slate-100 flex items-center justify-between transition-all cursor-pointer text-left group"
             title="Cambiar de Operador o Turno"
           >
             <div className="flex items-center gap-2 min-w-0">
@@ -227,7 +230,7 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
                 {currentUser.name.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
-                <span className="text-[11px] font-bold text-slate-900 block truncate leading-tight group-hover:text-blue-600 transition-colors">
+                <span className="text-[11px] font-bold text-slate-900 block truncate leading-tight group-hover:text-slate-900 transition-colors">
                   {currentUser.name}
                 </span>
                 <span className="text-[9px] font-semibold text-slate-500 uppercase font-mono block leading-none mt-0.5">
@@ -235,13 +238,13 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
                 </span>
               </div>
             </div>
-            <ArrowRightLeft className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 transition-colors shrink-0" />
+            <ArrowRightLeft className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 transition-colors shrink-0" />
           </button>
         ) : (
           <button
             type="button"
             onClick={() => setIsSwitcherOpen(true)}
-            className={`w-8 h-8 mx-auto rounded-full ${currentUser.avatarColor} text-white flex items-center justify-center text-[11px] font-bold cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all shadow-2xs`}
+            className={`w-8 h-8 mx-auto rounded-full ${currentUser.avatarColor} text-white flex items-center justify-center text-[11px] font-bold cursor-pointer hover:ring-2 hover:ring-lime-400 transition-all shadow-2xs`}
             title={`Operador: ${currentUser.name} (${currentUser.role}). Clic para cambiar.`}
           >
             {currentUser.name.charAt(0).toUpperCase()}

@@ -171,7 +171,7 @@ export function DashboardPage() {
           <button
             type="button"
             onClick={() => setIsPosOpen(true)}
-            className="h-8 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shadow-blue-500/20 focus-visible:ring-2 focus-visible:ring-blue-600"
+            className="h-8 px-3.5 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs focus-visible:ring-2 focus-visible:ring-lime-500"
           >
             <Plus className="w-4 h-4" aria-hidden="true" />
             <span>Venta Rápida (POS)</span>
@@ -180,21 +180,21 @@ export function DashboardPage() {
       </div>
 
       {/* Políticas de Integridad Comercial */}
-      <div className="p-3.5 rounded-lg bg-white border border-slate-200 flex items-center justify-between shadow-xs">
+      <div className="p-3.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-md bg-blue-50 text-blue-700 flex items-center justify-center shrink-0" aria-hidden="true">
-            <ShieldCheck className="w-4 h-4" />
+          <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shrink-0" aria-hidden="true">
+            <ShieldCheck className="w-4 h-4 text-slate-700 dark:text-zinc-300" />
           </div>
           <div>
-            <h4 className="text-xs font-semibold text-slate-900">
+            <h4 className="text-xs font-semibold text-slate-900 dark:text-zinc-100">
               Políticas de Integridad Comercial Activas
             </h4>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-slate-600 dark:text-zinc-400">
               Bloqueo automático de stock negativo • Costos históricos inmutables • Kardex auditado
             </p>
           </div>
         </div>
-        <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-900 border border-emerald-300">
+        <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-lime-500/10 text-lime-700 dark:text-lime-400 border border-lime-500/30">
           PROTEGIDO
         </span>
       </div>

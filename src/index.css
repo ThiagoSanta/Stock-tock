@@ -8,24 +8,25 @@
   --surface-muted: #f8fafc;
   --border: #e2e8f0;
   --border-strong: #cbd5e1;
-  --foreground: #0f172a;
-  --foreground-muted: #475569;
-  --primary: #0f172a;
-  --primary-hover: #1e293b;
+  --foreground: #09090b;
+  --foreground-muted: #64748b;
+  --primary: #09090b;
+  --primary-hover: #18181b;
   --primary-text: #ffffff;
   --success: #15803d;
   --danger: #b91c1c;
   --warning: #b45309;
+  --brand-lime: #84cc16;
   /* Sidebar */
   --sidebar-bg: #ffffff;
   --sidebar-border: #e2e8f0;
-  --sidebar-item-active: #0f172a;
+  --sidebar-item-active: #09090b;
   --sidebar-item-active-text: #ffffff;
   --sidebar-item-hover: #f1f5f9;
   /* Inputs */
   --input-bg: #ffffff;
   --input-border: #cbd5e1;
-  --input-text: #0f172a;
+  --input-text: #09090b;
   --input-placeholder: #94a3b8;
   /* Cards */
   --card-bg: #ffffff;
@@ -38,52 +39,53 @@
   --badge-bg: #f1f5f9;
   --badge-text: #334155;
   /* Modal overlay */
-  --modal-overlay: rgba(15, 23, 42, 0.5);
+  --modal-overlay: rgba(9, 9, 11, 0.5);
   --modal-bg: #ffffff;
   --modal-border: #cbd5e1;
 }
 
-/* ── Tema Oscuro ──────────────────────────────────────── */
+/* ── Tema Oscuro: Negro Grafito Puro (Zinc 950) ───────── */
 [data-theme="dark"] {
-  --background: #0f172a;
-  --surface: #1e293b;
-  --surface-hover: #293548;
-  --surface-muted: #172033;
-  --border: #334155;
-  --border-strong: #475569;
-  --foreground: #f1f5f9;
-  --foreground-muted: #94a3b8;
-  --primary: #e2e8f0;
-  --primary-hover: #f1f5f9;
-  --primary-text: #0f172a;
+  --background: #09090b;
+  --surface: #121214;
+  --surface-hover: #1c1c20;
+  --surface-muted: #18181b;
+  --border: #27272a;
+  --border-strong: #3f3f46;
+  --foreground: #f4f4f5;
+  --foreground-muted: #a1a1aa;
+  --primary: #f4f4f5;
+  --primary-hover: #ffffff;
+  --primary-text: #09090b;
   --success: #22c55e;
-  --danger: #f87171;
-  --warning: #fbbf24;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --brand-lime: #a3e635;
   /* Sidebar */
-  --sidebar-bg: #1e293b;
-  --sidebar-border: #334155;
-  --sidebar-item-active: #e2e8f0;
-  --sidebar-item-active-text: #0f172a;
-  --sidebar-item-hover: #293548;
+  --sidebar-bg: #09090b;
+  --sidebar-border: #27272a;
+  --sidebar-item-active: #18181b;
+  --sidebar-item-active-text: #f4f4f5;
+  --sidebar-item-hover: #1c1c20;
   /* Inputs */
-  --input-bg: #0f172a;
-  --input-border: #334155;
-  --input-text: #f1f5f9;
-  --input-placeholder: #64748b;
+  --input-bg: #121214;
+  --input-border: #27272a;
+  --input-text: #f4f4f5;
+  --input-placeholder: #71717a;
   /* Cards */
-  --card-bg: #1e293b;
-  --card-border: #334155;
+  --card-bg: #121214;
+  --card-border: #27272a;
   /* Table */
-  --table-header-bg: #172033;
-  --table-row-hover: #172033;
-  --table-border: #334155;
+  --table-header-bg: #18181b;
+  --table-row-hover: #18181b;
+  --table-border: #27272a;
   /* Badge chips */
-  --badge-bg: #293548;
-  --badge-text: #cbd5e1;
+  --badge-bg: #18181b;
+  --badge-text: #d4d4d8;
   /* Modal overlay */
-  --modal-overlay: rgba(0, 0, 0, 0.7);
-  --modal-bg: #1e293b;
-  --modal-border: #334155;
+  --modal-overlay: rgba(0, 0, 0, 0.85);
+  --modal-bg: #121214;
+  --modal-border: #27272a;
 }
 
 /* ── Aplicar variables al DOM ─────────────────────────── */
@@ -225,21 +227,37 @@ select:focus-visible {
   box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.45) !important;
 }
 
-/* Botones de acción principales en modo oscuro */
+/* Botones de acción principales en modo oscuro (Monocromático alto contraste) */
 [data-theme="dark"] button.bg-slate-900 {
-  background-color: #3b82f6 !important;
-  color: #ffffff !important;
+  background-color: #f4f4f5 !important;
+  color: #09090b !important;
 }
 
 [data-theme="dark"] button.hover\:bg-slate-800:hover {
-  background-color: #2563eb !important;
+  background-color: #e4e4e7 !important;
 }
 
 /* Ítem activo de navegación en el Sidebar en modo oscuro */
 [data-theme="dark"] nav a.bg-slate-900,
-[data-theme="dark"] nav a.bg-blue-600 {
-  background-color: #2563eb !important;
-  color: #ffffff !important;
+[data-theme="dark"] nav a.bg-zinc-900,
+[data-theme="dark"] nav a.active-nav-item {
+  background-color: #18181b !important;
+  color: #f4f4f5 !important;
+  border-color: #3f3f46 !important;
+}
+
+/* Clases de utilidad para acentos y delineados Verde Lima */
+.border-lime-accent {
+  border-color: #84cc16 !important;
+}
+[data-theme="dark"] .border-lime-accent {
+  border-color: #a3e635 !important;
+}
+.text-lime-accent {
+  color: #65a30d !important;
+}
+[data-theme="dark"] .text-lime-accent {
+  color: #a3e635 !important;
 }
 
 /* Respeto a preferencia de accesibilidad de movimiento reducido */
