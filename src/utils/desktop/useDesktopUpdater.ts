@@ -42,7 +42,7 @@ export function useDesktopUpdater() {
   }, []);
 
   const relaunch = () => {
-    window.location.reload();
+    window.open('https://github.com/ThiagoSanta/Stock-tock/releases/latest', '_blank');
   };
 
   return { updateAvailable, version, relaunch };
