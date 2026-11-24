@@ -163,79 +163,77 @@ select:focus-visible {
   outline-color: #e2e8f0;
 }
 
-/* ── Reglas de Inversión y Contraste Base para Tema Oscuro (en @layer components para no pisar utilities dark:*) ──────────── */
-@layer components {
-  [data-theme="dark"] .bg-white {
-    background-color: var(--surface);
-    color: var(--foreground);
-  }
+/* ── Reglas de Inversión y Contraste Base para Tema Oscuro (solo si el elemento no define dark:*) ──────────── */
+[data-theme="dark"] .bg-white:not([class*="dark:bg-"]) {
+  background-color: var(--surface) !important;
+  color: var(--foreground);
+}
 
-  [data-theme="dark"] .bg-slate-50 {
-    background-color: var(--background);
-  }
+[data-theme="dark"] .bg-slate-50:not([class*="dark:bg-"]) {
+  background-color: var(--background) !important;
+}
 
-  [data-theme="dark"] .bg-slate-100 {
-    background-color: var(--surface-muted);
-  }
+[data-theme="dark"] .bg-slate-100:not([class*="dark:bg-"]) {
+  background-color: var(--surface-muted) !important;
+}
 
-  [data-theme="dark"] .hover\:bg-slate-50:hover,
-  [data-theme="dark"] .hover\:bg-slate-100:hover,
-  [data-theme="dark"] .hover\:bg-slate-50\/80:hover {
-    background-color: var(--surface-hover);
-  }
+[data-theme="dark"] .hover\:bg-slate-50:not([class*="dark:hover:bg-"]):hover,
+[data-theme="dark"] .hover\:bg-slate-100:not([class*="dark:hover:bg-"]):hover,
+[data-theme="dark"] .hover\:bg-slate-50\/80:not([class*="dark:hover:bg-"]):hover {
+  background-color: var(--surface-hover) !important;
+}
 
-  [data-theme="dark"] .border-slate-100,
-  [data-theme="dark"] .border-slate-200,
-  [data-theme="dark"] .border-slate-300 {
-    border-color: var(--border);
-  }
+[data-theme="dark"] .border-slate-100:not([class*="dark:border-"]),
+[data-theme="dark"] .border-slate-200:not([class*="dark:border-"]),
+[data-theme="dark"] .border-slate-300:not([class*="dark:border-"]) {
+  border-color: var(--border) !important;
+}
 
-  [data-theme="dark"] .text-slate-900 {
-    color: #f4f4f5;
-  }
+[data-theme="dark"] .text-slate-900:not([class*="dark:text-"]) {
+  color: #f4f4f5 !important;
+}
 
-  [data-theme="dark"] .text-slate-800,
-  [data-theme="dark"] .text-slate-700 {
-    color: #e4e4e7;
-  }
+[data-theme="dark"] .text-slate-800:not([class*="dark:text-"]),
+[data-theme="dark"] .text-slate-700:not([class*="dark:text-"]) {
+  color: #e4e4e7 !important;
+}
 
-  [data-theme="dark"] .text-slate-600,
-  [data-theme="dark"] .text-slate-500 {
-    color: #a1a1aa;
-  }
+[data-theme="dark"] .text-slate-600:not([class*="dark:text-"]),
+[data-theme="dark"] .text-slate-500:not([class*="dark:text-"]) {
+  color: #a1a1aa !important;
+}
 
-  [data-theme="dark"] .text-slate-400 {
-    color: #71717a;
-  }
+[data-theme="dark"] .text-slate-400:not([class*="dark:text-"]) {
+  color: #71717a !important;
+}
 
-  [data-theme="dark"] input,
-  [data-theme="dark"] select,
-  [data-theme="dark"] textarea {
-    background-color: var(--input-bg);
-    color: var(--input-text);
-    border-color: var(--input-border);
-  }
+[data-theme="dark"] input:not([class*="dark:bg-"]),
+[data-theme="dark"] select:not([class*="dark:bg-"]),
+[data-theme="dark"] textarea:not([class*="dark:bg-"]) {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--input-border) !important;
+}
 
-  [data-theme="dark"] input::placeholder,
-  [data-theme="dark"] textarea::placeholder {
-    color: var(--input-placeholder);
-  }
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: var(--input-placeholder) !important;
+}
 
-  [data-theme="dark"] .shadow-xs,
-  [data-theme="dark"] .shadow-sm,
-  [data-theme="dark"] .shadow-md,
-  [data-theme="dark"] .shadow-xl {
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.45);
-  }
+[data-theme="dark"] .shadow-xs,
+[data-theme="dark"] .shadow-sm,
+[data-theme="dark"] .shadow-md,
+[data-theme="dark"] .shadow-xl {
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.45) !important;
+}
 
-  [data-theme="dark"] button.bg-slate-900 {
-    background-color: #f4f4f5;
-    color: #09090b;
-  }
+[data-theme="dark"] button.bg-slate-900:not([class*="dark:bg-"]) {
+  background-color: #f4f4f5 !important;
+  color: #09090b !important;
+}
 
-  [data-theme="dark"] button.hover\:bg-slate-800:hover {
-    background-color: #e4e4e7;
-  }
+[data-theme="dark"] button.hover\:bg-slate-800:not([class*="dark:hover:bg-"]):hover {
+  background-color: #e4e4e7 !important;
 }
 
 /* Clases de utilidad para acentos y delineados Verde Lima */
