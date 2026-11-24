@@ -41,26 +41,26 @@ export function ProductTable({ products, loading, onOpenLots }: ProductTableProp
   }
 
   return (
-    <div className="rounded-lg bg-white border border-slate-200 overflow-hidden shadow-xs">
+    <div className="rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-xs">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
           <caption className="sr-only">Listado completo de productos en catálogo y sus stocks</caption>
-          <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase tracking-wider text-[11px] font-bold">
+          <thead className="bg-slate-50 dark:bg-zinc-800/60 border-b border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 uppercase tracking-wider text-[11px] font-bold">
             <tr>
-              <th scope="col" className="py-3 px-3">Producto & SKU</th>
-              <th scope="col" className="py-3 px-3">Ubicación</th>
-              <th scope="col" className="py-3 px-3">Unidad</th>
-              <th scope="col" className="py-3 px-3 text-right">Costo PPP</th>
-              <th scope="col" className="py-3 px-3 text-right">Precio Venta</th>
-              <th scope="col" className="py-3 px-3 text-center">Físico</th>
-              <th scope="col" className="py-3 px-3 text-center">Reservado</th>
-              <th scope="col" className="py-3 px-3 text-center">Disponible</th>
-              <th scope="col" className="py-3 px-3 text-center">Mínimo</th>
-              <th scope="col" className="py-3 px-3 text-center">Estado</th>
-              <th scope="col" className="py-3 px-3 text-center">Lotes</th>
+              <th scope="col" className="py-2.5 px-2.5">Producto & SKU</th>
+              <th scope="col" className="py-2.5 px-2.5">Ubicación</th>
+              <th scope="col" className="py-2.5 px-2.5">Unidad</th>
+              <th scope="col" className="py-2.5 px-2.5 text-right">Costo PPP</th>
+              <th scope="col" className="py-2.5 px-2.5 text-right">Precio Venta</th>
+              <th scope="col" className="py-2.5 px-2 text-center">Físico</th>
+              <th scope="col" className="py-2.5 px-2 text-center">Reservado</th>
+              <th scope="col" className="py-2.5 px-2 text-center">Disponible</th>
+              <th scope="col" className="py-2.5 px-2 text-center">Mínimo</th>
+              <th scope="col" className="py-2.5 px-2.5 text-center">Estado</th>
+              <th scope="col" className="py-2.5 px-2.5 text-center">Lotes</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
             {products.map((item) => {
               const isOutOfStock = item.availableStock <= 0;
               const isLowStock = item.availableStock <= item.minStockAlert && !isOutOfStock;

@@ -18,10 +18,10 @@ export function AlertCard({ alert }: AlertCardProps) {
     : 'bg-sky-50 text-sky-900 border-sky-300 dark:bg-sky-950/80 dark:text-sky-300 dark:border-sky-800';
 
   const borderStyle = isCritical
-    ? 'border-rose-300/80 bg-rose-50/20 dark:border-rose-900/50 dark:bg-rose-950/20'
+    ? 'border-rose-300 bg-white dark:border-rose-500/50 dark:bg-zinc-900'
     : isWarning
-    ? 'border-amber-300/80 bg-amber-50/20 dark:border-amber-900/50 dark:bg-amber-950/20'
-    : 'border-slate-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50';
+    ? 'border-amber-300 bg-white dark:border-amber-500/50 dark:bg-zinc-900'
+    : 'border-slate-200 bg-white dark:border-zinc-800 dark:bg-zinc-900';
 
   const IconComponent = () => {
     if (alert.type === 'PENDING_ORDER_RESERVATION') {

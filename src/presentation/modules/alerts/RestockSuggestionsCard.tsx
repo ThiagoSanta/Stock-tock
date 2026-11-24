@@ -64,10 +64,10 @@ export function RestockSuggestionsCard({ products }: RestockSuggestionsCardProps
       </div>
 
       {/* Tabla resumen de sugerencias de compra */}
-      <div className="rounded-lg bg-slate-50/50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-2xs">
+      <div className="rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-slate-100/80 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-[11px] uppercase">
+            <thead className="bg-slate-50 dark:bg-zinc-800/60 border-b border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-[11px] uppercase">
               <tr>
                 <th scope="col" className="py-2.5 px-3">Artículo & SKU</th>
                 <th scope="col" className="py-2.5 px-3 text-center">Disponible</th>
@@ -133,7 +133,7 @@ export function RestockSuggestionsCard({ products }: RestockSuggestionsCardProps
         </div>
 
         {/* Totalizador del pedido sugerido */}
-        <div className="p-3 bg-slate-100/70 dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs gap-2">
+        <div className="p-3 bg-slate-50 dark:bg-zinc-800/60 border-t border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs gap-2">
           <span className="text-slate-600 dark:text-zinc-400">
             Total de unidades sugeridas para reponer el depósito central:{' '}
             <strong className="text-slate-900 dark:text-zinc-100 font-bold">{totalUnitsToBuy} un.</strong>

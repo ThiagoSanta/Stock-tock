@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ── Tema Claro (por defecto) ─────────────────────────── */
 :root {
@@ -162,88 +163,79 @@ select:focus-visible {
   outline-color: #e2e8f0;
 }
 
-/* ── Reglas de Inversión y Contraste para Tema Oscuro ──────────── */
-[data-theme="dark"] .bg-white {
-  background-color: var(--surface) !important;
-  color: var(--foreground) !important;
-}
+/* ── Reglas de Inversión y Contraste Base para Tema Oscuro (en @layer components para no pisar utilities dark:*) ──────────── */
+@layer components {
+  [data-theme="dark"] .bg-white {
+    background-color: var(--surface);
+    color: var(--foreground);
+  }
 
-[data-theme="dark"] .bg-slate-50 {
-  background-color: var(--background) !important;
-}
+  [data-theme="dark"] .bg-slate-50 {
+    background-color: var(--background);
+  }
 
-[data-theme="dark"] .bg-slate-100 {
-  background-color: var(--surface-muted) !important;
-}
+  [data-theme="dark"] .bg-slate-100 {
+    background-color: var(--surface-muted);
+  }
 
-[data-theme="dark"] .hover\:bg-slate-50:hover,
-[data-theme="dark"] .hover\:bg-slate-100:hover,
-[data-theme="dark"] .hover\:bg-slate-50\/80:hover {
-  background-color: var(--surface-hover) !important;
-}
+  [data-theme="dark"] .hover\:bg-slate-50:hover,
+  [data-theme="dark"] .hover\:bg-slate-100:hover,
+  [data-theme="dark"] .hover\:bg-slate-50\/80:hover {
+    background-color: var(--surface-hover);
+  }
 
-[data-theme="dark"] .border-slate-100,
-[data-theme="dark"] .border-slate-200,
-[data-theme="dark"] .border-slate-300 {
-  border-color: var(--border) !important;
-}
+  [data-theme="dark"] .border-slate-100,
+  [data-theme="dark"] .border-slate-200,
+  [data-theme="dark"] .border-slate-300 {
+    border-color: var(--border);
+  }
 
-[data-theme="dark"] .text-slate-900 {
-  color: #f8fafc !important;
-}
+  [data-theme="dark"] .text-slate-900 {
+    color: #f4f4f5;
+  }
 
-[data-theme="dark"] .text-slate-800,
-[data-theme="dark"] .text-slate-700 {
-  color: #e2e8f0 !important;
-}
+  [data-theme="dark"] .text-slate-800,
+  [data-theme="dark"] .text-slate-700 {
+    color: #e4e4e7;
+  }
 
-[data-theme="dark"] .text-slate-600,
-[data-theme="dark"] .text-slate-500 {
-  color: #94a3b8 !important;
-}
+  [data-theme="dark"] .text-slate-600,
+  [data-theme="dark"] .text-slate-500 {
+    color: #a1a1aa;
+  }
 
-[data-theme="dark"] .text-slate-400 {
-  color: #64748b !important;
-}
+  [data-theme="dark"] .text-slate-400 {
+    color: #71717a;
+  }
 
-[data-theme="dark"] input,
-[data-theme="dark"] select,
-[data-theme="dark"] textarea {
-  background-color: var(--input-bg) !important;
-  color: var(--input-text) !important;
-  border-color: var(--input-border) !important;
-}
+  [data-theme="dark"] input,
+  [data-theme="dark"] select,
+  [data-theme="dark"] textarea {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--input-border);
+  }
 
-[data-theme="dark"] input::placeholder,
-[data-theme="dark"] textarea::placeholder {
-  color: var(--input-placeholder) !important;
-}
+  [data-theme="dark"] input::placeholder,
+  [data-theme="dark"] textarea::placeholder {
+    color: var(--input-placeholder);
+  }
 
-/* Modales y tarjetas con sombras en modo oscuro */
-[data-theme="dark"] .shadow-xs,
-[data-theme="dark"] .shadow-sm,
-[data-theme="dark"] .shadow-md,
-[data-theme="dark"] .shadow-xl {
-  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.45) !important;
-}
+  [data-theme="dark"] .shadow-xs,
+  [data-theme="dark"] .shadow-sm,
+  [data-theme="dark"] .shadow-md,
+  [data-theme="dark"] .shadow-xl {
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.45);
+  }
 
-/* Botones de acción principales en modo oscuro (Monocromático alto contraste) */
-[data-theme="dark"] button.bg-slate-900 {
-  background-color: #f4f4f5 !important;
-  color: #09090b !important;
-}
+  [data-theme="dark"] button.bg-slate-900 {
+    background-color: #f4f4f5;
+    color: #09090b;
+  }
 
-[data-theme="dark"] button.hover\:bg-slate-800:hover {
-  background-color: #e4e4e7 !important;
-}
-
-/* Ítem activo de navegación en el Sidebar en modo oscuro */
-[data-theme="dark"] nav a.bg-slate-900,
-[data-theme="dark"] nav a.bg-zinc-900,
-[data-theme="dark"] nav a.active-nav-item {
-  background-color: #18181b !important;
-  color: #f4f4f5 !important;
-  border-color: #3f3f46 !important;
+  [data-theme="dark"] button.hover\:bg-slate-800:hover {
+    background-color: #e4e4e7;
+  }
 }
 
 /* Clases de utilidad para acentos y delineados Verde Lima */

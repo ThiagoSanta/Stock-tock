@@ -23,10 +23,10 @@ export function MetricCard({
   return (
     <article
       aria-label={`${title}: ${value}`}
-      className="p-4 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors shadow-xs"
+      className="p-4 rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 hover:border-lime-500/50 dark:hover:border-lime-500/40 transition-colors shadow-xs"
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-semibold text-slate-600">{title}</span>
+        <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">{title}</span>
         {Icon && (
           <div
             aria-hidden="true"
@@ -38,7 +38,7 @@ export function MetricCard({
       </div>
 
       <div className="flex items-baseline justify-between gap-2">
-        <div className="text-xl font-bold tracking-tight text-slate-900 font-mono tabular-nums">
+        <div className="text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-100 font-mono tabular-nums">
           {value}
         </div>
 
@@ -46,10 +46,10 @@ export function MetricCard({
           <div
             className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded border ${
               isAlert
-                ? 'bg-amber-50 text-amber-900 border-amber-300'
+                ? 'bg-amber-50 text-amber-900 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700/60'
                 : isPositive
-                ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
-                : 'bg-rose-50 text-rose-900 border-rose-300'
+                ? 'bg-emerald-50 text-emerald-900 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-700/60'
+                : 'bg-rose-50 text-rose-900 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-700/60'
             }`}
           >
             {isAlert && <AlertTriangle className="w-3 h-3" aria-hidden="true" />}
@@ -59,7 +59,7 @@ export function MetricCard({
       </div>
 
       {subtitle && (
-        <div className="text-xs text-slate-600 mt-1.5 truncate font-medium">
+        <div className="text-xs text-slate-600 dark:text-zinc-400 mt-1.5 truncate font-medium">
           {subtitle}
         </div>
       )}

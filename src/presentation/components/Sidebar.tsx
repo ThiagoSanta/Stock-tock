@@ -165,11 +165,11 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
                 onFocus={() => handlePrefetch(item.href)}
                 className={`w-8 h-8 mx-auto rounded-lg flex items-center justify-center transition-all relative ${
                   isActive
-                    ? 'bg-slate-900 text-white shadow-2xs ring-1 ring-lime-500/60'
-                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                    ? 'bg-slate-900 text-white dark:bg-zinc-800 dark:text-zinc-100 shadow-2xs ring-1 ring-lime-500/80'
+                    : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800/60'
                 }`}
               >
-                <Icon className="w-4 h-4" aria-hidden="true" />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-lime-400' : ''}`} aria-hidden="true" />
                 {isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-lime-400 absolute top-1 right-1" />
                 )}
@@ -189,14 +189,14 @@ export function Sidebar({ onOpenSearch, isCollapsed, onToggleCollapse }: Sidebar
               onFocus={() => handlePrefetch(item.href)}
               className={`h-8 w-full px-2.5 rounded-lg flex items-center justify-between gap-2.5 transition-all ${
                 isActive
-                  ? 'bg-slate-900 text-white font-medium shadow-2xs border-l-2 border-lime-500 pl-2'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-slate-900 text-white dark:bg-zinc-800 dark:text-zinc-100 font-medium shadow-2xs border-l-2 border-lime-500 pl-2'
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800/60'
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <Icon
                   aria-hidden="true"
-                  className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`}
+                  className={`w-4 h-4 shrink-0 ${isActive ? 'text-lime-400' : 'text-slate-400 dark:text-zinc-500'}`}
                 />
                 <span className={`text-[12px] truncate ${isActive ? 'text-white' : 'text-slate-700'}`}>
                   {item.name}
