@@ -32,22 +32,22 @@ export function RestockSuggestionsCard({ products }: RestockSuggestionsCardProps
   const totalUnitsToBuy = criticalItems.reduce((acc, it) => acc + it.suggestedQty, 0);
 
   return (
-    <div className="rounded-xl border border-amber-300/60 dark:border-amber-500/30 bg-amber-50/50 dark:bg-zinc-900/70 p-4 sm:p-5 space-y-4 shadow-2xs">
+    <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 sm:p-5 space-y-4 shadow-2xs">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-950/50 text-amber-900 dark:text-amber-400 border border-amber-300 dark:border-amber-800 flex items-center justify-center shrink-0">
-            <Truck className="w-5 h-5 text-amber-800 dark:text-amber-400" aria-hidden="true" />
+          <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center shrink-0">
+            <Truck className="w-5 h-5" aria-hidden="true" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">
                 Sugerencia Inteligente de Reabastecimiento
               </h3>
-              <span className="text-[10px] font-bold uppercase bg-amber-200/80 dark:bg-amber-950/80 text-amber-950 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-300 dark:border-amber-700">
+              <span className="text-[10px] font-bold uppercase bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800/60">
                 {criticalItems.length} {criticalItems.length === 1 ? 'artículo crítico' : 'artículos críticos'}
               </span>
             </div>
-            <p className="text-xs text-slate-600 dark:text-zinc-400 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
               Cálculo automatizado basado en puntos de reorden y costos promedio ponderados
             </p>
           </div>
@@ -64,10 +64,10 @@ export function RestockSuggestionsCard({ products }: RestockSuggestionsCardProps
       </div>
 
       {/* Tabla resumen de sugerencias de compra */}
-      <div className="rounded-lg bg-white dark:bg-zinc-950 border border-amber-200/80 dark:border-zinc-800 overflow-hidden shadow-2xs">
+      <div className="rounded-lg bg-slate-50/50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-amber-100/50 dark:bg-zinc-900 border-b border-amber-200/80 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-[11px] uppercase">
+            <thead className="bg-slate-100/80 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-[11px] uppercase">
               <tr>
                 <th scope="col" className="py-2.5 px-3">Artículo & SKU</th>
                 <th scope="col" className="py-2.5 px-3 text-center">Disponible</th>
@@ -81,7 +81,7 @@ export function RestockSuggestionsCard({ products }: RestockSuggestionsCardProps
               {criticalItems.map((item) => {
                 const isZero = item.availableStock <= 0;
                 return (
-                  <tr key={item.sku} className="hover:bg-amber-50/30 dark:hover:bg-zinc-900/60 transition-colors">
+                  <tr key={item.sku} className="hover:bg-white dark:hover:bg-zinc-900/60 transition-colors">
                     <td className="py-2 px-3">
                       <div className="flex items-center gap-2">
                         {isZero ? (
@@ -113,7 +113,7 @@ export function RestockSuggestionsCard({ products }: RestockSuggestionsCardProps
                     </td>
 
                     <td className="py-2 px-3 text-center">
-                      <span className="font-mono font-bold text-slate-900 dark:text-zinc-100 bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-slate-200 dark:border-zinc-700">
+                      <span className="font-mono font-bold text-slate-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 px-2 py-0.5 rounded border border-slate-200 dark:border-zinc-700">
                         +{item.suggestedQty} un.
                       </span>
                     </td>
@@ -133,7 +133,7 @@ export function RestockSuggestionsCard({ products }: RestockSuggestionsCardProps
         </div>
 
         {/* Totalizador del pedido sugerido */}
-        <div className="p-3 bg-amber-50/60 dark:bg-zinc-900/90 border-t border-amber-200/80 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs gap-2">
+        <div className="p-3 bg-slate-100/70 dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs gap-2">
           <span className="text-slate-600 dark:text-zinc-400">
             Total de unidades sugeridas para reponer el depósito central:{' '}
             <strong className="text-slate-900 dark:text-zinc-100 font-bold">{totalUnitsToBuy} un.</strong>

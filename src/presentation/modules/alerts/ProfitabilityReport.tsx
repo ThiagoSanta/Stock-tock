@@ -246,66 +246,66 @@ export function ProfitabilityReport({ companyId }: ProfitabilityReportProps) {
 
       {/* 4 Tarjetas de Métricas de Rentabilidad */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-2xs">
+          <span className="text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block">
             Facturación Total
           </span>
-          <p className="text-xl font-bold font-mono text-slate-900 mt-1">
+          <p className="text-xl font-bold font-mono text-slate-900 dark:text-zinc-100 mt-1">
             ${totals.revenue.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
           </p>
-          <span className="text-[11px] text-slate-500 mt-1 block">
+          <span className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1 block">
             {totals.units} unidades vendidas
           </span>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-2xs">
+          <span className="text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block">
             Costo de Mercadería (CMV)
           </span>
-          <p className="text-xl font-bold font-mono text-slate-700 mt-1">
+          <p className="text-xl font-bold font-mono text-slate-700 dark:text-zinc-300 mt-1">
             ${totals.cost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
           </p>
-          <span className="text-[11px] text-slate-500 mt-1 block">
+          <span className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1 block">
             Costo histórico de reposición
           </span>
         </div>
 
-        <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 shadow-2xs">
-          <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">
+        <div className="p-4 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 shadow-2xs">
+          <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider block">
             Ganancia Bruta Real
           </span>
-          <p className="text-xl font-bold font-mono text-emerald-700 mt-1">
+          <p className="text-xl font-bold font-mono text-emerald-700 dark:text-emerald-400 mt-1">
             ${totals.profit.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
           </p>
-          <span className="text-[11px] text-emerald-800 font-semibold mt-1 block">
+          <span className="text-[11px] text-emerald-800 dark:text-emerald-400 font-semibold mt-1 block">
             Margen bruto en pesos
           </span>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-2xs">
+          <span className="text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block">
             Margen Promedio Comercial
           </span>
-          <p className="text-xl font-bold font-mono text-slate-900 mt-1">
+          <p className="text-xl font-bold font-mono text-slate-900 dark:text-zinc-100 mt-1">
             {totals.margin.toFixed(1)}%
           </p>
-          <span className="text-[11px] text-slate-500 mt-1 block">
+          <span className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1 block">
             Retorno sobre facturación
           </span>
         </div>
       </div>
 
       {/* Selector de Pestaña de Ranking */}
-      <div className="rounded-xl bg-white border border-slate-200 overflow-hidden shadow-xs">
-        <div className="p-3 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
+      <div className="rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-xs">
+        <div className="p-3 border-b border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/80 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={() => setActiveRankView('PROFIT')}
               className={`h-7 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeRankView === 'PROFIT'
-                  ? 'bg-slate-900 text-white'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                  ? 'bg-slate-900 dark:bg-zinc-100 text-white dark:text-zinc-900'
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-200/60 dark:hover:bg-zinc-800'
               }`}
             >
               <Award className="w-3.5 h-3.5" />
@@ -316,8 +316,8 @@ export function ProfitabilityReport({ companyId }: ProfitabilityReportProps) {
               onClick={() => setActiveRankView('VOLUME')}
               className={`h-7 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeRankView === 'VOLUME'
-                  ? 'bg-slate-900 text-white'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                  ? 'bg-slate-900 dark:bg-zinc-100 text-white dark:text-zinc-900'
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-200/60 dark:hover:bg-zinc-800'
               }`}
             >
               <TrendingUp className="w-3.5 h-3.5" />
@@ -328,8 +328,8 @@ export function ProfitabilityReport({ companyId }: ProfitabilityReportProps) {
               onClick={() => setActiveRankView('CATEGORIES')}
               className={`h-7 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeRankView === 'CATEGORIES'
-                  ? 'bg-slate-900 text-white'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                  ? 'bg-slate-900 dark:bg-zinc-100 text-white dark:text-zinc-900'
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-200/60 dark:hover:bg-zinc-800'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -337,7 +337,7 @@ export function ProfitabilityReport({ companyId }: ProfitabilityReportProps) {
             </button>
           </div>
 
-          <span className="text-[11px] text-slate-500 font-mono">
+          <span className="text-[11px] text-slate-500 dark:text-zinc-400 font-mono">
             {activeRankView === 'CATEGORIES'
               ? `${categoryMetrics.length} rubros evaluados`
               : `${productsMetrics.length} productos con ventas`}
@@ -347,13 +347,13 @@ export function ProfitabilityReport({ companyId }: ProfitabilityReportProps) {
         {/* Tabla según la vista seleccionada */}
         <div className="overflow-x-auto">
           {productsMetrics.length === 0 ? (
-            <div className="p-12 text-center text-xs text-slate-500">
+            <div className="p-12 text-center text-xs text-slate-500 dark:text-zinc-400">
               Aún no hay ventas registradas en el período seleccionado para calcular rentabilidad.
             </div>
           ) : activeRankView === 'CATEGORIES' ? (
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold text-[11px] uppercase">
+                <tr className="bg-slate-50 dark:bg-zinc-900/50 border-b border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 font-bold text-[11px] uppercase">
                   <th className="py-2.5 px-3">Rubro / Categoría</th>
                   <th className="py-2.5 px-3 text-center">Unidades</th>
                   <th className="py-2.5 px-3 text-right">Facturación</th>
@@ -362,28 +362,28 @@ export function ProfitabilityReport({ companyId }: ProfitabilityReportProps) {
                   <th className="py-2.5 px-3 text-right">Margen (%)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
                 {categoryMetrics.map((cat, idx) => (
-                  <tr key={cat.category} className="hover:bg-slate-50/70">
-                    <td className="py-2.5 px-3 font-semibold text-slate-900 flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 font-mono text-[10px] flex items-center justify-center font-bold">
+                  <tr key={cat.category} className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40">
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-zinc-100 flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-mono text-[10px] flex items-center justify-center font-bold">
                         {idx + 1}
                       </span>
                       <span>{cat.category}</span>
                     </td>
-                    <td className="py-2.5 px-3 text-center font-mono text-slate-700">
+                    <td className="py-2.5 px-3 text-center font-mono text-slate-700 dark:text-zinc-300">
                       {cat.unitsSold}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-slate-900">
+                    <td className="py-2.5 px-3 text-right font-mono text-slate-900 dark:text-zinc-100">
                       ${cat.totalRevenue.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-slate-500">
+                    <td className="py-2.5 px-3 text-right font-mono text-slate-500 dark:text-zinc-400">
                       ${cat.totalCost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700">
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700 dark:text-emerald-400">
                       ${cat.grossProfit.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-zinc-100">
                       {cat.marginPercentage.toFixed(1)}%
                     </td>
                   </tr>
@@ -393,7 +393,7 @@ export function ProfitabilityReport({ companyId }: ProfitabilityReportProps) {
           ) : (
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold text-[11px] uppercase">
+                <tr className="bg-slate-50 dark:bg-zinc-900/50 border-b border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 font-bold text-[11px] uppercase">
                   <th className="py-2.5 px-3 w-12 text-center">Rank</th>
                   <th className="py-2.5 px-3">Producto</th>
                   <th className="py-2.5 px-3">Rubro</th>
@@ -404,39 +404,39 @@ export function ProfitabilityReport({ companyId }: ProfitabilityReportProps) {
                   <th className="py-2.5 px-3 text-right">Margen (%)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
                 {(activeRankView === 'PROFIT' ? topByProfit : topByVolume).map((p, idx) => (
-                  <tr key={p.productId} className="hover:bg-slate-50/70">
+                  <tr key={p.productId} className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40">
                     <td className="py-2.5 px-3 text-center">
                       <span
                         className={`w-5 h-5 mx-auto rounded-full font-mono text-[10px] flex items-center justify-center font-bold ${
                           idx === 0
-                            ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                            ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700'
                             : idx === 1
-                            ? 'bg-slate-200 text-slate-800'
+                            ? 'bg-slate-200 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200'
                             : idx === 2
-                            ? 'bg-amber-50 text-amber-800'
-                            : 'text-slate-500'
+                            ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400'
+                            : 'text-slate-500 dark:text-zinc-400'
                         }`}
                       >
                         {idx + 1}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 font-semibold text-slate-900">{p.name}</td>
-                    <td className="py-2.5 px-3 text-slate-500 text-[11px]">{p.category}</td>
-                    <td className="py-2.5 px-3 text-center font-mono font-bold text-slate-800">
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-zinc-100">{p.name}</td>
+                    <td className="py-2.5 px-3 text-slate-500 dark:text-zinc-400 text-[11px]">{p.category}</td>
+                    <td className="py-2.5 px-3 text-center font-mono font-bold text-slate-800 dark:text-zinc-200">
                       {p.unitsSold}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-slate-900">
+                    <td className="py-2.5 px-3 text-right font-mono text-slate-900 dark:text-zinc-100">
                       ${p.totalRevenue.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-slate-500">
+                    <td className="py-2.5 px-3 text-right font-mono text-slate-500 dark:text-zinc-400">
                       ${p.totalCost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700">
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700 dark:text-emerald-400">
                       ${p.grossProfit.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-zinc-100">
                       {p.marginPercentage.toFixed(1)}%
                     </td>
                   </tr>
