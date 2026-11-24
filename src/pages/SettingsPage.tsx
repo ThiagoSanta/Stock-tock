@@ -90,9 +90,13 @@ export function SettingsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 border border-slate-200 text-[11px] font-mono text-slate-600">
-          <Database className="w-3.5 h-3.5 text-slate-500" />
-          <span>PostgreSQL Cloud</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-[11px] font-mono text-slate-700 shadow-2xs">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          </span>
+          <Database className="w-3.5 h-3.5 text-slate-600" />
+          <span>PostgreSQL Cloud • Conectado</span>
         </div>
       </div>
 
@@ -119,85 +123,77 @@ export function SettingsPage() {
 
           <BusinessRulesViewer />
 
-          {/* Interfaz & Operatividad — Modo Oscuro y PWA */}
+          {/* Apariencia & Visualización — Modo Oscuro */}
           <div className="p-4 rounded-lg bg-white border border-slate-200 shadow-xs space-y-4">
             <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200">
-              <div className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center">
-                <Sun className="w-3.5 h-3.5 text-slate-700" />
+              <div className="w-6 h-6 rounded-md bg-blue-50 text-blue-700 flex items-center justify-center">
+                <Sun className="w-3.5 h-3.5" />
               </div>
               <div>
                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                  Interfaz & Operatividad
+                  Apariencia & Visualización
                 </h3>
                 <p className="text-xs text-slate-500 font-medium">
-                  Personalización visual y aplicación nativa de escritorio
+                  Preferencia de tema visual para mostrador o ambientes con poca luz
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Modo Oscuro */}
-              <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/50 flex items-center justify-between gap-3">
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-1.5">
-                    {isDark ? (
-                      <Moon className="w-4 h-4 text-amber-400" />
-                    ) : (
-                      <Sun className="w-4 h-4 text-amber-500" />
-                    )}
-                    <span className="text-xs font-bold text-slate-900">Tema Visual</span>
+            <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  {isDark ? (
+                    <span className="p-1.5 rounded-md bg-amber-500/10 text-amber-400">
+                      <Moon className="w-4 h-4" />
+                    </span>
+                  ) : (
+                    <span className="p-1.5 rounded-md bg-blue-50 text-blue-600">
+                      <Sun className="w-4 h-4" />
+                    </span>
+                  )}
+                  <span className="text-xs font-bold text-slate-900">
+                    {isDark ? 'Modo Oscuro Activo' : 'Modo Claro Activo'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  {isDark
+                    ? 'Optimizado para ambientes con poca luz, reduciendo fatiga visual durante turnos nocturnos.'
+                    : 'Contraste alto y descansado para operación continua de mostrador en horario diurno.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="h-8 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-xs shadow-blue-500/20"
+              >
+                {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                <span>{isDark ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}</span>
+              </button>
+            </div>
+
+            {/* Banner opcional para PWA si el navegador permite instalar */}
+            {isInstallable && (
+              <div className="p-3 rounded-lg border border-blue-200 bg-blue-50/50 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <MonitorDown className="w-4 h-4 text-blue-600 shrink-0" />
+                  <div>
+                    <span className="text-xs font-semibold text-blue-900 block">
+                      Instalar Stock·tock como App de Escritorio
+                    </span>
+                    <span className="text-[11px] text-blue-700">
+                      Podés instalar el sistema en tu PC para abrirlo directamente sin barra de navegador.
+                    </span>
                   </div>
-                  <p className="text-[11px] text-slate-500">
-                    {isDark
-                      ? 'Modo Oscuro activo (optimizado para ambientes con poca luz y fatiga visual)'
-                      : 'Modo Claro activo (contraste óptimo para mostrador diurno)'}
-                  </p>
                 </div>
                 <button
                   type="button"
-                  onClick={toggleTheme}
-                  className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shrink-0 shadow-xs"
+                  onClick={installApp}
+                  className="h-7 px-3 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors cursor-pointer shrink-0"
                 >
-                  {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-                  <span>{isDark ? 'Usar Modo Claro' : 'Usar Modo Oscuro'}</span>
+                  Instalar
                 </button>
               </div>
-
-              {/* App PWA de Escritorio */}
-              <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/50 flex items-center justify-between gap-3">
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-1.5">
-                    <MonitorDown className="w-4 h-4 text-blue-600" />
-                    <span className="text-xs font-bold text-slate-900">Aplicación de Escritorio (PWA)</span>
-                  </div>
-                  <p className="text-[11px] text-slate-500">
-                    {isInstalled
-                      ? 'Stock·tock está instalada y funcionando como app nativa'
-                      : 'Instalá Stock·tock en tu PC sin bordes de navegador para mayor velocidad'}
-                  </p>
-                </div>
-
-                {isInstalled ? (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2.5 py-1 rounded-md shrink-0">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    Instalada
-                  </span>
-                ) : isInstallable ? (
-                  <button
-                    type="button"
-                    onClick={installApp}
-                    className="h-8 px-3 rounded bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shrink-0 shadow-xs"
-                  >
-                    <MonitorDown className="w-3.5 h-3.5" />
-                    <span>Instalar App</span>
-                  </button>
-                ) : (
-                  <span className="text-[11px] font-medium text-slate-500 bg-white border border-slate-200 px-2 py-1 rounded shrink-0">
-                    Listo en navegador
-                  </span>
-                )}
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Seguridad & Auditoría — solo Admin */}

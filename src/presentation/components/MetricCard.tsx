@@ -30,7 +30,7 @@ export function MetricCard({
         {Icon && (
           <div
             aria-hidden="true"
-            className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-700"
+            className="w-6 h-6 rounded-md bg-blue-50/80 border border-blue-100/60 flex items-center justify-center text-blue-700"
           >
             <Icon className="w-3.5 h-3.5" />
           </div>

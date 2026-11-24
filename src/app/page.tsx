@@ -162,7 +162,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Reglas de Negocio V1 Status Banner */}
+      {/* Políticas de Integridad */}
       <div className="p-4 rounded-xl bg-gradient-to-r from-[#121410] to-[#121214] border border-[#84cc16]/20 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-[#84cc16]/10 border border-[#84cc16]/30 flex items-center justify-center text-[#84cc16]">
@@ -170,7 +170,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <h4 className="text-xs font-semibold text-zinc-200">
-              Políticas de Integridad V1 Activas en Base de Datos
+              Políticas de Integridad Activas en Base de Datos
             </h4>
             <p className="text-[11px] text-zinc-400">
               Bloqueo automático de stock negativo • Costos históricos inmutables • Kardex auditado

@@ -171,7 +171,7 @@ export function DashboardPage() {
           <button
             type="button"
             onClick={() => setIsPosOpen(true)}
-            className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs focus-visible:ring-2 focus-visible:ring-slate-900"
+            className="h-8 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shadow-blue-500/20 focus-visible:ring-2 focus-visible:ring-blue-600"
           >
             <Plus className="w-4 h-4" aria-hidden="true" />
             <span>Venta Rápida (POS)</span>
@@ -179,15 +179,15 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* Reglas de Negocio V1 Status Banner */}
+      {/* Políticas de Integridad Comercial */}
       <div className="p-3.5 rounded-lg bg-white border border-slate-200 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-800 shrink-0" aria-hidden="true">
+          <div className="w-7 h-7 rounded-md bg-blue-50 text-blue-700 flex items-center justify-center shrink-0" aria-hidden="true">
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div>
             <h4 className="text-xs font-semibold text-slate-900">
-              Políticas de Integridad V1 Activas
+              Políticas de Integridad Comercial Activas
             </h4>
             <p className="text-xs text-slate-600">
               Bloqueo automático de stock negativo • Costos históricos inmutables • Kardex auditado

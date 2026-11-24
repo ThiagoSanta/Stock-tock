@@ -236,9 +236,10 @@ select:focus-visible {
 }
 
 /* Ítem activo de navegación en el Sidebar en modo oscuro */
-[data-theme="dark"] nav a.bg-slate-900 {
-  background-color: #334155 !important;
-  color: #f8fafc !important;
+[data-theme="dark"] nav a.bg-slate-900,
+[data-theme="dark"] nav a.bg-blue-600 {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
 }
 
 /* Respeto a preferencia de accesibilidad de movimiento reducido */

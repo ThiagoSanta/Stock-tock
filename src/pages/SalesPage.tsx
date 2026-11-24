@@ -174,7 +174,7 @@ export function SalesPage() {
           value={`$${totalBilled.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`}
           trend={`${sales.length} ventas`}
           isPositive={true}
-          subtitle="Total acumulado en V1"
+          subtitle="Total histórico acumulado"
           icon={DollarSign}
         />
         <MetricCard
