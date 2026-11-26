@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Users, Truck, Plus, Search, DollarSign, Building2 } from 'lucide-react';
+import { Users, Truck, Plus, Search, DollarSign, Building2 } from 'lucide-react';
+import { PageHeader, Button, Input } from '@/presentation/components/ui';
 import { CustomerWithMetrics, SupplierWithMetrics } from '@/core/domain/contacts/types';
 import { SupabaseContactRepository } from '@/core/infrastructure/repositories/SupabaseContactRepository';
 import { GetContactsUseCase } from '@/core/application/use-cases/contacts/GetContactsUseCase';
@@ -117,36 +117,20 @@ export function ContactsPage() {
 
   return (
     <div className="space-y-5">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
-            <Link
-              to="/"
-              className="hover:text-slate-700 flex items-center gap-1 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
-              <Users className="w-3.5 h-3.5" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">
-              Clientes & Proveedores
-            </h1>
-          </div>
-        </div>
-
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Nuevo Contacto</span>
-        </button>
-      </div>
+      <PageHeader
+        title="Clientes & Proveedores"
+        icon={<Users className="w-3.5 h-3.5" />}
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setIsModalOpen(true)}
+            leftIcon={<Plus className="w-4 h-4 text-lime-400 dark:text-lime-600" />}
+          >
+            Nuevo Contacto
+          </Button>
+        }
+      />
 
       {/* KPI Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -183,25 +167,27 @@ export function ContactsPage() {
       </div>
 
       {/* Tabs and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-2 rounded-lg border border-slate-200 shadow-xs">
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-md text-xs w-full sm:w-auto">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-zinc-900 p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-xs">
+        <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-950 p-1 rounded-md text-xs w-full sm:w-auto">
           <button
+            type="button"
             onClick={() => setActiveTab('CUSTOMERS')}
-            className={`px-3 py-1 rounded font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-1 rounded-md font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'CUSTOMERS'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
             <span>Clientes ({customers.length})</span>
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('SUPPLIERS')}
-            className={`px-3 py-1 rounded font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-1 rounded-md font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'SUPPLIERS'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
             <Truck className="w-3.5 h-3.5" />
@@ -209,14 +195,13 @@ export function ContactsPage() {
           </button>
         </div>
 
-        <div className="relative w-full sm:w-72">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
+        <div className="w-full sm:w-72">
+          <Input
+            type="search"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por nombre, CUIT, email..."
-            className="w-full h-8 pl-8 pr-3 rounded bg-slate-50 border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 transition-colors"
+            leftIcon={<Search className="w-3.5 h-3.5" />}
           />
         </div>
       </div>

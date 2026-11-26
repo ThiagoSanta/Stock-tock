@@ -156,17 +156,17 @@ export function SupplierCostComparisonModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/50 backdrop-blur-xs"
     >
-      <div className="w-full max-w-4xl max-h-[90vh] rounded-lg bg-white border border-slate-300 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col">
+      <div className="w-full max-w-4xl max-h-[90vh] rounded-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col">
         {/* Header */}
-        <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
+        <div className="h-12 px-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-zinc-950 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-slate-900 text-white flex items-center justify-center">
+            <div className="w-6 h-6 rounded bg-zinc-900 text-white flex items-center justify-center">
               <ArrowUpDown className="w-3.5 h-3.5" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">
                 Comparativa de Costos por Proveedor
               </h3>
             </div>
@@ -174,7 +174,7 @@ export function SupplierCostComparisonModal({
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-500 hover:text-slate-800 p-1.5 rounded hover:bg-slate-200 transition-colors cursor-pointer"
+            className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 p-1.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -183,31 +183,31 @@ export function SupplierCostComparisonModal({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
           {/* Selector de Producto */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-50 border border-slate-200 rounded">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                 Buscar Producto
               </label>
               <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
                 <input
                   type="text"
                   value={searchProduct}
                   onChange={(e) => setSearchProduct(e.target.value)}
                   placeholder="Filtrar por nombre o SKU..."
-                  className="w-full h-8 pl-8 pr-2.5 rounded bg-white border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-slate-900"
+                  className="w-full h-8 pl-8 pr-2.5 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                 Seleccionar Producto del Catálogo
               </label>
               <select
                 value={selectedProductId}
                 onChange={(e) => setSelectedProductId(e.target.value)}
-                className="w-full h-8 px-2 rounded bg-white border border-slate-300 text-xs text-slate-900 font-semibold focus:outline-none focus:border-slate-900"
+                className="w-full h-8 px-2 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 font-semibold focus:outline-none focus:border-zinc-900"
               >
                 {filteredProducts.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -221,31 +221,31 @@ export function SupplierCostComparisonModal({
           {/* Banner de Resumen de Ahorro */}
           {lowestSupplier && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded">
-                <span className="text-[10px] uppercase font-bold text-emerald-700 block">Mejor Proveedor (Menor Costo)</span>
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 rounded">
+                <span className="text-[10px] uppercase font-bold text-emerald-800 dark:text-emerald-300 block">Mejor Proveedor (Menor Costo)</span>
                 <span className="font-bold text-emerald-950 text-sm block">{lowestSupplier.supplierName}</span>
-                <span className="font-mono font-black text-emerald-800 text-base">
+                <span className="font-mono font-black text-emerald-800 dark:text-emerald-300 text-base">
                   ${lowestSupplier.latestCost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
               {highestSupplier && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded">
-                  <span className="text-[10px] uppercase font-bold text-rose-700 block">Mayor Costo Registrado</span>
+                <div className="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 rounded">
+                  <span className="text-[10px] uppercase font-bold text-rose-800 dark:text-rose-300 block">Mayor Costo Registrado</span>
                   <span className="font-bold text-rose-950 text-sm block">{highestSupplier.supplierName}</span>
-                  <span className="font-mono font-black text-rose-800 text-base">
+                  <span className="font-mono font-black text-rose-800 dark:text-rose-300 text-base">
                     ${highestSupplier.latestCost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
               )}
 
               {costSavingsPercentage && (
-                <div className="p-3 bg-slate-900 text-white rounded flex flex-col justify-center">
-                  <span className="text-[10px] uppercase font-bold text-slate-300 block">Diferencia de Precio</span>
+                <div className="p-3 bg-zinc-900 text-white rounded flex flex-col justify-center">
+                  <span className="text-[10px] uppercase font-bold text-zinc-300 block">Diferencia de Precio</span>
                   <span className="text-xl font-black text-emerald-400 font-mono">
                     {costSavingsPercentage}% de Ahorro
                   </span>
-                  <span className="text-[11px] text-slate-300">Comprando al proveedor más económico</span>
+                  <span className="text-[11px] text-zinc-300">Comprando al proveedor más económico</span>
                 </div>
               )}
             </div>
@@ -253,18 +253,18 @@ export function SupplierCostComparisonModal({
 
           {/* Tabla Comparativa de Proveedores */}
           <div>
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wide mb-2">
+            <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wide mb-2">
               Proveedores que cotizaron / abastecieron este producto
             </h4>
 
             {supplierSummary.length === 0 ? (
-              <div className="py-8 text-center text-xs text-slate-500 bg-slate-50 rounded border border-slate-200">
+              <div className="py-8 text-center text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 rounded border border-zinc-200 dark:border-zinc-800">
                 No hay órdenes de compra registradas para este producto todavía.
               </div>
             ) : (
-              <div className="rounded border border-slate-200 overflow-hidden">
+              <div className="rounded border border-zinc-200 dark:border-zinc-800 overflow-hidden">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-50 border-b border-slate-200 uppercase text-[10px] font-bold text-slate-700">
+                  <thead className="bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 uppercase text-[10px] font-bold text-zinc-700 dark:text-zinc-300">
                     <tr>
                       <th className="py-2 px-3">Proveedor</th>
                       <th className="py-2 px-3 text-right">Último Costo</th>
@@ -275,34 +275,34 @@ export function SupplierCostComparisonModal({
                       <th className="py-2 px-3 text-center">Calificación</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                     {supplierSummary.map((s, idx) => (
-                      <tr key={s.supplierName} className="hover:bg-slate-50 transition-colors">
-                        <td className="py-2.5 px-3 font-semibold text-slate-900">
+                      <tr key={s.supplierName} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors">
+                        <td className="py-2.5 px-3 font-semibold text-zinc-900 dark:text-zinc-100">
                           {s.supplierName}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-zinc-900 dark:text-zinc-100">
                           ${s.latestCost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-slate-600">
+                        <td className="py-2.5 px-3 text-right font-mono text-zinc-600 dark:text-zinc-400">
                           ${s.minCost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-slate-600">
+                        <td className="py-2.5 px-3 text-right font-mono text-zinc-600 dark:text-zinc-400">
                           ${s.maxCost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                         </td>
-                        <td className="py-2.5 px-3 text-center font-mono font-semibold text-slate-700">
+                        <td className="py-2.5 px-3 text-center font-mono font-semibold text-zinc-700 dark:text-zinc-300">
                           {s.purchasesCount}
                         </td>
-                        <td className="py-2.5 px-3 text-right text-slate-500 font-mono text-[11px]">
+                        <td className="py-2.5 px-3 text-right text-zinc-500 dark:text-zinc-400 font-mono text-[11px]">
                           {new Date(s.latestDate).toLocaleDateString('es-AR')}
                         </td>
                         <td className="py-2.5 px-3 text-center">
                           {idx === 0 ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
                               <CheckCircle2 className="w-3 h-3" /> Mejor Opción
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
                               Alternativa
                             </span>
                           )}
@@ -318,12 +318,12 @@ export function SupplierCostComparisonModal({
           {/* Historial Detallado de Compras del Artículo */}
           {history.length > 0 && (
             <div>
-              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wide mb-2">
+              <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wide mb-2">
                 Historial de Compras Inmutables ({history.length} órdenes)
               </h4>
-              <div className="rounded border border-slate-200 overflow-hidden max-h-48 overflow-y-auto">
+              <div className="rounded border border-zinc-200 dark:border-zinc-800 overflow-hidden max-h-48 overflow-y-auto">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-50 border-b border-slate-200 uppercase text-[10px] font-bold text-slate-700 sticky top-0">
+                  <thead className="bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 uppercase text-[10px] font-bold text-zinc-700 dark:text-zinc-300 sticky top-0">
                     <tr>
                       <th className="py-2 px-3">Fecha</th>
                       <th className="py-2 px-3">Nº Orden</th>
@@ -333,22 +333,22 @@ export function SupplierCostComparisonModal({
                       <th className="py-2 px-3 text-center">Estado</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                     {history.map((h) => (
-                      <tr key={h.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="py-1.5 px-3 text-slate-500 font-mono text-[11px]">
+                      <tr key={h.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors">
+                        <td className="py-1.5 px-3 text-zinc-500 dark:text-zinc-400 font-mono text-[11px]">
                           {new Date(h.purchaseDate).toLocaleDateString('es-AR')}
                         </td>
-                        <td className="py-1.5 px-3 font-mono font-bold text-slate-900">
+                        <td className="py-1.5 px-3 font-mono font-bold text-zinc-900 dark:text-zinc-100">
                           {h.purchaseNumber}
                         </td>
-                        <td className="py-1.5 px-3 font-medium text-slate-800">{h.supplierName}</td>
-                        <td className="py-1.5 px-3 text-right font-mono text-slate-700">{h.quantityOrdered} un.</td>
-                        <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
+                        <td className="py-1.5 px-3 font-medium text-zinc-800 dark:text-zinc-200">{h.supplierName}</td>
+                        <td className="py-1.5 px-3 text-right font-mono text-zinc-700 dark:text-zinc-300">{h.quantityOrdered} un.</td>
+                        <td className="py-1.5 px-3 text-right font-mono font-bold text-zinc-900 dark:text-zinc-100">
                           ${h.unitCost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                         </td>
                         <td className="py-1.5 px-3 text-center">
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
                             {h.status}
                           </span>
                         </td>
@@ -362,14 +362,14 @@ export function SupplierCostComparisonModal({
         </div>
 
         {/* Footer */}
-        <div className="h-11 px-4 border-t border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
-          <p className="text-[11px] text-slate-500">
+        <div className="h-11 px-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-zinc-950 shrink-0">
+          <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
             Comparativa basada en las órdenes de compra reales cargadas en el sistema
           </p>
           <button
             type="button"
             onClick={onClose}
-            className="h-7 px-3 rounded border border-slate-300 text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="h-7 px-3 rounded border border-zinc-300 dark:border-zinc-700 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             Cerrar
           </button>

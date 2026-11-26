@@ -162,17 +162,17 @@ export function BulkPriceUpdateModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/50 backdrop-blur-xs"
     >
-      <div className="w-full max-w-2xl rounded-lg bg-white border border-slate-300 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-2xl rounded-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
+        <div className="h-12 px-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-zinc-950 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-slate-900 text-white flex items-center justify-center">
+            <div className="w-6 h-6 rounded bg-zinc-900 text-white flex items-center justify-center">
               <Percent className="w-3.5 h-3.5" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">
                 Actualizador Masivo de Precios
               </h3>
             </div>
@@ -180,23 +180,23 @@ export function BulkPriceUpdateModal({
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-500 hover:text-slate-800 p-1.5 rounded hover:bg-slate-200 transition-colors cursor-pointer"
+            className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 p-1.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Controls */}
-        <div className="p-4 border-b border-slate-200 bg-slate-50/50 space-y-3 shrink-0">
+        <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 space-y-3 shrink-0">
           {error && (
-            <div className="p-2.5 rounded bg-rose-50 border border-rose-300 text-rose-900 text-xs font-medium flex items-center gap-1.5">
+            <div className="p-2.5 rounded bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 text-rose-800 dark:text-rose-300 text-xs font-medium flex items-center gap-1.5">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
 
           {successCount !== null && (
-            <div className="p-2.5 rounded bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-medium flex items-center gap-1.5">
+            <div className="p-2.5 rounded bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 text-emerald-800 dark:text-emerald-300 text-xs font-medium flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
               <span>¡Se actualizaron con éxito los precios de {successCount} productos!</span>
             </div>
@@ -205,13 +205,13 @@ export function BulkPriceUpdateModal({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Modalidad */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                 ¿Qué querés actualizar?
               </label>
               <select
                 value={target}
                 onChange={(e) => setTarget(e.target.value as UpdateTarget)}
-                className="w-full h-8 px-2 rounded bg-white border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-slate-900"
+                className="w-full h-8 px-2 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900"
               >
                 <option value="SALE_PRICE_PERCENT">Precio de Venta Minorista (+ / - %)</option>
                 <option value="ALL_PRICES_PERCENT">Todas las Listas (Minorista + Mayorista + Gremio) (+ / - %)</option>
@@ -222,7 +222,7 @@ export function BulkPriceUpdateModal({
 
             {/* Porcentaje */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                 Porcentaje (%)
               </label>
               <div className="relative">
@@ -232,9 +232,9 @@ export function BulkPriceUpdateModal({
                   value={percentage}
                   onChange={(e) => setPercentage(e.target.value)}
                   placeholder="Ej: 15"
-                  className="w-full h-8 pl-3 pr-7 rounded bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-slate-900"
+                  className="w-full h-8 pl-3 pr-7 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs font-mono font-bold text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900"
                 />
-                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500">
                   %
                 </span>
               </div>
@@ -242,13 +242,13 @@ export function BulkPriceUpdateModal({
 
             {/* Redondeo */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                 Criterio de Redondeo
               </label>
               <select
                 value={rounding}
                 onChange={(e) => setRounding(e.target.value as RoundingMode)}
-                className="w-full h-8 px-2 rounded bg-white border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-slate-900"
+                className="w-full h-8 px-2 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900"
               >
                 <option value="INTEGER">Al entero más cercano ($1)</option>
                 <option value="DECADE">A decenas ($10)</option>
@@ -263,16 +263,16 @@ export function BulkPriceUpdateModal({
 
         {/* Preview Table */}
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-medium pb-1">
+          <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 font-medium pb-1">
             <span>Previsualización de Cambios ({products.length} productos)</span>
             <span className="font-mono text-[11px]">
-              Ajuste aplicado: <strong className="text-slate-900">{numPercent > 0 ? `+${numPercent}%` : `${numPercent}%`}</strong>
+              Ajuste aplicado: <strong className="text-zinc-900 dark:text-zinc-100">{numPercent > 0 ? `+${numPercent}%` : `${numPercent}%`}</strong>
             </span>
           </div>
 
-          <div className="rounded border border-slate-200 overflow-hidden">
+          <div className="rounded border border-zinc-200 dark:border-zinc-800 overflow-hidden">
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-50 border-b border-slate-200 uppercase text-[10px] font-bold text-slate-700">
+              <thead className="bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 uppercase text-[10px] font-bold text-zinc-700 dark:text-zinc-300">
                 <tr>
                   <th className="py-2 px-3">Producto / SKU</th>
                   <th className="py-2 px-3 text-right">Precio Actual</th>
@@ -281,7 +281,7 @@ export function BulkPriceUpdateModal({
                   <th className="py-2 px-3 text-right">Diferencia</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                 {previewList.slice(0, 15).map((item) => {
                   const isSaleTarget = target === 'SALE_PRICE_PERCENT' || target === 'MARKUP_ON_COST';
                   const currentVal = isSaleTarget ? item.oldSalePrice : item.oldCostPrice;
@@ -289,20 +289,20 @@ export function BulkPriceUpdateModal({
                   const diffVal = isSaleTarget ? item.diffSale : item.diffCost;
 
                   return (
-                    <tr key={item.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={item.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors">
                       <td className="py-2 px-3">
-                        <span className="font-semibold text-slate-900 block truncate max-w-xs">{item.name}</span>
-                        <span className="font-mono text-[11px] text-slate-500">{item.sku}</span>
+                        <span className="font-semibold text-zinc-900 dark:text-zinc-100 block truncate max-w-xs">{item.name}</span>
+                        <span className="font-mono text-[11px] text-zinc-500 dark:text-zinc-400">{item.sku}</span>
                       </td>
-                      <td className="py-2 px-3 text-right font-mono text-slate-600">
+                      <td className="py-2 px-3 text-right font-mono text-zinc-600 dark:text-zinc-400">
                         ${currentVal.toFixed(2)}
                       </td>
-                      <td className="py-2 px-3 text-center text-slate-400">→</td>
-                      <td className="py-2 px-3 text-right font-mono font-bold text-slate-900">
+                      <td className="py-2 px-3 text-center text-zinc-400 dark:text-zinc-500">→</td>
+                      <td className="py-2 px-3 text-right font-mono font-bold text-zinc-900 dark:text-zinc-100">
                         ${newVal.toFixed(2)}
                       </td>
                       <td className="py-2 px-3 text-right font-mono font-semibold">
-                        <span className={diffVal >= 0 ? 'text-emerald-700' : 'text-rose-700'}>
+                        <span className={diffVal >= 0 ? 'text-emerald-800 dark:text-emerald-300' : 'text-rose-800 dark:text-rose-300'}>
                           {diffVal >= 0 ? `+$${diffVal.toFixed(2)}` : `-$${Math.abs(diffVal).toFixed(2)}`}
                         </span>
                       </td>
@@ -314,15 +314,15 @@ export function BulkPriceUpdateModal({
           </div>
 
           {products.length > 15 && (
-            <p className="text-[11px] text-slate-400 text-center pt-1">
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 text-center pt-1">
               Mostrando los primeros 15 de {products.length} productos afectados.
             </p>
           )}
         </div>
 
         {/* Footer */}
-        <div className="h-12 px-4 border-t border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
-          <p className="text-[11px] text-slate-500">
+        <div className="h-12 px-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-zinc-950 shrink-0">
+          <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
             Esta acción modificará la base de datos de productos de forma irreversible.
           </p>
           <div className="flex gap-2">
@@ -330,7 +330,7 @@ export function BulkPriceUpdateModal({
               type="button"
               onClick={onClose}
               disabled={updating}
-              className="h-8 px-3 rounded border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="h-8 px-3 rounded border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
@@ -338,7 +338,7 @@ export function BulkPriceUpdateModal({
               type="button"
               onClick={handleApplyUpdate}
               disabled={updating || products.length === 0}
-              className="h-8 px-4 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className="h-8 px-4 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 disabled:opacity-50 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               {updating ? (
                 <>

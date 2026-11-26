@@ -139,20 +139,20 @@ export function TransferStockModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="transfer-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-xs"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg bg-white rounded-xl border border-slate-300 shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-xl border border-zinc-300 dark:border-zinc-700 shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabecera */}
-        <div className="h-13 px-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/70">
+        <div className="h-13 px-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/70">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center">
               <ArrowRightLeft className="w-3.5 h-3.5" />
             </div>
-            <h3 id="transfer-modal-title" className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+            <h3 id="transfer-modal-title" className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">
               Transferencia Interna entre Depósitos
             </h3>
           </div>
@@ -160,7 +160,7 @@ export function TransferStockModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar ventana"
-            className="w-7 h-7 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-200/80 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-md text-zinc-400 dark:text-zinc-500 hover:text-zinc-800 hover:bg-zinc-200/80 flex items-center justify-center transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -169,28 +169,28 @@ export function TransferStockModal({
         {/* Si la transferencia se completó con éxito */}
         {transferSuccess ? (
           <div className="p-6 text-center space-y-4">
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-6 h-6" />
             </div>
 
             <div>
-              <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-900">
+              <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100">
                 {transferSuccess.transferNumber}
               </span>
-              <h4 className="text-sm font-bold text-slate-900 mt-2">
+              <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mt-2">
                 ¡Transferencia Asentada en Kardex!
               </h4>
-              <p className="text-xs text-slate-600 mt-1 max-w-sm mx-auto">
-                Se descontaron <strong className="font-semibold text-slate-900">{transferSuccess.quantity} un.</strong> de{' '}
-                <strong className="text-slate-900">{transferSuccess.originName}</strong> y se ingresaron en{' '}
-                <strong className="text-slate-900">{transferSuccess.destName}</strong>.
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 max-w-sm mx-auto">
+                Se descontaron <strong className="font-semibold text-zinc-900 dark:text-zinc-100">{transferSuccess.quantity} un.</strong> de{' '}
+                <strong className="text-zinc-900 dark:text-zinc-100">{transferSuccess.originName}</strong> y se ingresaron en{' '}
+                <strong className="text-zinc-900 dark:text-zinc-100">{transferSuccess.destName}</strong>.
               </p>
             </div>
 
-            <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-left space-y-1 font-mono">
-              <p className="text-slate-700">Artículo: <strong className="font-sans text-slate-900">{transferSuccess.productName}</strong></p>
-              <p className="text-slate-700">Cantidad: <strong>{transferSuccess.quantity} unidades</strong></p>
-              <p className="text-slate-700">Fecha: {new Date().toLocaleString('es-AR')}</p>
+            <div className="p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs text-left space-y-1 font-mono">
+              <p className="text-zinc-700 dark:text-zinc-300">Artículo: <strong className="font-sans text-zinc-900 dark:text-zinc-100">{transferSuccess.productName}</strong></p>
+              <p className="text-zinc-700 dark:text-zinc-300">Cantidad: <strong>{transferSuccess.quantity} unidades</strong></p>
+              <p className="text-zinc-700 dark:text-zinc-300">Fecha: {new Date().toLocaleString('es-AR')}</p>
             </div>
 
             <div className="flex items-center justify-center gap-2 pt-2">
@@ -201,14 +201,14 @@ export function TransferStockModal({
                   setSelectedProductId('');
                   setQuantity('');
                 }}
-                className="h-8 px-3.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer"
+                className="h-8 px-3.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 text-white text-xs font-semibold transition-colors cursor-pointer"
               >
                 Nueva Transferencia
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="h-8 px-3.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors cursor-pointer"
+                className="h-8 px-3.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-semibold transition-colors cursor-pointer"
               >
                 Cerrar
               </button>
@@ -219,7 +219,7 @@ export function TransferStockModal({
             {error && (
               <div
                 role="alert"
-                className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-center gap-2 font-medium"
+                className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2 font-medium"
               >
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
@@ -227,9 +227,9 @@ export function TransferStockModal({
             )}
 
             {/* Selector de Depósitos Origen y Destino */}
-            <div className="grid grid-cols-2 gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="grid grid-cols-2 gap-3 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
               <div>
-                <label htmlFor="trf-origin" className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                <label htmlFor="trf-origin" className="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1">
                   Depósito Origen (Sale)
                 </label>
                 <select
@@ -239,7 +239,7 @@ export function TransferStockModal({
                     setOriginWarehouseId(e.target.value);
                     setSelectedProductId('');
                   }}
-                  className="w-full h-8 px-2 rounded-md bg-white border border-slate-300 text-xs font-semibold text-slate-900 focus:outline-none focus:border-slate-900"
+                  className="w-full h-8 px-2 rounded-md bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900"
                 >
                   {warehouses.map((w) => (
                     <option key={w.id} value={w.id}>
@@ -250,14 +250,14 @@ export function TransferStockModal({
               </div>
 
               <div>
-                <label htmlFor="trf-dest" className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                <label htmlFor="trf-dest" className="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1">
                   Depósito Destino (Entra)
                 </label>
                 <select
                   id="trf-dest"
                   value={destinationWarehouseId}
                   onChange={(e) => setDestinationWarehouseId(e.target.value)}
-                  className="w-full h-8 px-2 rounded-md bg-white border border-slate-300 text-xs font-semibold text-slate-900 focus:outline-none focus:border-slate-900"
+                  className="w-full h-8 px-2 rounded-md bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900"
                 >
                   {warehouses
                     .filter((w) => w.id !== originWarehouseId)
@@ -272,7 +272,7 @@ export function TransferStockModal({
 
             {/* Selector de Producto */}
             <div>
-              <label htmlFor="trf-prod" className="block text-xs font-semibold text-slate-700 mb-1">
+              <label htmlFor="trf-prod" className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                 Producto a Transferir *
               </label>
               <select
@@ -280,7 +280,7 @@ export function TransferStockModal({
                 required
                 value={selectedProductId}
                 onChange={(e) => setSelectedProductId(e.target.value)}
-                className="w-full h-8 px-2 rounded-md bg-white border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-slate-900"
+                className="w-full h-8 px-2 rounded-md bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900"
               >
                 <option value="">-- Seleccionar producto con stock --</option>
                 {availableProductsInOrigin.map((p) => (
@@ -290,7 +290,7 @@ export function TransferStockModal({
                 ))}
               </select>
               {availableProductsInOrigin.length === 0 && (
-                <p className="text-[11px] text-amber-700 mt-1">
+                <p className="text-[11px] text-amber-800 dark:text-amber-300 mt-1">
                   No hay productos con stock disponible en el depósito de origen seleccionado.
                 </p>
               )}
@@ -298,13 +298,13 @@ export function TransferStockModal({
 
             {/* Cantidad a Transferir con validador de stock máximo */}
             {selectedProductId && (
-              <div className="space-y-1.5 p-3 rounded-lg border border-slate-200 bg-white">
+              <div className="space-y-1.5 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                 <div className="flex items-center justify-between text-xs">
-                  <label htmlFor="trf-qty" className="font-semibold text-slate-700">
+                  <label htmlFor="trf-qty" className="font-semibold text-zinc-700 dark:text-zinc-300">
                     Cantidad a Enviar *
                   </label>
-                  <span className="text-[11px] text-slate-500 font-mono">
-                    Stock Disponible: <strong className="text-slate-900 font-bold">{maxAvailable} un.</strong>
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
+                    Stock Disponible: <strong className="text-zinc-900 dark:text-zinc-100 font-bold">{maxAvailable} un.</strong>
                   </span>
                 </div>
 
@@ -319,12 +319,12 @@ export function TransferStockModal({
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     placeholder="0"
-                    className="w-full h-8 px-2.5 rounded-md border border-slate-300 bg-white text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-slate-900"
+                    className="w-full h-8 px-2.5 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-mono font-bold text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900"
                   />
                   <button
                     type="button"
                     onClick={() => setQuantity(String(maxAvailable))}
-                    className="h-8 px-2.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold shrink-0 cursor-pointer"
+                    className="h-8 px-2.5 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold shrink-0 cursor-pointer"
                   >
                     Máximo ({maxAvailable})
                   </button>
@@ -340,7 +340,7 @@ export function TransferStockModal({
 
             {/* Motivo o Remito Interno */}
             <div>
-              <label htmlFor="trf-reason" className="block text-xs font-semibold text-slate-700 mb-1">
+              <label htmlFor="trf-reason" className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                 Motivo / Justificación del Traslado
               </label>
               <input
@@ -349,16 +349,16 @@ export function TransferStockModal({
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Ej: Reposición de mercadería para mostrador sucursal 2..."
-                className="w-full h-8 px-2.5 rounded-md border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-slate-900"
+                className="w-full h-8 px-2.5 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900"
               />
             </div>
 
             {/* Botones de acción */}
-            <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+            <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="h-8 px-3.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                className="h-8 px-3.5 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-colors cursor-pointer"
               >
                 Cancelar
               </button>
@@ -371,7 +371,7 @@ export function TransferStockModal({
                   hasInsufficientStock ||
                   warehouses.length < 2
                 }
-                className="h-8 px-4 rounded-md bg-slate-900 hover:bg-slate-800 active:bg-slate-950 disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="h-8 px-4 rounded-md bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 active:bg-zinc-950 disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 {loading ? 'Transfiriendo...' : 'Confirmar Transferencia'}
               </button>

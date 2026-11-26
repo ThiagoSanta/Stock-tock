@@ -369,29 +369,29 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
       role="dialog"
       aria-modal="true"
       aria-label="Búsqueda rápida y comandos del sistema"
-      className="fixed inset-0 z-50 flex items-start justify-center pt-[14vh] px-4 bg-slate-900/30 backdrop-blur-[2px] animate-in fade-in duration-100"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-[14vh] px-4 bg-zinc-950/40 dark:bg-black/70 backdrop-blur-[2px] animate-in fade-in duration-100"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-[560px] rounded-xl bg-white border border-slate-200 shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-98 duration-100"
+        className="w-full max-w-[560px] rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-98 duration-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Barra del input de búsqueda */}
-        <div className="h-11 px-3.5 border-b border-slate-100 flex items-center gap-2.5 bg-white">
-          <Search className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
+        <div className="h-11 px-3.5 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2.5 bg-white dark:bg-zinc-900">
+          <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500 shrink-0" aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Escribí para buscar módulos, opciones o acciones..."
-            className="w-full bg-transparent text-[13px] text-slate-900 placeholder:text-slate-400 border-0 outline-none focus:outline-none focus:ring-0 p-0 shadow-none"
+            className="w-full bg-transparent dark:bg-transparent text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border-0 outline-none focus:outline-none focus:ring-0 p-0 shadow-none"
           />
           <button
             type="button"
             onClick={onClose}
             aria-label="Cerrar buscador"
-            className="text-[10px] font-sans font-medium text-slate-400 hover:text-slate-700 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded transition-colors cursor-pointer shrink-0"
+            className="text-xs font-sans font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.5 rounded-md transition-colors cursor-pointer shrink-0"
           >
             Esc
           </button>
@@ -400,8 +400,8 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
         {/* Lista de comandos */}
         <div className="max-h-[380px] overflow-y-auto p-1.5 space-y-0.5">
           {filteredCommands.length === 0 ? (
-            <div className="py-12 text-center text-xs text-slate-400">
-              No se encontraron resultados para <span className="font-semibold text-slate-700">"{query}"</span>
+            <div className="py-12 text-center text-xs text-zinc-500 dark:text-zinc-400">
+              No se encontraron resultados para <span className="font-semibold text-zinc-800 dark:text-zinc-200">"{query}"</span>
             </div>
           ) : (
             filteredCommands.map((cmd, idx) => {
@@ -415,7 +415,7 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
               return (
                 <React.Fragment key={cmd.id}>
                   {showCategoryHeader && (
-                    <div className="px-2.5 pt-2 pb-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                    <div className="px-2.5 pt-2 pb-1 text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                       {cmd.category}
                     </div>
                   )}
@@ -426,39 +426,39 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
                     onMouseEnter={() => setSelectedIndex(idx)}
                     className={`w-full px-2.5 py-2 rounded-lg text-left flex items-center justify-between gap-3 transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-slate-100 text-slate-900'
-                        : 'text-slate-700 hover:bg-slate-50'
+                        ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                        : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/60'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div
-                        className={`w-6 h-6 rounded flex items-center justify-center shrink-0 ${
+                        className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${
                           isSelected
-                            ? 'text-slate-900 bg-white border border-slate-200 shadow-2xs'
-                            : 'text-slate-400 bg-slate-50 border border-slate-100'
+                            ? 'text-zinc-900 dark:text-lime-400 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-2xs'
+                            : 'text-zinc-400 dark:text-zinc-500 bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200/70 dark:border-zinc-700/70'
                         }`}
                       >
                         <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className={`text-[12px] truncate ${isSelected ? 'font-semibold text-slate-900' : 'font-medium text-slate-800'}`}>
+                          <span className={`text-xs truncate ${isSelected ? 'font-semibold text-zinc-900 dark:text-zinc-100' : 'font-medium text-zinc-800 dark:text-zinc-200'}`}>
                             {cmd.title}
                           </span>
                           {query.trim() && (
-                            <span className="text-[9px] text-slate-400 bg-slate-100 px-1 py-0.2 rounded font-normal">
+                            <span className="text-[11px] text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded font-normal">
                               {cmd.category}
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-400 truncate leading-snug">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate leading-snug">
                           {cmd.description}
                         </p>
                       </div>
                     </div>
 
                     {isSelected && (
-                      <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400 shrink-0 pr-1">
+                      <div className="flex items-center gap-1 text-xs font-medium text-zinc-500 dark:text-zinc-400 shrink-0 pr-1">
                         <span>Ir</span>
                         <CornerDownLeft className="w-3 h-3" />
                       </div>
@@ -471,19 +471,19 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
         </div>
 
         {/* Footer minimalista */}
-        <div className="h-7 px-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+        <div className="h-8 px-3 bg-zinc-50 dark:bg-zinc-900/80 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
-              <kbd className="bg-white border border-slate-200 px-1 py-px rounded font-sans leading-none">↑</kbd>
-              <kbd className="bg-white border border-slate-200 px-1 py-px rounded font-sans leading-none">↓</kbd>
+              <kbd className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.5 rounded font-sans leading-none">↑</kbd>
+              <kbd className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.5 rounded font-sans leading-none">↓</kbd>
               <span className="ml-0.5">para navegar</span>
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="bg-white border border-slate-200 px-1 py-px rounded font-sans leading-none">↵</kbd>
+              <kbd className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.5 rounded font-sans leading-none">↵</kbd>
               <span className="ml-0.5">para seleccionar</span>
             </span>
           </div>
-          <span className="font-medium text-slate-400">Búsqueda global</span>
+          <span className="font-medium text-zinc-500 dark:text-zinc-400">Búsqueda global</span>
         </div>
       </div>
     </div>

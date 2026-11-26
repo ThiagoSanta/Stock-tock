@@ -12,8 +12,7 @@
     "reset:0km": "node scripts/reset-system-0km.cjs --confirm",
     "next:dev": "next dev",
     "next:build": "next build",
-    "lint": "eslint",
-    "tauri": "tauri"
+    "lint": "eslint"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -35,7 +34,6 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
-    "@tauri-apps/cli": "^2.12.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

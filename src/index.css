@@ -1,48 +1,59 @@
 @import "tailwindcss";
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/* ── Tema Claro (por defecto) ─────────────────────────── */
+/* ── Tema Claro (Zinc Neutro + Acento Lime) ────────────── */
 :root {
-  --background: #f8fafc;
+  --background: #fafafa;
   --surface: #ffffff;
-  --surface-hover: #f1f5f9;
-  --surface-muted: #f8fafc;
-  --border: #e2e8f0;
-  --border-strong: #cbd5e1;
+  --surface-hover: #f4f4f5;
+  --surface-muted: #f4f4f5;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
   --foreground: #09090b;
-  --foreground-muted: #64748b;
-  --primary: #09090b;
-  --primary-hover: #18181b;
+  --foreground-muted: #71717a;
+  --primary: #18181b;
+  --primary-hover: #27272a;
   --primary-text: #ffffff;
+  /* Semánticos */
   --success: #15803d;
-  --danger: #b91c1c;
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
+  --danger: #be123c;
+  --danger-bg: #fff1f2;
+  --danger-border: #fecdd3;
   --warning: #b45309;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --info: #0369a1;
+  --info-bg: #f0f9ff;
+  --info-border: #bae6fd;
   --brand-lime: #84cc16;
+  --brand-lime-text: #4d7c0f;
   /* Sidebar */
   --sidebar-bg: #ffffff;
-  --sidebar-border: #e2e8f0;
-  --sidebar-item-active: #09090b;
+  --sidebar-border: #e4e4e7;
+  --sidebar-item-active: #18181b;
   --sidebar-item-active-text: #ffffff;
-  --sidebar-item-hover: #f1f5f9;
+  --sidebar-item-hover: #f4f4f5;
   /* Inputs */
   --input-bg: #ffffff;
-  --input-border: #cbd5e1;
+  --input-border: #d4d4d8;
   --input-text: #09090b;
-  --input-placeholder: #94a3b8;
+  --input-placeholder: #a1a1aa;
   /* Cards */
   --card-bg: #ffffff;
-  --card-border: #e2e8f0;
+  --card-border: #e4e4e7;
   /* Table */
-  --table-header-bg: #f8fafc;
-  --table-row-hover: #f8fafc;
-  --table-border: #e2e8f0;
+  --table-header-bg: #fafafa;
+  --table-row-hover: #f4f4f5;
+  --table-border: #e4e4e7;
   /* Badge chips */
-  --badge-bg: #f1f5f9;
-  --badge-text: #334155;
+  --badge-bg: #f4f4f5;
+  --badge-text: #3f3f46;
   /* Modal overlay */
   --modal-overlay: rgba(9, 9, 11, 0.5);
   --modal-bg: #ffffff;
-  --modal-border: #cbd5e1;
+  --modal-border: #d4d4d8;
 }
 
 /* ── Tema Oscuro: Negro Grafito Puro (Zinc 950) ───────── */
@@ -58,10 +69,21 @@
   --primary: #f4f4f5;
   --primary-hover: #ffffff;
   --primary-text: #09090b;
-  --success: #22c55e;
-  --danger: #ef4444;
-  --warning: #f59e0b;
+  /* Semánticos */
+  --success: #34d399;
+  --success-bg: rgba(6, 78, 59, 0.45);
+  --success-border: rgba(16, 185, 129, 0.35);
+  --danger: #fb7185;
+  --danger-bg: rgba(136, 19, 55, 0.45);
+  --danger-border: rgba(244, 63, 94, 0.35);
+  --warning: #fbbf24;
+  --warning-bg: rgba(120, 53, 15, 0.45);
+  --warning-border: rgba(245, 158, 11, 0.35);
+  --info: #38bdf8;
+  --info-bg: rgba(12, 74, 110, 0.45);
+  --info-border: rgba(14, 165, 233, 0.35);
   --brand-lime: #a3e635;
+  --brand-lime-text: #a3e635;
   /* Sidebar */
   --sidebar-bg: #09090b;
   --sidebar-border: #27272a;
@@ -84,7 +106,7 @@
   --badge-bg: #18181b;
   --badge-text: #d4d4d8;
   /* Modal overlay */
-  --modal-overlay: rgba(0, 0, 0, 0.85);
+  --modal-overlay: rgba(0, 0, 0, 0.8);
   --modal-bg: #121214;
   --modal-border: #27272a;
 }
@@ -111,20 +133,17 @@ code, kbd, samp, pre, .font-mono {
   font-feature-settings: 'tnum';
 }
 
-/* Enfoque accesible global (WCAG 2.1 AA) sin romper inputs contenidos */
+/* Enfoque accesible global (WCAG 2.1 AA) */
 :focus-visible {
-  outline: 2px solid #0f172a;
+  outline: 2px solid var(--brand-lime);
   outline-offset: 2px;
 }
 
-input:focus,
 input:focus-visible,
-textarea:focus,
 textarea:focus-visible,
-select:focus,
 select:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
+  outline: 2px solid var(--brand-lime);
+  outline-offset: 0px;
 }
 
 /* Soporte para números alineados en tablas comerciales */
@@ -132,7 +151,7 @@ select:focus-visible {
   font-variant-numeric: tabular-nums;
 }
 
-/* Scrollbar sobrio y accesible */
+/* Scrollbar sobrio y accesible (Zinc unificado) */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -143,97 +162,20 @@ select:focus-visible {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: #d4d4d8;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #a1a1aa;
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #27272a;
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
-}
-
-[data-theme="dark"] :focus-visible {
-  outline-color: #e2e8f0;
-}
-
-/* ── Reglas de Inversión y Contraste Base para Tema Oscuro (solo si el elemento no define dark:*) ──────────── */
-[data-theme="dark"] .bg-white:not([class*="dark:bg-"]) {
-  background-color: var(--surface) !important;
-  color: var(--foreground);
-}
-
-[data-theme="dark"] .bg-slate-50:not([class*="dark:bg-"]) {
-  background-color: var(--background) !important;
-}
-
-[data-theme="dark"] .bg-slate-100:not([class*="dark:bg-"]) {
-  background-color: var(--surface-muted) !important;
-}
-
-[data-theme="dark"] .hover\:bg-slate-50:not([class*="dark:hover:bg-"]):hover,
-[data-theme="dark"] .hover\:bg-slate-100:not([class*="dark:hover:bg-"]):hover,
-[data-theme="dark"] .hover\:bg-slate-50\/80:not([class*="dark:hover:bg-"]):hover {
-  background-color: var(--surface-hover) !important;
-}
-
-[data-theme="dark"] .border-slate-100:not([class*="dark:border-"]),
-[data-theme="dark"] .border-slate-200:not([class*="dark:border-"]),
-[data-theme="dark"] .border-slate-300:not([class*="dark:border-"]) {
-  border-color: var(--border) !important;
-}
-
-[data-theme="dark"] .text-slate-900:not([class*="dark:text-"]) {
-  color: #f4f4f5 !important;
-}
-
-[data-theme="dark"] .text-slate-800:not([class*="dark:text-"]),
-[data-theme="dark"] .text-slate-700:not([class*="dark:text-"]) {
-  color: #e4e4e7 !important;
-}
-
-[data-theme="dark"] .text-slate-600:not([class*="dark:text-"]),
-[data-theme="dark"] .text-slate-500:not([class*="dark:text-"]) {
-  color: #a1a1aa !important;
-}
-
-[data-theme="dark"] .text-slate-400:not([class*="dark:text-"]) {
-  color: #71717a !important;
-}
-
-[data-theme="dark"] input:not([class*="dark:bg-"]),
-[data-theme="dark"] select:not([class*="dark:bg-"]),
-[data-theme="dark"] textarea:not([class*="dark:bg-"]) {
-  background-color: var(--input-bg) !important;
-  color: var(--input-text) !important;
-  border-color: var(--input-border) !important;
-}
-
-[data-theme="dark"] input::placeholder,
-[data-theme="dark"] textarea::placeholder {
-  color: var(--input-placeholder) !important;
-}
-
-[data-theme="dark"] .shadow-xs,
-[data-theme="dark"] .shadow-sm,
-[data-theme="dark"] .shadow-md,
-[data-theme="dark"] .shadow-xl {
-  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.45) !important;
-}
-
-[data-theme="dark"] button.bg-slate-900:not([class*="dark:bg-"]) {
-  background-color: #f4f4f5 !important;
-  color: #09090b !important;
-}
-
-[data-theme="dark"] button.hover\:bg-slate-800:not([class*="dark:hover:bg-"]):hover {
-  background-color: #e4e4e7 !important;
+  background: #3f3f46;
 }
 
 /* Clases de utilidad para acentos y delineados Verde Lima */

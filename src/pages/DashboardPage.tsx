@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { MetricCard } from '@/presentation/components/MetricCard';
+import { PageHeader, Button, Badge } from '@/presentation/components/ui';
 import { createClient } from '@/utils/supabase/client';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 import { PosModal } from '@/presentation/modules/pos/PosModal';
@@ -149,54 +150,51 @@ export function DashboardPage() {
   const stockValuation = products.reduce((acc, p) => acc + (Number(p.physicalStock) || 0) * (Number(p.costPrice) || 0), 0);
 
   return (
-    <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-slate-600 mb-1">
-            <Building2 className="w-3.5 h-3.5 text-slate-700" aria-hidden="true" />
-            <span className="font-semibold text-slate-800">
+    <div className="space-y-5">
+      <PageHeader
+        title="Control de Operaciones"
+        backTo=""
+        subtitle={
+          <>
+            <Building2 className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" aria-hidden="true" />
+            <span className="font-semibold text-zinc-800 dark:text-zinc-200">
               {company ? company.name : 'Stock-tock Casa Central'}
             </span>
             <span aria-hidden="true">•</span>
-            <Calendar className="w-3.5 h-3.5 text-slate-600" aria-hidden="true" />
-            <span className="capitalize font-medium text-slate-700">{currentDate}</span>
-          </div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">
-            Control de Operaciones
-          </h1>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
+            <Calendar className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" aria-hidden="true" />
+            <span className="capitalize font-medium text-zinc-600 dark:text-zinc-400">{currentDate}</span>
+          </>
+        }
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
             onClick={() => setIsPosOpen(true)}
-            className="h-8 px-3.5 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs focus-visible:ring-2 focus-visible:ring-lime-500"
+            leftIcon={<Plus className="w-4 h-4 text-lime-400 dark:text-lime-600" aria-hidden="true" />}
           >
-            <Plus className="w-4 h-4" aria-hidden="true" />
-            <span>Venta Rápida (POS)</span>
-          </button>
-        </div>
-      </div>
+            Venta Rápida (POS)
+          </Button>
+        }
+      />
 
       {/* Políticas de Integridad Comercial */}
-      <div className="p-3.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center justify-between shadow-xs">
+      <div className="p-3.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shrink-0" aria-hidden="true">
-            <ShieldCheck className="w-4 h-4 text-slate-700 dark:text-zinc-300" />
+          <div className="w-7 h-7 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center shrink-0" aria-hidden="true">
+            <ShieldCheck className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
           </div>
           <div>
-            <h4 className="text-xs font-semibold text-slate-900 dark:text-zinc-100">
+            <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
               Políticas de Integridad Comercial Activas
             </h4>
-            <p className="text-xs text-slate-600 dark:text-zinc-400">
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">
               Bloqueo automático de stock negativo • Costos históricos inmutables • Kardex auditado
             </p>
           </div>
         </div>
-        <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-lime-500/10 text-lime-700 dark:text-lime-400 border border-lime-500/30">
+        <Badge variant="brand" mono>
           PROTEGIDO
-        </span>
+        </Badge>
       </div>
 
       {/* Metric Cards Grid */}
@@ -246,41 +244,41 @@ export function DashboardPage() {
       {/* Main Grid: Products & Movements */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left Column: Catálogo */}
-        <section aria-label="Productos destacados del catálogo" className="lg:col-span-2 rounded-lg bg-white border border-slate-200 p-4 space-y-3 shadow-xs">
-          <div className="flex items-center justify-between pb-2.5 border-b border-slate-200">
+        <section aria-label="Productos destacados del catálogo" className="lg:col-span-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 space-y-3 shadow-xs">
+          <div className="flex items-center justify-between pb-2.5 border-b border-zinc-200 dark:border-zinc-800">
             <div>
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">
                 Productos en Catálogo
               </h3>
-              <p className="text-xs text-slate-600 font-medium">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
                 Existencia física real y precios de lista
               </p>
             </div>
             <Link
               to="/productos"
-              className="text-xs text-blue-700 hover:text-blue-900 flex items-center gap-1 font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-slate-900"
+              className="text-xs text-sky-800 dark:text-sky-300 hover:text-sky-900 dark:text-sky-400 dark:hover:text-sky-300 flex items-center gap-1 font-semibold transition-colors"
             >
               Ver todos <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>
           </div>
 
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
             {products.slice(0, 5).map((prod) => (
               <div
                 key={prod.id}
-                className="py-2.5 flex items-center justify-between hover:bg-slate-50/80 px-2 rounded transition-colors"
+                className="py-2.5 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 px-2 rounded-lg transition-colors"
               >
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-semibold text-slate-800">
+                    <span className="font-mono text-xs font-semibold text-zinc-800 dark:text-zinc-200">
                       {prod.sku}
                     </span>
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-300">
+                    <Badge variant="neutral">
                       {prod.availableStock} un. disp.
-                    </span>
+                    </Badge>
                   </div>
-                  <p className="text-xs text-slate-900 font-semibold">{prod.name}</p>
-                  <p className="text-xs text-slate-600 font-mono">
+                  <p className="text-xs text-zinc-900 dark:text-zinc-100 font-semibold">{prod.name}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
                     {permissions.canViewFinancials
                       ? `Costo: $${prod.costPrice.toLocaleString('es-AR')} • Venta: $${prod.salePrice.toLocaleString('es-AR')}`
                       : `Venta: $${prod.salePrice.toLocaleString('es-AR')}`}
@@ -288,17 +286,17 @@ export function DashboardPage() {
                 </div>
 
                 <div className="text-right space-y-1">
-                  <p className="text-xs font-bold font-mono text-slate-900 tabular-nums">
+                  <p className="text-xs font-bold font-mono text-zinc-900 dark:text-zinc-100 tabular-nums">
                     ${prod.salePrice.toLocaleString('es-AR')}
                   </p>
-                  <button
-                    type="button"
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={() => setIsPosOpen(true)}
                     aria-label={`Vender ${prod.name}`}
-                    className="text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 border border-slate-300 transition-colors cursor-pointer"
                   >
                     Vender
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -306,17 +304,17 @@ export function DashboardPage() {
         </section>
 
         {/* Right Column: Movimientos Kardex */}
-        <section aria-label="Últimos movimientos del Kardex" className="rounded-lg bg-white border border-slate-200 p-4 space-y-3 shadow-xs">
-          <div className="pb-2.5 border-b border-slate-200">
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+        <section aria-label="Últimos movimientos del Kardex" className="rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 space-y-3 shadow-xs">
+          <div className="pb-2.5 border-b border-zinc-200 dark:border-zinc-800">
+            <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">
               Kardex de Inventario
             </h3>
-            <p className="text-xs text-slate-600 font-medium">Últimos movimientos auditados</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Últimos movimientos auditados</p>
           </div>
 
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
             {recentMovements.length === 0 ? (
-              <p className="text-xs text-slate-600 text-center py-4 font-medium">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center py-4 font-medium">
                 No hay movimientos registrados aún.
               </p>
             ) : (
@@ -325,19 +323,13 @@ export function DashboardPage() {
                 return (
                   <div key={mov.id} className="py-2.5 flex items-start justify-between gap-2">
                     <div>
-                      <span
-                        className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded border ${
-                          isNegative
-                            ? 'bg-rose-50 text-rose-800 border-rose-300'
-                            : 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                        }`}
-                      >
+                      <Badge variant={isNegative ? 'danger' : 'success'} mono>
                         {mov.movement_type}
-                      </span>
-                      <p className="text-xs font-semibold text-slate-900 mt-1 line-clamp-1">
+                      </Badge>
+                      <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mt-1 line-clamp-1">
                         {mov.product?.name || mov.notes || 'Movimiento'}
                       </p>
-                      <p className="text-xs text-slate-500 font-mono">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
                         {new Date(mov.created_at).toLocaleTimeString('es-AR', {
                           hour: '2-digit',
                           minute: '2-digit',
@@ -347,12 +339,12 @@ export function DashboardPage() {
                     <div className="text-right shrink-0">
                       <span
                         className={`text-xs font-mono font-bold tabular-nums ${
-                          isNegative ? 'text-rose-700' : 'text-emerald-700'
+                          isNegative ? 'text-rose-700 dark:text-rose-400' : 'text-emerald-700 dark:text-emerald-400'
                         }`}
                       >
                         {isNegative ? '' : '+'}{mov.quantity} un.
                       </span>
-                      <p className="text-xs text-slate-600 font-mono tabular-nums">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono tabular-nums">
                         Saldo: {mov.balance_physical_after}
                       </p>
                     </div>

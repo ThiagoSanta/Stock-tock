@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Package, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Package } from 'lucide-react';
+import { PageHeader } from '@/presentation/components/ui';
 import { ProductWithStock } from '@/core/application/ports/IProductRepository';
 import { SupabaseProductRepository } from '@/core/infrastructure/repositories/SupabaseProductRepository';
 import { CreateProductUseCase } from '@/core/application/use-cases/catalog/CreateProductUseCase';
@@ -92,28 +92,10 @@ export function ProductsPage() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
-            <Link
-              to="/"
-              className="hover:text-slate-700 flex items-center gap-1 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
-              <Package className="w-3.5 h-3.5" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">
-              Catálogo de Productos
-            </h1>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Catálogo de Productos"
+        icon={<Package className="w-3.5 h-3.5" />}
+      />
 
       {/* Filtros y Acción de Alta */}
       <ProductFilters

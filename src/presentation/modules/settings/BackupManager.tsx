@@ -251,24 +251,24 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
   };
 
   return (
-    <div className="rounded-lg bg-white border border-slate-200 p-4 sm:p-5 space-y-6 shadow-xs font-sans">
+    <div className="rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-5 space-y-6 shadow-xs font-sans">
       {/* Encabezado */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+      <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center">
             <Database className="w-3.5 h-3.5" />
           </div>
           <div>
-            <h3 className="font-semibold text-slate-900 text-xs uppercase tracking-wider">
+            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-xs uppercase tracking-wider">
               Copia de Seguridad y Restauración de Datos
             </h3>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
               Respaldo total de existencias, costos, ventas y clientes en tu computadora
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded text-[11px] font-semibold">
+        <div className="flex items-center gap-1.5 text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 px-2.5 py-0.5 rounded text-[11px] font-semibold">
           <ShieldCheck className="w-3.5 h-3.5" />
           <span>Datos 100% Privados</span>
         </div>
@@ -277,15 +277,15 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
       {/* Sección 1: Descargar Backup */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
         <div className="sm:col-span-2 space-y-1.5">
-          <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+          <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">
             1. Generar Copia de Seguridad (.JSON)
           </h4>
-          <p className="text-xs text-slate-700 leading-relaxed">
+          <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
             Descargá en cualquier momento una <strong>copia de seguridad completa en formato JSON</strong> con
             todos los artículos, compras, kardex histórico, cuentas corrientes y clientes.
           </p>
           {lastBackupDate && (
-            <p className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
+            <p className="text-[11px] text-emerald-800 dark:text-emerald-300 font-semibold flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3" />
               <span>Último respaldo descargado: {lastBackupDate}</span>
             </p>
@@ -297,7 +297,7 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
             type="button"
             onClick={handleDownloadFullBackup}
             disabled={downloading}
-            className="h-9 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 disabled:opacity-50 text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+            className="h-9 px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 active:bg-zinc-950 disabled:opacity-50 text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs"
           >
             {downloading ? (
               <>
@@ -314,17 +314,17 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
         </div>
       </div>
 
-      <hr className="border-slate-100" />
+      <hr className="border-zinc-100 dark:border-zinc-800" />
 
       {/* Sección 2: Restaurar Backup */}
       <div className="space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="space-y-1">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-              <Upload className="w-3.5 h-3.5 text-slate-700" />
+            <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider flex items-center gap-1.5">
+              <Upload className="w-3.5 h-3.5 text-zinc-700 dark:text-zinc-300" />
               <span>2. Restaurar Copia de Seguridad</span>
             </h4>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">
               Selecciona un archivo <code>backup-stocktock-*.json</code> previo para restablecer los registros de tu negocio.
             </p>
           </div>
@@ -341,9 +341,9 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={restoring}
-              className="h-8 px-3.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+              className="h-8 px-3.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
             >
-              <Upload className="w-3.5 h-3.5 text-slate-500" />
+              <Upload className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
               <span>Seleccionar Archivo JSON</span>
             </button>
           </div>
@@ -351,7 +351,7 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
 
         {/* Mensaje de error al cargar JSON */}
         {restoreError && (
-          <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2">
+          <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 text-xs text-rose-800 dark:text-rose-300 flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
             <span>{restoreError}</span>
           </div>
@@ -359,7 +359,7 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
 
         {/* Mensaje de éxito al restaurar */}
         {restoreSuccess && (
-          <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2">
+          <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
             <span>{restoreSuccess}</span>
           </div>
@@ -367,41 +367,41 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
 
         {/* Previsualización del archivo de Backup antes de confirmar */}
         {restoreData && (
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-300 space-y-3">
+          <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-xs font-bold text-slate-900">
+                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
                   Respaldo verificado: {restoreFile?.name}
                 </span>
               </div>
-              <span className="text-[11px] text-slate-500 font-mono">
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
                 Emitido: {new Date(restoreData.meta?.exportedAt || '').toLocaleString('es-AR')}
               </span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-              <div className="p-2 rounded bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-500 block">Productos</span>
-                <strong className="font-mono text-slate-900">
+              <div className="p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">Productos</span>
+                <strong className="font-mono text-zinc-900 dark:text-zinc-100">
                   {restoreData.meta?.recordCounts?.products ?? restoreData.database?.products?.length ?? 0}
                 </strong>
               </div>
-              <div className="p-2 rounded bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-500 block">Ventas</span>
-                <strong className="font-mono text-slate-900">
+              <div className="p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">Ventas</span>
+                <strong className="font-mono text-zinc-900 dark:text-zinc-100">
                   {restoreData.meta?.recordCounts?.sales ?? restoreData.database?.sales?.length ?? 0}
                 </strong>
               </div>
-              <div className="p-2 rounded bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-500 block">Clientes</span>
-                <strong className="font-mono text-slate-900">
+              <div className="p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">Clientes</span>
+                <strong className="font-mono text-zinc-900 dark:text-zinc-100">
                   {restoreData.meta?.recordCounts?.customers ?? restoreData.database?.customers?.length ?? 0}
                 </strong>
               </div>
-              <div className="p-2 rounded bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-500 block">Mov. Kardex</span>
-                <strong className="font-mono text-slate-900">
+              <div className="p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">Mov. Kardex</span>
+                <strong className="font-mono text-zinc-900 dark:text-zinc-100">
                   {restoreData.meta?.recordCounts?.stockMovements ?? restoreData.database?.stockMovements?.length ?? 0}
                 </strong>
               </div>
@@ -415,7 +415,7 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
                   setRestoreFile(null);
                 }}
                 disabled={restoring}
-                className="h-8 px-3 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                className="h-8 px-3 rounded-lg bg-zinc-200 hover:bg-zinc-300 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-colors cursor-pointer"
               >
                 Cancelar
               </button>

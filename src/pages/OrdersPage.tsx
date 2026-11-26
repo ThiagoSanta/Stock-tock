@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, ShoppingBag, Plus } from 'lucide-react';
+import { ShoppingBag, Plus } from 'lucide-react';
+import { PageHeader, Button } from '@/presentation/components/ui';
 import { Order, OrderStatus } from '@/core/domain/orders/types';
 import { ProductWithStock } from '@/core/application/ports/IProductRepository';
 import { SupabaseOrderRepository } from '@/core/infrastructure/repositories/SupabaseOrderRepository';
@@ -96,39 +96,23 @@ export function OrdersPage() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
-            <Link
-              to="/"
-              className="hover:text-slate-700 flex items-center gap-1 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
-              <ShoppingBag className="w-3.5 h-3.5" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">
-              Pedidos de Clientes
-            </h1>
-          </div>
-        </div>
-
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Nuevo Pedido</span>
-        </button>
-      </div>
+      <PageHeader
+        title="Pedidos de Clientes"
+        icon={<ShoppingBag className="w-3.5 h-3.5" />}
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setIsCreateModalOpen(true)}
+            leftIcon={<Plus className="w-4 h-4 text-lime-400 dark:text-lime-600" />}
+          >
+            Nuevo Pedido
+          </Button>
+        }
+      />
 
       {/* Tabs de Filtro por Estado */}
-      <div className="flex items-center gap-1 p-1 rounded-lg bg-slate-100 border border-slate-200 text-xs w-fit overflow-x-auto">
+      <div className="flex items-center gap-1 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs w-fit overflow-x-auto">
         {[
           { id: 'ALL', label: 'Todos' },
           { id: 'BORRADOR', label: 'Borradores' },
@@ -138,11 +122,12 @@ export function OrdersPage() {
         ].map((tab) => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setStatusFilter(tab.id as any)}
-            className={`px-3 py-1 rounded font-medium transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-md font-semibold transition-all cursor-pointer ${
               statusFilter === tab.id
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
             {tab.label}

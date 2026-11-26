@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Receipt, DollarSign, TrendingUp, ShoppingBag, Search, Calculator } from 'lucide-react';
+import { Receipt, DollarSign, TrendingUp, ShoppingBag, Search, Calculator, ArrowDownRight, Clock } from 'lucide-react';
+import { PageHeader, Button, Badge, Input } from '@/presentation/components/ui';
 import { SaleWithDetails } from '@/core/application/ports/ISaleRepository';
 import { SupabaseSaleRepository } from '@/core/infrastructure/repositories/SupabaseSaleRepository';
 import { GetSalesHistoryUseCase } from '@/core/application/use-cases/sales/GetSalesHistoryUseCase';
@@ -13,7 +13,6 @@ import { SaleReturnModal } from '@/presentation/modules/sales/SaleReturnModal';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
 import { createClient } from '@/utils/supabase/client';
-import { ArrowDownRight, Clock } from 'lucide-react';
 
 export function SalesPage() {
   const [sales, setSales] = useState<SaleWithDetails[]>([]);
@@ -102,70 +101,47 @@ export function SalesPage() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
-            <Link
-              to="/"
-              className="hover:text-slate-700 flex items-center gap-1 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
-              <Receipt className="w-3.5 h-3.5" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">
-              Historial de Ventas & Comprobantes
-            </h1>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {activeShift ? (
-            <div className="h-8 px-2.5 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center gap-1.5 shadow-2xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
-              </span>
-              <span>
+      <PageHeader
+        title="Historial de Ventas & Comprobantes"
+        icon={<Receipt className="w-3.5 h-3.5" />}
+        actions={
+          <>
+            {activeShift ? (
+              <Badge variant="success" dot pulse className="h-8 px-2.5">
                 Caja Abierta: {activeShift.shiftType.replace('TURNO_', '')} (Fondo: ${activeShift.initialCash.toLocaleString('es-AR')})
-              </span>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setIsOpenShiftModalOpen(true)}
-              className="h-8 px-3 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+              </Badge>
+            ) : (
+              <Button
+                variant="success"
+                size="sm"
+                onClick={() => setIsOpenShiftModalOpen(true)}
+                leftIcon={<Clock className="w-3.5 h-3.5" />}
+              >
+                Abrir Turno Caja
+              </Button>
+            )}
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsMovementModalOpen(true)}
+              title="Asentar gasto menor, flete o aporte en efectivo"
+              leftIcon={<ArrowDownRight className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />}
             >
-              <Clock className="w-3.5 h-3.5" />
-              <span>Abrir Turno Caja</span>
-            </button>
-          )}
+              + Gasto / Mov. Caja
+            </Button>
 
-          <button
-            type="button"
-            onClick={() => setIsMovementModalOpen(true)}
-            className="h-8 px-3 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-            title="Asentar gasto menor, flete o aporte en efectivo"
-          >
-            <ArrowDownRight className="w-3.5 h-3.5 text-rose-600" />
-            <span>+ Gasto / Mov. Caja</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsCashShiftOpen(true)}
-            className="h-8 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
-          >
-            <Calculator className="w-3.5 h-3.5" />
-            <span>Arqueo / Cierre de Caja</span>
-          </button>
-        </div>
-      </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsCashShiftOpen(true)}
+              leftIcon={<Calculator className="w-3.5 h-3.5" />}
+            >
+              Arqueo / Cierre de Caja
+            </Button>
+          </>
+        }
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -205,19 +181,18 @@ export function SalesPage() {
 
       {/* Filtros y Buscador */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
+        <div className="flex-1 max-w-md">
+          <Input
+            type="search"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por comprobante (ej: VTA-...), cliente o pago..."
-            className="w-full h-8 pl-8 pr-3 rounded bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 transition-colors shadow-xs"
+            leftIcon={<Search className="w-3.5 h-3.5" />}
           />
         </div>
 
         {/* Tabs de Filtro por Canal de Origen */}
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-slate-100 border border-slate-200 text-xs w-fit">
+        <div className="flex items-center gap-1 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs w-fit">
           {[
             { id: 'ALL', label: 'Todas' },
             { id: 'VENTA_DIRECTA_MOSTRADOR', label: 'Mostrador POS' },
@@ -225,11 +200,12 @@ export function SalesPage() {
           ].map((tab) => (
             <button
               key={tab.id}
+              type="button"
               onClick={() => setOriginFilter(tab.id as any)}
-              className={`px-3 py-1 rounded font-medium transition-all cursor-pointer ${
+              className={`px-3 py-1 rounded-md font-semibold transition-all cursor-pointer ${
                 originFilter === tab.id
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
               }`}
             >
               {tab.label}

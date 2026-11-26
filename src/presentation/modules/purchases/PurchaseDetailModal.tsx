@@ -33,20 +33,20 @@ export function PurchaseDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-      <div className="w-full max-w-xl rounded-lg bg-white border border-slate-200 shadow-xl overflow-hidden flex flex-col">
+      <div className="w-full max-w-xl rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between shrink-0">
+        <div className="h-12 px-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
+            <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800">
               {purchase.purchaseNumber}
             </span>
-            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+            <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">
               Detalle de Orden de Compra
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors cursor-pointer"
+            className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -55,42 +55,42 @@ export function PurchaseDetailModal({
         {/* Content */}
         <div className="p-4 space-y-3">
           {error && (
-            <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+            <div className="p-2.5 rounded bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2">
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3 p-3 rounded bg-slate-50 border border-slate-200 text-xs">
+          <div className="grid grid-cols-2 gap-3 p-3 rounded bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs">
             <div>
-              <span className="text-[10px] text-slate-500 uppercase block font-semibold">Proveedor</span>
-              <span className="font-medium text-slate-900">{purchase.supplierName}</span>
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase block font-semibold">Proveedor</span>
+              <span className="font-medium text-zinc-900 dark:text-zinc-100">{purchase.supplierName}</span>
             </div>
             <div>
-              <span className="text-[10px] text-slate-500 uppercase block font-semibold">Fecha de Emisión</span>
-              <span className="font-mono text-slate-700">
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase block font-semibold">Fecha de Emisión</span>
+              <span className="font-mono text-zinc-700 dark:text-zinc-300">
                 {new Date(purchase.createdAt).toLocaleString('es-AR')}
               </span>
             </div>
             <div>
-              <span className="text-[10px] text-slate-500 uppercase block font-semibold">Estado de Orden</span>
-              <span className="font-medium text-slate-900">{purchase.status}</span>
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase block font-semibold">Estado de Orden</span>
+              <span className="font-medium text-zinc-900 dark:text-zinc-100">{purchase.status}</span>
             </div>
             <div>
-              <span className="text-[10px] text-slate-500 uppercase block font-semibold">Monto Total Compra</span>
-              <span className="font-mono font-bold text-slate-900">
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase block font-semibold">Monto Total Compra</span>
+              <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">
                 ${purchase.totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
               </span>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <span className="text-[11px] font-medium text-slate-600 uppercase tracking-wider block">
+            <span className="text-[11px] font-medium text-zinc-600 dark:text-zinc-400 uppercase tracking-wider block">
               Ítems Ordenados ({purchase.items.length})
             </span>
-            <div className="rounded border border-slate-200 overflow-hidden">
+            <div className="rounded border border-zinc-200 dark:border-zinc-800 overflow-hidden">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 text-[10px] uppercase font-semibold">
+                <thead className="bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 text-[10px] uppercase font-semibold">
                   <tr>
                     <th className="py-2 px-3">Producto</th>
                     <th className="py-2 px-3 text-center">Cant. Pedida</th>
@@ -98,17 +98,17 @@ export function PurchaseDetailModal({
                     <th className="py-2 px-3 text-right">Subtotal</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {purchase.items.map((it) => (
                     <tr key={it.id}>
-                      <td className="py-2 px-3 font-medium text-slate-900">{it.productName}</td>
-                      <td className="py-2 px-3 text-center font-mono text-slate-700">
+                      <td className="py-2 px-3 font-medium text-zinc-900 dark:text-zinc-100">{it.productName}</td>
+                      <td className="py-2 px-3 text-center font-mono text-zinc-700 dark:text-zinc-300">
                         {it.quantityOrdered} un.
                       </td>
-                      <td className="py-2 px-3 text-right font-mono text-slate-600">
+                      <td className="py-2 px-3 text-right font-mono text-zinc-600 dark:text-zinc-400">
                         ${it.unitCost.toFixed(2)}
                       </td>
-                      <td className="py-2 px-3 text-right font-mono font-bold text-slate-900">
+                      <td className="py-2 px-3 text-right font-mono font-bold text-zinc-900 dark:text-zinc-100">
                         ${it.subtotal.toFixed(2)}
                       </td>
                     </tr>
@@ -118,10 +118,10 @@ export function PurchaseDetailModal({
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+          <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800">
             <button
               onClick={onClose}
-              className="h-8 px-3 rounded bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
+              className="h-8 px-3 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer"
             >
               Cerrar
             </button>

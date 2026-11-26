@@ -292,24 +292,24 @@ export function ProductImportModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="import-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-xs overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-zinc-950/70 backdrop-blur-xs overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl bg-white rounded-xl border border-slate-300 shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-4xl bg-white dark:bg-zinc-900 rounded-xl border border-zinc-300 dark:border-zinc-700 shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabecera modal */}
-        <div className="h-13 px-4 border-b border-slate-200 flex items-center justify-between shrink-0 bg-slate-50/80">
+        <div className="h-13 px-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-50/80">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center">
               <Upload className="w-4 h-4" />
             </div>
             <div>
-              <h3 id="import-modal-title" className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              <h3 id="import-modal-title" className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">
                 Importación Masiva de Productos (CSV)
               </h3>
-              <p className="text-[11px] text-slate-500 font-medium">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">
                 Carga catálogo completo, precios y existencias iniciales
               </p>
             </div>
@@ -319,7 +319,7 @@ export function ProductImportModal({
             <button
               type="button"
               onClick={handleDownloadTemplate}
-              className="h-7 px-3 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200"
+              className="h-7 px-3 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-800"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Bajar Plantilla CSV</span>
@@ -327,7 +327,7 @@ export function ProductImportModal({
             <button
               type="button"
               onClick={onClose}
-              className="w-7 h-7 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-200/80 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-md text-zinc-400 dark:text-zinc-500 hover:text-zinc-800 hover:bg-zinc-200/80 flex items-center justify-center transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -340,7 +340,7 @@ export function ProductImportModal({
           {!resultSummary && (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-300 hover:border-slate-400 bg-slate-50 hover:bg-slate-100/70 p-6 rounded-xl text-center cursor-pointer transition-colors"
+              className="border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 bg-zinc-50 dark:bg-zinc-950 hover:bg-zinc-100/70 p-6 rounded-xl text-center cursor-pointer transition-colors"
             >
               <input
                 ref={fileInputRef}
@@ -349,11 +349,11 @@ export function ProductImportModal({
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <FileSpreadsheet className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-              <p className="text-xs font-semibold text-slate-800">
+              <FileSpreadsheet className="w-8 h-8 text-zinc-400 dark:text-zinc-500 mx-auto mb-2" />
+              <p className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
                 {file ? file.name : 'Haz clic o arrastra aquí tu archivo CSV'}
               </p>
-              <p className="text-[11px] text-slate-500 mt-1">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">
                 Acepta archivos delimitados por coma o punto y coma con columnas: sku, nombre, precio_venta, etc.
               </p>
             </div>
@@ -361,7 +361,7 @@ export function ProductImportModal({
 
           {/* Errores generales */}
           {generalError && (
-            <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2">
+            <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 text-xs text-rose-800 dark:text-rose-300 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
               <span>{generalError}</span>
             </div>
@@ -369,12 +369,12 @@ export function ProductImportModal({
 
           {/* Resultado exitoso */}
           {resultSummary && (
-            <div className="p-6 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
+            <div className="p-6 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 text-center space-y-3">
               <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
-              <h4 className="text-sm font-bold text-emerald-900">
+              <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-300">
                 ¡Importación completada con éxito!
               </h4>
-              <p className="text-xs text-emerald-800 max-w-md mx-auto">
+              <p className="text-xs text-emerald-800 dark:text-emerald-300 max-w-md mx-auto">
                 Se dieron de alta / actualizaron <strong>{resultSummary.inserted} productos</strong> en el catálogo y se crearon los registros de stock y Kardex para <strong>{resultSummary.initialStockCount} artículos</strong> con existencias iniciales.
               </p>
               <button
@@ -392,23 +392,23 @@ export function ProductImportModal({
             <div className="space-y-3">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-3">
-                  <span className="font-semibold text-slate-900">
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                     Previsualización: {rows.length} filas
                   </span>
-                  <span className="text-[11px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-semibold">
                     ✓ {validCount} listas para importar
                   </span>
                   {invalidCount > 0 && (
-                    <span className="text-[11px] px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-semibold">
+                    <span className="text-[11px] px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 font-semibold">
                       ✕ {invalidCount} con errores
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="border border-slate-200 rounded-lg overflow-hidden max-h-72 overflow-y-auto">
+              <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden max-h-72 overflow-y-auto">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-100 sticky top-0 border-b border-slate-200 text-slate-600 font-semibold text-[11px]">
+                  <thead className="bg-zinc-100 dark:bg-zinc-800 sticky top-0 border-b border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 font-semibold text-[11px]">
                     <tr>
                       <th className="py-2 px-3 w-10 text-center">Estado</th>
                       <th className="py-2 px-3">SKU</th>
@@ -419,11 +419,11 @@ export function ProductImportModal({
                       <th className="py-2 px-3">Observaciones</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                     {rows.map((r, i) => (
                       <tr
                         key={i}
-                        className={r.isValid ? 'hover:bg-slate-50' : 'bg-rose-50/40 hover:bg-rose-50/70'}
+                        className={r.isValid ? 'hover:bg-zinc-50 dark:hover:bg-zinc-800/60' : 'bg-rose-50/40 hover:bg-rose-50/70'}
                       >
                         <td className="py-2 px-3 text-center">
                           {r.isValid ? (
@@ -432,18 +432,18 @@ export function ProductImportModal({
                             <AlertTriangle className="w-3.5 h-3.5 text-rose-600 mx-auto" />
                           )}
                         </td>
-                        <td className="py-2 px-3 font-mono font-medium text-slate-700">{r.sku || '-'}</td>
-                        <td className="py-2 px-3 font-semibold text-slate-900">{r.name || '-'}</td>
-                        <td className="py-2 px-3 text-slate-600">{r.category}</td>
-                        <td className="py-2 px-3 text-right font-mono font-bold text-slate-900">
+                        <td className="py-2 px-3 font-mono font-medium text-zinc-700 dark:text-zinc-300">{r.sku || '-'}</td>
+                        <td className="py-2 px-3 font-semibold text-zinc-900 dark:text-zinc-100">{r.name || '-'}</td>
+                        <td className="py-2 px-3 text-zinc-600 dark:text-zinc-400">{r.category}</td>
+                        <td className="py-2 px-3 text-right font-mono font-bold text-zinc-900 dark:text-zinc-100">
                           ${r.salePrice.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                         </td>
-                        <td className="py-2 px-3 text-right font-mono text-slate-700">
+                        <td className="py-2 px-3 text-right font-mono text-zinc-700 dark:text-zinc-300">
                           {r.initialStock > 0 ? r.initialStock : '-'}
                         </td>
                         <td className="py-2 px-3 text-[11px]">
                           {r.isValid ? (
-                            <span className="text-slate-400">Correcto</span>
+                            <span className="text-zinc-400 dark:text-zinc-500">Correcto</span>
                           ) : (
                             <span className="text-rose-600 font-medium">{r.errors.join(', ')}</span>
                           )}
@@ -459,8 +459,8 @@ export function ProductImportModal({
 
         {/* Footer con botón de acción */}
         {!resultSummary && (
-          <div className="h-12 px-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between shrink-0">
-            <span className="text-[11px] text-slate-500">
+          <div className="h-12 px-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 flex items-center justify-between shrink-0">
+            <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
               {validCount > 0 ? `${validCount} productos válidos serán procesados` : 'Selecciona un archivo CSV'}
             </span>
 
@@ -469,7 +469,7 @@ export function ProductImportModal({
                 type="button"
                 onClick={onClose}
                 disabled={importing}
-                className="h-8 px-3.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                className="h-8 px-3.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-colors cursor-pointer"
               >
                 Cancelar
               </button>
@@ -477,7 +477,7 @@ export function ProductImportModal({
                 type="button"
                 onClick={handleExecuteImport}
                 disabled={validCount === 0 || importing}
-                className="h-8 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                className="h-8 px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 disabled:opacity-40 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
               >
                 {importing && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>{importing ? 'Importando...' : `Confirmar e Importar (${validCount})`}</span>

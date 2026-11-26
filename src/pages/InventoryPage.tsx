@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Boxes, History, SlidersHorizontal, PackageCheck, Clock, ArrowRightLeft } from 'lucide-react';
+import { Boxes, History, SlidersHorizontal, PackageCheck, Clock, ArrowRightLeft } from 'lucide-react';
+import { PageHeader, Button } from '@/presentation/components/ui';
 import {
   InventoryStockDetailed,
   StockMovementDetailed,
@@ -137,81 +137,63 @@ export function InventoryPage() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
-            <Link
-              to="/"
-              className="hover:text-slate-700 flex items-center gap-1 transition-colors"
+      <PageHeader
+        title="Inventario & Kardex Multidepósito"
+        icon={<Boxes className="w-3.5 h-3.5" />}
+        actions={
+          <>
+            {warehouses.length > 1 && (
+              <select
+                aria-label="Filtrar por depósito"
+                value={selectedWarehouseFilter}
+                onChange={(e) => setSelectedWarehouseFilter(e.target.value)}
+                className="h-8 px-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-lime-500 cursor-pointer shadow-2xs"
+              >
+                <option value="ALL">Todos los depósitos ({warehouses.length})</option>
+                {warehouses.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name} {w.isDefault ? '★' : ''}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsTransferModalOpen(true)}
+              disabled={warehouses.length < 2}
+              title={
+                warehouses.length < 2
+                  ? 'Para transferir necesitás al menos 2 depósitos activos (crealos en Configuración)'
+                  : 'Mover mercadería entre depósitos con remito interno'
+              }
+              leftIcon={<ArrowRightLeft className="w-3.5 h-3.5" />}
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
-              <Boxes className="w-3.5 h-3.5" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">
-              Inventario & Kardex Multidepósito
-            </h1>
-          </div>
-        </div>
+              Transferir entre Depósitos
+            </Button>
 
-        {/* Acciones de Depósito & Transferencias */}
-        <div className="flex flex-wrap items-center gap-2">
-          {warehouses.length > 1 && (
-            <select
-              aria-label="Filtrar por depósito"
-              value={selectedWarehouseFilter}
-              onChange={(e) => setSelectedWarehouseFilter(e.target.value)}
-              className="h-8 px-2.5 rounded bg-white border border-slate-300 text-xs font-semibold text-slate-800 focus:outline-none focus:border-slate-900 cursor-pointer shadow-2xs"
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsHistoryModalOpen(true)}
+              title="Ver e imprimir historial de remitos de transferencia interna en A4"
+              leftIcon={<History className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />}
             >
-              <option value="ALL">Todos los depósitos ({warehouses.length})</option>
-              {warehouses.map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.name} {w.isDefault ? '★' : ''}
-                </option>
-              ))}
-            </select>
-          )}
+              Historial Remitos
+            </Button>
 
-          <button
-            type="button"
-            onClick={() => setIsTransferModalOpen(true)}
-            disabled={warehouses.length < 2}
-            title={
-              warehouses.length < 2
-                ? 'Para transferir necesitás al menos 2 depósitos activos (crealos en Configuración)'
-                : 'Mover mercadería entre depósitos con remito interno'
-            }
-            className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:pointer-events-none text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs"
-          >
-            <ArrowRightLeft className="w-3.5 h-3.5" />
-            <span>Transferir entre Depósitos</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsHistoryModalOpen(true)}
-            title="Ver e imprimir historial de remitos de transferencia interna en A4"
-            className="h-8 px-3 rounded bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
-          >
-            <History className="w-3.5 h-3.5 text-slate-500" />
-            <span>Historial Remitos</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleOpenAdjust()}
-            className="h-8 px-3 rounded bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
-            <span>Ajustar Stock</span>
-          </button>
-        </div>
-      </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => handleOpenAdjust()}
+              leftIcon={<SlidersHorizontal className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />}
+            >
+              Ajustar Stock
+            </Button>
+          </>
+        }
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -250,24 +232,26 @@ export function InventoryPage() {
       </div>
 
       {/* Tab Switcher */}
-      <div className="flex items-center gap-1 p-1 rounded-lg bg-slate-100 border border-slate-200 text-xs w-fit">
+      <div className="flex items-center gap-1 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs w-fit">
         <button
+          type="button"
           onClick={() => setActiveTab('STOCK')}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded font-medium transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all cursor-pointer ${
             activeTab === 'STOCK'
-              ? 'bg-white text-slate-900 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900'
+              ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs'
+              : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
           }`}
         >
           <Boxes className="w-3.5 h-3.5" />
           <span>Existencias por Depósito</span>
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab('KARDEX')}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded font-medium transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all cursor-pointer ${
             activeTab === 'KARDEX'
-              ? 'bg-white text-slate-900 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900'
+              ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs'
+              : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
           }`}
         >
           <History className="w-3.5 h-3.5" />

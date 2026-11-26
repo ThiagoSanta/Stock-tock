@@ -38,12 +38,12 @@ function daysUntilExpiry(expiry: string | null): number | null {
 }
 
 function ExpiryBadge({ expiry }: { expiry: string | null }) {
-  if (!expiry) return <span className="text-slate-400 text-xs">Sin venc.</span>;
+  if (!expiry) return <span className="text-zinc-400 dark:text-zinc-500 text-xs">Sin venc.</span>;
   const days = daysUntilExpiry(expiry)!;
-  if (days < 0) return <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700">VENCIDO</span>;
-  if (days <= 30) return <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-orange-100 text-orange-700"><AlertTriangle className="w-3 h-3" />{days}d</span>;
-  if (days <= 90) return <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-700">{days}d</span>;
-  return <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">{formatLocalDate(expiry)}</span>;
+  if (days < 0) return <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300">VENCIDO</span>;
+  if (days <= 30) return <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300"><AlertTriangle className="w-3 h-3" />{days}d</span>;
+  if (days <= 90) return <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">{days}d</span>;
+  return <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">{formatLocalDate(expiry)}</span>;
 }
 
 export function LotManagementModal({
@@ -166,62 +166,62 @@ export function LotManagementModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200 bg-slate-50 shrink-0">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 shrink-0">
           <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-slate-700" />
+            <Layers className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
             <div>
-              <h2 className="text-sm font-bold text-slate-900">Control de Lotes — {productName}</h2>
-              <p className="text-xs text-slate-500">SKU: {productSku} · {totalQty} u. en {lots.length} lote{lots.length !== 1 ? 's' : ''}</p>
+              <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Control de Lotes — {productName}</h2>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">SKU: {productSku} · {totalQty} u. en {lots.length} lote{lots.length !== 1 ? 's' : ''}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1 rounded hover:bg-slate-200 transition-colors cursor-pointer">
+          <button onClick={onClose} className="p-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* FIFO Note */}
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 border border-blue-200 text-xs text-blue-700">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/70 text-xs text-sky-800 dark:text-sky-300">
             <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
             <span>Los lotes se despachan en orden <strong>FIFO</strong> (el que vence primero, primero en salir). Están ordenados por fecha de vencimiento.</span>
           </div>
 
           {/* Lots Table */}
           {loading ? (
-            <div className="text-center py-8 text-xs text-slate-400">Cargando lotes...</div>
+            <div className="text-center py-8 text-xs text-zinc-400 dark:text-zinc-500">Cargando lotes...</div>
           ) : sortedLots.length === 0 ? (
-            <div className="text-center py-8 text-xs text-slate-400">Este producto no tiene lotes registrados.</div>
+            <div className="text-center py-8 text-xs text-zinc-400 dark:text-zinc-500">Este producto no tiene lotes registrados.</div>
           ) : (
-            <div className="overflow-x-auto rounded-lg border border-slate-200">
+            <div className="overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800">
               <table className="w-full text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800">
                   <tr>
-                    <th className="px-3 py-2 text-left font-semibold text-slate-700">Lote</th>
-                    <th className="px-3 py-2 text-left font-semibold text-slate-700">Depósito</th>
-                    <th className="px-3 py-2 text-center font-semibold text-slate-700">Vencimiento</th>
-                    <th className="px-3 py-2 text-right font-semibold text-slate-700">Cant. Inicial</th>
-                    <th className="px-3 py-2 text-right font-semibold text-slate-700">Disponible</th>
-                    <th className="px-3 py-2 text-right font-semibold text-slate-700">Costo Unit.</th>
-                    <th className="px-3 py-2 text-center font-semibold text-slate-700">Acción</th>
+                    <th className="px-3 py-2 text-left font-semibold text-zinc-700 dark:text-zinc-300">Lote</th>
+                    <th className="px-3 py-2 text-left font-semibold text-zinc-700 dark:text-zinc-300">Depósito</th>
+                    <th className="px-3 py-2 text-center font-semibold text-zinc-700 dark:text-zinc-300">Vencimiento</th>
+                    <th className="px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-300">Cant. Inicial</th>
+                    <th className="px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-300">Disponible</th>
+                    <th className="px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-300">Costo Unit.</th>
+                    <th className="px-3 py-2 text-center font-semibold text-zinc-700 dark:text-zinc-300">Acción</th>
                   </tr>
                 </thead>
                 <tbody>
                   {sortedLots.map((lot, idx) => (
-                    <tr key={lot.id} className={`border-b border-slate-100 ${idx === 0 && lot.current_quantity > 0 ? 'bg-emerald-50' : ''}`}>
-                      <td className="px-3 py-2 font-mono font-bold text-slate-900">{lot.lot_number}</td>
-                      <td className="px-3 py-2 text-slate-600">{lot.warehouse_name}</td>
+                    <tr key={lot.id} className={`border-b border-zinc-100 dark:border-zinc-800 ${idx === 0 && lot.current_quantity > 0 ? 'bg-emerald-50 dark:bg-emerald-950/60' : ''}`}>
+                      <td className="px-3 py-2 font-mono font-bold text-zinc-900 dark:text-zinc-100">{lot.lot_number}</td>
+                      <td className="px-3 py-2 text-zinc-600 dark:text-zinc-400">{lot.warehouse_name}</td>
                       <td className="px-3 py-2 text-center"><ExpiryBadge expiry={lot.expiry_date} /></td>
-                      <td className="px-3 py-2 text-right font-mono text-slate-700">{lot.initial_quantity.toLocaleString('es-AR')}</td>
-                      <td className="px-3 py-2 text-right font-mono font-bold text-slate-900">{lot.current_quantity.toLocaleString('es-AR')}</td>
-                      <td className="px-3 py-2 text-right font-mono text-slate-600">
+                      <td className="px-3 py-2 text-right font-mono text-zinc-700 dark:text-zinc-300">{lot.initial_quantity.toLocaleString('es-AR')}</td>
+                      <td className="px-3 py-2 text-right font-mono font-bold text-zinc-900 dark:text-zinc-100">{lot.current_quantity.toLocaleString('es-AR')}</td>
+                      <td className="px-3 py-2 text-right font-mono text-zinc-600 dark:text-zinc-400">
                         ${lot.unit_cost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-3 py-2 text-center">
                         <button
                           onClick={() => handleDeleteLot(lot.id)}
-                          className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                          className="p-1 rounded text-zinc-400 dark:text-zinc-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                           title="Eliminar lote"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -230,10 +230,10 @@ export function LotManagementModal({
                     </tr>
                   ))}
                 </tbody>
-                <tfoot className="bg-slate-50 border-t border-slate-200">
+                <tfoot className="bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800">
                   <tr>
-                    <td colSpan={4} className="px-3 py-2 text-xs font-semibold text-slate-700">Total</td>
-                    <td className="px-3 py-2 text-right font-mono font-black text-slate-900">{totalQty.toLocaleString('es-AR')}</td>
+                    <td colSpan={4} className="px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300">Total</td>
+                    <td className="px-3 py-2 text-right font-mono font-black text-zinc-900 dark:text-zinc-100">{totalQty.toLocaleString('es-AR')}</td>
                     <td colSpan={2} />
                   </tr>
                 </tfoot>
@@ -243,31 +243,31 @@ export function LotManagementModal({
 
           {/* Add Lot Form */}
           {showForm ? (
-            <form onSubmit={handleSaveLot} className="border border-slate-200 rounded-lg p-4 space-y-3 bg-slate-50">
-              <p className="text-xs font-bold text-slate-700">Registrar nuevo lote</p>
-              {error && <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded">{error}</p>}
+            <form onSubmit={handleSaveLot} className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 space-y-3 bg-zinc-50 dark:bg-zinc-950">
+              <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Registrar nuevo lote</p>
+              {error && <p className="text-xs text-rose-600 bg-rose-50 dark:bg-rose-950/60 px-3 py-2 rounded">{error}</p>}
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs text-slate-600 font-medium">Nº de Lote *</label>
+                  <label className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Nº de Lote *</label>
                   <input
                     value={form.lot_number}
                     onChange={(e) => setForm((f) => ({ ...f, lot_number: e.target.value }))}
                     placeholder="LOT-001"
-                    className="w-full h-8 px-2 rounded border border-slate-300 text-xs focus:outline-none focus:border-slate-900 font-mono"
+                    className="w-full h-8 px-2 rounded border border-zinc-300 dark:border-zinc-700 text-xs focus:outline-none focus:border-zinc-900 font-mono"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs text-slate-600 font-medium">Fecha de Vencimiento</label>
+                  <label className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Fecha de Vencimiento</label>
                   <input
                     type="date"
                     value={form.expiry_date}
                     onChange={(e) => setForm((f) => ({ ...f, expiry_date: e.target.value }))}
-                    className="w-full h-8 px-2 rounded border border-slate-300 text-xs focus:outline-none focus:border-slate-900"
+                    className="w-full h-8 px-2 rounded border border-zinc-300 dark:border-zinc-700 text-xs focus:outline-none focus:border-zinc-900"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs text-slate-600 font-medium">Cantidad inicial *</label>
+                  <label className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Cantidad inicial *</label>
                   <input
                     type="number"
                     min="0.01"
@@ -275,11 +275,11 @@ export function LotManagementModal({
                     value={form.initial_quantity}
                     onChange={(e) => setForm((f) => ({ ...f, initial_quantity: e.target.value }))}
                     placeholder="0"
-                    className="w-full h-8 px-2 rounded border border-slate-300 text-xs focus:outline-none focus:border-slate-900 font-mono"
+                    className="w-full h-8 px-2 rounded border border-zinc-300 dark:border-zinc-700 text-xs focus:outline-none focus:border-zinc-900 font-mono"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs text-slate-600 font-medium">Costo unitario</label>
+                  <label className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Costo unitario</label>
                   <input
                     type="number"
                     min="0"
@@ -287,41 +287,41 @@ export function LotManagementModal({
                     value={form.unit_cost}
                     onChange={(e) => setForm((f) => ({ ...f, unit_cost: e.target.value }))}
                     placeholder="0.00"
-                    className="w-full h-8 px-2 rounded border border-slate-300 text-xs focus:outline-none focus:border-slate-900 font-mono"
+                    className="w-full h-8 px-2 rounded border border-zinc-300 dark:border-zinc-700 text-xs focus:outline-none focus:border-zinc-900 font-mono"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs text-slate-600 font-medium">Depósito *</label>
+                  <label className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Depósito *</label>
                   <div className="relative">
                     <select
                       value={form.warehouse_id}
                       onChange={(e) => setForm((f) => ({ ...f, warehouse_id: e.target.value }))}
-                      className="w-full h-8 pl-2 pr-6 rounded border border-slate-300 text-xs bg-white appearance-none focus:outline-none focus:border-slate-900"
+                      className="w-full h-8 pl-2 pr-6 rounded border border-zinc-300 dark:border-zinc-700 text-xs bg-white dark:bg-zinc-900 appearance-none focus:outline-none focus:border-zinc-900"
                     >
                       <option value="">Seleccionar...</option>
                       {warehouses.map((w) => (
                         <option key={w.id} value={w.id}>{w.name}</option>
                       ))}
                     </select>
-                    <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 pointer-events-none" />
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs text-slate-600 font-medium">Notas (opcional)</label>
+                  <label className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Notas (opcional)</label>
                   <input
                     value={form.notes}
                     onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
                     placeholder="Observaciones del lote..."
-                    className="w-full h-8 px-2 rounded border border-slate-300 text-xs focus:outline-none focus:border-slate-900"
+                    className="w-full h-8 px-2 rounded border border-zinc-300 dark:border-zinc-700 text-xs focus:outline-none focus:border-zinc-900"
                   />
                 </div>
               </div>
 
               <div className="flex gap-2 justify-end">
-                <button type="button" onClick={() => setShowForm(false)} className="h-8 px-3 rounded border border-slate-300 text-xs hover:bg-slate-100 transition-colors cursor-pointer">
+                <button type="button" onClick={() => setShowForm(false)} className="h-8 px-3 rounded border border-zinc-300 dark:border-zinc-700 text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
                   Cancelar
                 </button>
-                <button type="submit" disabled={saving} className="h-8 px-4 rounded bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 disabled:opacity-50 cursor-pointer transition-colors">
+                <button type="submit" disabled={saving} className="h-8 px-4 rounded bg-zinc-900 text-white text-xs font-semibold hover:bg-zinc-800 disabled:opacity-50 cursor-pointer transition-colors">
                   {saving ? 'Guardando...' : 'Registrar Lote'}
                 </button>
               </div>
@@ -329,7 +329,7 @@ export function LotManagementModal({
           ) : (
             <button
               onClick={() => setShowForm(true)}
-              className="w-full h-9 rounded-lg border-2 border-dashed border-slate-300 text-xs text-slate-500 hover:border-slate-400 hover:text-slate-700 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full h-9 rounded-lg border-2 border-dashed border-zinc-300 dark:border-zinc-700 text-xs text-zinc-500 dark:text-zinc-400 hover:border-zinc-400 hover:text-zinc-700 transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               Registrar nuevo lote / recepción
@@ -338,9 +338,9 @@ export function LotManagementModal({
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-slate-200 bg-slate-50 flex justify-between items-center shrink-0">
-          <p className="text-xs text-slate-400">Control comercial interno · Sin validez fiscal</p>
-          <button onClick={onClose} className="h-8 px-4 rounded border border-slate-300 bg-white text-xs font-medium hover:bg-slate-50 transition-colors cursor-pointer">
+        <div className="px-5 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 flex justify-between items-center shrink-0">
+          <p className="text-xs text-zinc-400 dark:text-zinc-500">Control comercial interno · Sin validez fiscal</p>
+          <button onClick={onClose} className="h-8 px-4 rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer">
             Cerrar
           </button>
         </div>

@@ -504,16 +504,16 @@ export function PosModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="pos-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/60 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-zinc-950/60 backdrop-blur-xs"
     >
-      <div className="w-full max-w-2xl rounded-xl bg-white border border-slate-300 shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-in fade-in zoom-in-95 duration-150 font-sans">
+      <div className="w-full max-w-2xl rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-in fade-in zoom-in-95 duration-150 font-sans">
         {/* Header con Atajos y Botón de Carritos en Espera */}
-        <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between shrink-0 bg-slate-50">
+        <div className="h-12 px-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-50 dark:bg-zinc-950">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-slate-900 text-white flex items-center justify-center">
+            <div className="w-6 h-6 rounded bg-zinc-900 text-white flex items-center justify-center">
               <Receipt className="w-3.5 h-3.5" />
             </div>
-            <h3 id="pos-modal-title" className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+            <h3 id="pos-modal-title" className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">
               Venta Rápida (Mostrador / POS)
             </h3>
           </div>
@@ -525,8 +525,8 @@ export function PosModal({
               onClick={() => setShowPausedList((prev) => !prev)}
               className={`h-7 px-2.5 rounded text-[11px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border ${
                 pausedTickets.length > 0
-                  ? 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100'
-                  : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-100'
+                  ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800/70 text-amber-800 dark:text-amber-300 hover:bg-amber-100'
+                  : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
               }`}
               title="Ver tickets pausados"
             >
@@ -539,10 +539,10 @@ export function PosModal({
               type="button"
               onClick={handlePauseCurrentTicket}
               disabled={cart.length === 0}
-              className="h-7 px-2.5 rounded bg-white hover:bg-slate-100 border border-slate-200 disabled:opacity-40 text-slate-700 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+              className="h-7 px-2.5 rounded bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 disabled:opacity-40 text-zinc-700 dark:text-zinc-300 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
               title="Pausar ticket actual para atender al siguiente cliente (F8)"
             >
-              <Pause className="w-3 h-3 text-slate-500" />
+              <Pause className="w-3 h-3 text-zinc-500 dark:text-zinc-400" />
               <span>Pausar (F8)</span>
             </button>
 
@@ -550,7 +550,7 @@ export function PosModal({
               type="button"
               onClick={onClose}
               aria-label="Cerrar mostrador"
-              className="text-slate-400 hover:text-slate-800 p-1 rounded hover:bg-slate-200 transition-colors cursor-pointer"
+              className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-800 p-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -559,36 +559,36 @@ export function PosModal({
 
         {/* Panel Desplegable de Carritos en Espera */}
         {showPausedList && (
-          <div className="p-3 bg-amber-50/70 border-b border-amber-200 space-y-2 animate-in fade-in duration-100">
-            <div className="flex items-center justify-between text-xs font-bold text-amber-900">
+          <div className="p-3 bg-amber-50/70 border-b border-amber-200 dark:border-amber-800/70 space-y-2 animate-in fade-in duration-100">
+            <div className="flex items-center justify-between text-xs font-bold text-amber-800 dark:text-amber-300">
               <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-amber-700" />
+                <Clock className="w-3.5 h-3.5 text-amber-800 dark:text-amber-300" />
                 <span>Tickets Pausados en Mostrador</span>
               </span>
               <button
                 type="button"
                 onClick={() => setShowPausedList(false)}
-                className="text-[11px] text-amber-800 hover:underline cursor-pointer"
+                className="text-[11px] text-amber-800 dark:text-amber-300 hover:underline cursor-pointer"
               >
                 Cerrar lista
               </button>
             </div>
 
             {pausedTickets.length === 0 ? (
-              <p className="text-xs text-amber-800">No hay ventas pausadas actualmente.</p>
+              <p className="text-xs text-amber-800 dark:text-amber-300">No hay ventas pausadas actualmente.</p>
             ) : (
               <div className="space-y-1.5 max-h-36 overflow-y-auto">
                 {pausedTickets.map((t) => (
                   <div
                     key={t.id}
-                    className="p-2 rounded bg-white border border-amber-200 flex items-center justify-between text-xs shadow-2xs"
+                    className="p-2 rounded bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/70 flex items-center justify-between text-xs shadow-2xs"
                   >
                     <div>
-                      <p className="font-bold text-slate-900">
+                      <p className="font-bold text-zinc-900 dark:text-zinc-100">
                         {t.customerName}{' '}
-                        <span className="font-mono text-slate-400 font-normal">({t.timestamp})</span>
+                        <span className="font-mono text-zinc-400 dark:text-zinc-500 font-normal">({t.timestamp})</span>
                       </p>
-                      <p className="text-[11px] text-slate-500 font-mono">
+                      <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
                         {t.cart.length} artículos • ${t.total.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                       </p>
                     </div>
@@ -597,7 +597,7 @@ export function PosModal({
                       <button
                         type="button"
                         onClick={() => handleResumeTicket(t)}
-                        className="h-6 px-2.5 rounded bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                        className="h-6 px-2.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 text-white text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
                       >
                         <Play className="w-3 h-3" />
                         <span>Reanudar</span>
@@ -605,7 +605,7 @@ export function PosModal({
                       <button
                         type="button"
                         onClick={() => handleDeletePausedTicket(t.id)}
-                        className="h-6 w-6 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
+                        className="h-6 w-6 rounded text-zinc-400 dark:text-zinc-500 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
                         title="Descartar ticket"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -621,31 +621,31 @@ export function PosModal({
         {/* Pantalla de Éxito / Ticket Cerrado */}
         {completedSale ? (
           <div className="p-6 text-center space-y-4 my-auto">
-            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center mx-auto border border-emerald-300">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center mx-auto border border-emerald-200 dark:border-emerald-800/70">
               <CheckCircle2 className="w-6 h-6" />
             </div>
 
             <div>
-              <h4 className="text-base font-bold text-slate-900">¡Venta Registrada con Éxito!</h4>
-              <p className="text-xs text-slate-600 mt-0.5">
+              <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100">¡Venta Registrada con Éxito!</h4>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
                 Comprobante{' '}
-                <span className="font-mono text-slate-900 font-bold">{completedSale.saleNumber}</span> •
+                <span className="font-mono text-zinc-900 dark:text-zinc-100 font-bold">{completedSale.saleNumber}</span> •
                 Stock actualizado en tiempo real
               </p>
             </div>
 
-            <div className="max-w-xs mx-auto p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-left space-y-2 text-xs">
-              <div className="flex justify-between text-slate-700">
+            <div className="max-w-xs mx-auto p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-left space-y-2 text-xs">
+              <div className="flex justify-between text-zinc-700 dark:text-zinc-300">
                 <span className="font-medium">Cliente:</span>
-                <span className="text-slate-900 font-semibold">{completedSale.customerName}</span>
+                <span className="text-zinc-900 dark:text-zinc-100 font-semibold">{completedSale.customerName}</span>
               </div>
-              <div className="flex justify-between text-slate-700">
+              <div className="flex justify-between text-zinc-700 dark:text-zinc-300">
                 <span className="font-medium">Medio de Pago:</span>
-                <span className="text-slate-900 font-mono font-semibold">{completedSale.paymentMethod}</span>
+                <span className="text-zinc-900 dark:text-zinc-100 font-mono font-semibold">{completedSale.paymentMethod}</span>
               </div>
-              <div className="flex justify-between text-slate-700 pt-2 border-t border-slate-200">
-                <span className="font-bold text-slate-900">Total Cobrado:</span>
-                <span className="font-mono font-bold text-sm text-slate-900 tabular-nums">
+              <div className="flex justify-between text-zinc-700 dark:text-zinc-300 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                <span className="font-bold text-zinc-900 dark:text-zinc-100">Total Cobrado:</span>
+                <span className="font-mono font-bold text-sm text-zinc-900 dark:text-zinc-100 tabular-nums">
                   ${completedSale.totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -666,9 +666,9 @@ export function PosModal({
               <button
                 type="button"
                 onClick={() => setShowA4Receipt(true)}
-                className="h-8 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer border border-slate-300"
+                className="h-8 px-3 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer border border-zinc-300 dark:border-zinc-700"
               >
-                <Printer className="w-3.5 h-3.5 text-slate-700" />
+                <Printer className="w-3.5 h-3.5 text-zinc-700 dark:text-zinc-300" />
                 <span>Imprimir A4</span>
               </button>
 
@@ -679,7 +679,7 @@ export function PosModal({
                   setCart([]);
                   setShowA4Receipt(false);
                 }}
-                className="h-8 px-3.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                className="h-8 px-3.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
               >
                 Nueva Venta
               </button>
@@ -697,7 +697,7 @@ export function PosModal({
             {error && (
               <div
                 role="alert"
-                className="p-3 rounded-lg bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-center gap-2 font-medium"
+                className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2 font-medium"
               >
                 <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                 <span>{error}</span>
@@ -707,16 +707,16 @@ export function PosModal({
             {/* Buscador de Producto (F9) */}
             <div className="relative">
               <div className="flex items-center justify-between mb-1">
-                <label htmlFor="pos-search" className="text-xs font-semibold text-slate-700">
+                <label htmlFor="pos-search" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                   Buscar Producto o Pistolear Código
                 </label>
-                <kbd className="text-[10px] bg-slate-100 border border-slate-200 text-slate-500 px-1 py-0.2 rounded font-mono">
+                <kbd className="text-[10px] bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 px-1 py-0.2 rounded font-mono">
                   F9 para buscar
                 </kbd>
               </div>
 
               <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
                 <input
                   ref={searchInputRef}
                   id="pos-search"
@@ -725,14 +725,14 @@ export function PosModal({
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Escribí nombre, SKU o escaneá código de barras..."
-                  className="w-full h-8 pl-8 pr-3 rounded-lg bg-white border border-slate-300 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900"
+                  className="w-full h-8 pl-8 pr-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900"
                 />
               </div>
 
               {filteredProducts.length > 0 && (
                 <div
                   role="listbox"
-                  className="absolute top-full left-0 right-0 mt-1 rounded-lg bg-white border border-slate-300 shadow-xl overflow-hidden z-20 divide-y divide-slate-100"
+                  className="absolute top-full left-0 right-0 mt-1 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 shadow-xl overflow-hidden z-20 divide-y divide-zinc-100 dark:divide-zinc-800"
                 >
                   {filteredProducts.map((p) => {
                     const isOut = p.availableStock <= 0;
@@ -744,17 +744,17 @@ export function PosModal({
                         aria-selected="false"
                         disabled={isOut}
                         onClick={() => addToCart(p)}
-                        className={`w-full p-2.5 text-left text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${
-                          isOut ? 'opacity-40 cursor-not-allowed bg-slate-50' : ''
+                        className={`w-full p-2.5 text-left text-xs flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer ${
+                          isOut ? 'opacity-40 cursor-not-allowed bg-zinc-50 dark:bg-zinc-950' : ''
                         }`}
                       >
                         <div>
-                          <p className="font-semibold text-slate-900">{p.name}</p>
-                          <span className="text-[11px] font-mono text-slate-500">
+                          <p className="font-semibold text-zinc-900 dark:text-zinc-100">{p.name}</p>
+                          <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
                             SKU: {p.sku} • Disp: {p.availableStock} {p.unitOfMeasure}
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-slate-900 tabular-nums">
+                        <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">
                           ${getProductPrice(p, activePriceList).toLocaleString('es-AR')}
                         </span>
                       </button>
@@ -765,18 +765,18 @@ export function PosModal({
             </div>
 
             {/* Lista del Carrito */}
-            <div className="rounded-lg border border-slate-200 overflow-hidden">
-              <div className="px-3 py-1.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+              <div className="px-3 py-1.5 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
                 <span className="flex items-center gap-1.5">
-                  <ShoppingCart className="w-3.5 h-3.5 text-slate-600" />
+                  <ShoppingCart className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
                   <span>Ítems en Mostrador ({cart.length})</span>
                 </span>
                 <span>Subtotal</span>
               </div>
 
-              <div className="p-1 space-y-0.5 max-h-40 overflow-y-auto divide-y divide-slate-100">
+              <div className="p-1 space-y-0.5 max-h-40 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800">
                 {cart.length === 0 ? (
-                  <p className="p-4 text-center text-xs text-slate-400">
+                  <p className="p-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
                     Buscá o escaneá un producto arriba para agregarlo.
                   </p>
                 ) : (
@@ -785,16 +785,16 @@ export function PosModal({
                     return (
                       <div
                         key={product.id}
-                        className="p-1.5 flex items-center justify-between gap-2 text-xs hover:bg-slate-50/50 rounded"
+                        className="p-1.5 flex items-center justify-between gap-2 text-xs hover:bg-zinc-50/50 rounded"
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-slate-900 truncate">{product.name}</p>
+                          <p className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">{product.name}</p>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[11px] font-mono text-slate-500">
+                            <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
                               ${getProductPrice(product, activePriceList).toLocaleString('es-AR')} c/u
                             </span>
                             {isInsufficient && (
-                              <span className="text-[10px] font-semibold text-rose-700 bg-rose-50 px-1 rounded border border-rose-200">
+                              <span className="text-[10px] font-semibold text-rose-800 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 px-1 rounded border border-rose-200 dark:border-rose-800/70">
                                 Supera stock ({product.availableStock})
                               </span>
                             )}
@@ -805,13 +805,13 @@ export function PosModal({
                           <button
                             type="button"
                             onClick={() => updateQuantity(product.id, -1)}
-                            className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-5 h-5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 flex items-center justify-center cursor-pointer transition-colors"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
                           <span
                             className={`w-7 text-center font-mono font-bold tabular-nums ${
-                              isInsufficient ? 'text-rose-700' : 'text-slate-900'
+                              isInsufficient ? 'text-rose-800 dark:text-rose-300' : 'text-zinc-900 dark:text-zinc-100'
                             }`}
                           >
                             {quantity}
@@ -819,20 +819,20 @@ export function PosModal({
                           <button
                             type="button"
                             onClick={() => updateQuantity(product.id, 1)}
-                            className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-5 h-5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 flex items-center justify-center cursor-pointer transition-colors"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
                         </div>
 
-                        <span className="w-20 text-right font-mono font-bold text-slate-900 tabular-nums">
+                        <span className="w-20 text-right font-mono font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">
                           ${(quantity * getProductPrice(product, activePriceList)).toLocaleString('es-AR')}
                         </span>
 
                         <button
                           type="button"
                           onClick={() => removeFromCart(product.id)}
-                          className="text-slate-400 hover:text-rose-600 p-1 rounded transition-colors cursor-pointer"
+                          className="text-zinc-400 dark:text-zinc-500 hover:text-rose-600 p-1 rounded transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -844,16 +844,16 @@ export function PosModal({
             </div>
 
             {/* Ajustes de Descuento / Recargo en Mostrador */}
-            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-2 text-xs">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-700 text-[11px] flex items-center gap-1">
-                  <Percent className="w-3 h-3 text-slate-400" />
+                <span className="font-semibold text-zinc-700 dark:text-zinc-300 text-[11px] flex items-center gap-1">
+                  <Percent className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
                   <span>Ajuste comercial:</span>
                 </span>
                 <select
                   value={adjustmentType}
                   onChange={(e) => setAdjustmentType(e.target.value as any)}
-                  className="h-7 px-2 rounded border border-slate-300 text-xs text-slate-800 bg-white focus:outline-none"
+                  className="h-7 px-2 rounded border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 focus:outline-none"
                 >
                   <option value="NONE">Sin ajuste (Precio lista)</option>
                   <option value="DISCOUNT_PERCENT">Descuento (%)</option>
@@ -872,11 +872,11 @@ export function PosModal({
                     value={adjustmentValue}
                     onChange={(e) => setAdjustmentValue(e.target.value)}
                     placeholder={adjustmentType.includes('PERCENT') ? 'Ej: 10' : 'Ej: 1500'}
-                    className="w-24 h-7 px-2 rounded border border-slate-300 text-xs font-mono font-semibold text-slate-900 bg-white focus:outline-none"
+                    className="w-24 h-7 px-2 rounded border border-zinc-300 dark:border-zinc-700 text-xs font-mono font-semibold text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 focus:outline-none"
                   />
                   <span
                     className={`font-mono font-bold text-xs ${
-                      adjustmentAmount < 0 ? 'text-emerald-700' : 'text-amber-700'
+                      adjustmentAmount < 0 ? 'text-emerald-800 dark:text-emerald-300' : 'text-amber-800 dark:text-amber-300'
                     }`}
                   >
                     {adjustmentAmount < 0 ? '-' : '+'}
@@ -890,12 +890,12 @@ export function PosModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label htmlFor="pos-customer" className="text-xs font-semibold text-slate-700">
+                  <label htmlFor="pos-customer" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                     Cliente Comercial
                   </label>
                   <div className="flex items-center gap-1">
-                    <span className="text-[10px] text-slate-400 font-medium">Lista:</span>
-                    <div className="flex bg-slate-100 p-0.5 rounded border border-slate-200 text-[10px]">
+                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">Lista:</span>
+                    <div className="flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded border border-zinc-200 dark:border-zinc-800 text-[10px]">
                       {(['MINORISTA', 'MAYORISTA', 'GREMIO'] as const).map((tier) => (
                         <button
                           key={tier}
@@ -904,11 +904,11 @@ export function PosModal({
                           className={`px-1.5 py-0.5 rounded font-bold transition-all cursor-pointer ${
                             activePriceList === tier
                               ? tier === 'MAYORISTA'
-                                ? 'bg-purple-600 text-white shadow-2xs'
+                                ? 'bg-sky-600 text-white shadow-2xs'
                                 : tier === 'GREMIO'
-                                ? 'bg-blue-600 text-white shadow-2xs'
-                                : 'bg-slate-900 text-white shadow-2xs'
-                              : 'text-slate-600 hover:text-slate-900'
+                                ? 'bg-sky-600 text-white shadow-2xs'
+                                : 'bg-zinc-900 text-white shadow-2xs'
+                              : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                           }`}
                           title={`Cambiar a Lista ${tier}`}
                         >
@@ -936,7 +936,7 @@ export function PosModal({
                       }
                     }
                   }}
-                  className="w-full h-8 px-2 rounded-lg bg-white border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-slate-900 font-medium"
+                  className="w-full h-8 px-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 font-medium"
                 >
                   <option value="">Consumidor Final (Venta mostrador al paso)</option>
                   {availableCustomers.map((c) => (
@@ -949,8 +949,8 @@ export function PosModal({
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-semibold text-slate-700">Medio de Cobro</label>
-                  <span className="text-[10px] text-slate-400 font-mono">F2 Efectivo • F3 Transf • F4 Cta Cte</span>
+                  <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Medio de Cobro</label>
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono">F2 Efectivo • F3 Transf • F4 Cta Cte</span>
                 </div>
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-1" role="group">
                   {[
@@ -969,8 +969,8 @@ export function PosModal({
                         onClick={() => setPaymentMethod(m.id as PaymentMethod)}
                         className={`h-7 px-1 rounded border text-[11px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-slate-900 border-slate-900 text-white shadow-2xs'
-                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                            ? 'bg-zinc-900 border-zinc-900 text-white shadow-2xs'
+                            : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                         }`}
                       >
                         <Icon className="w-3 h-3" />
@@ -994,7 +994,7 @@ export function PosModal({
                 return (
                   <div
                     role="alert"
-                    className="p-2.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center gap-2 font-medium"
+                    className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 text-amber-800 dark:text-amber-300 text-xs flex items-center gap-2 font-medium"
                   >
                     <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600" />
                     <span>
@@ -1007,23 +1007,23 @@ export function PosModal({
             })()}
 
             {/* Footer y Totales */}
-            <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-[10px] text-slate-500 uppercase block font-bold tracking-wider">
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase block font-bold tracking-wider">
                   Total a Cobrar
                 </span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-bold font-mono text-slate-900 tabular-nums">
+                  <span className="text-xl font-bold font-mono text-zinc-900 dark:text-zinc-100 tabular-nums">
                     ${finalTotalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                   </span>
                   {adjustmentAmount !== 0 && (
-                    <span className="text-xs font-mono text-slate-400 line-through">
+                    <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500 line-through">
                       ${rawSubtotal.toLocaleString('es-AR')}
                     </span>
                   )}
                 </div>
                 {finalTotalAmount > 0 && permissions.canViewFinancials && (
-                  <span className="text-[11px] text-emerald-800 block font-semibold">
+                  <span className="text-[11px] text-emerald-800 dark:text-emerald-300 block font-semibold">
                     Margen bruto estimado: ${estimatedMargin.toLocaleString('es-AR')}
                   </span>
                 )}
@@ -1034,10 +1034,10 @@ export function PosModal({
                   type="button"
                   onClick={handleGenerateQuote}
                   disabled={cart.length === 0}
-                  className="h-8 px-2.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 disabled:opacity-40 text-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                  className="h-8 px-2.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 disabled:opacity-40 text-zinc-800 dark:text-zinc-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                   title="Emitir presupuesto formal imprimible en A4 sin descontar stock"
                 >
-                  <FileText className="w-3.5 h-3.5 text-slate-600" />
+                  <FileText className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
                   <span>Presupuesto A4</span>
                 </button>
 
@@ -1045,7 +1045,7 @@ export function PosModal({
                   type="button"
                   onClick={handleCheckout}
                   disabled={cart.length === 0 || hasInsufficientStock || loading}
-                  className="h-8 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 disabled:opacity-40 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  className="h-8 px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 active:bg-zinc-950 disabled:opacity-40 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   {loading ? 'Cobrando...' : 'Confirmar y Cobrar'}
                 </button>

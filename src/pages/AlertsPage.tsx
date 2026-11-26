@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import {
-  ArrowLeft,
   AlertTriangle,
   ShieldAlert,
   Info,
@@ -10,7 +8,9 @@ import {
   FileSpreadsheet,
   CheckCircle2,
   ClipboardCheck,
+  TrendingUp,
 } from 'lucide-react';
+import { PageHeader, Button } from '@/presentation/components/ui';
 import { SystemAlert, InventoryExportRow } from '@/core/domain/alerts/types';
 import { SupabaseAlertRepository } from '@/core/infrastructure/repositories/SupabaseAlertRepository';
 import { GetSystemAlertsUseCase } from '@/core/application/use-cases/alerts/GetSystemAlertsUseCase';
@@ -23,7 +23,6 @@ import { ExpiryAlertCard } from '@/presentation/modules/alerts/ExpiryAlertCard';
 import { ProfitabilityReport } from '@/presentation/modules/alerts/ProfitabilityReport';
 import { MetricCard } from '@/presentation/components/MetricCard';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
-import { TrendingUp } from 'lucide-react';
 
 export function AlertsPage() {
   const [alerts, setAlerts] = useState<SystemAlert[]>([]);
@@ -93,65 +92,48 @@ export function AlertsPage() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-zinc-800">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400 mb-1">
-            <Link
-              to="/"
-              className="hover:text-slate-700 dark:hover:text-zinc-200 flex items-center gap-1 transition-colors"
+      <PageHeader
+        title="Centro de Alertas & Reportes"
+        icon={<AlertTriangle className="w-3.5 h-3.5" />}
+        actions={
+          <>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsReconcileModalOpen(true)}
+              leftIcon={<ClipboardCheck className="w-3.5 h-3.5" />}
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 flex items-center justify-center">
-              <AlertTriangle className="w-3.5 h-3.5" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">
-              Centro de Alertas & Reportes
-            </h1>
-          </div>
-        </div>
-
-        {/* Action Export & Audit Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setIsReconcileModalOpen(true)}
-            className="h-8 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
-          >
-            <ClipboardCheck className="w-3.5 h-3.5" />
-            <span>Conciliar Inventario</span>
-          </button>
-
-          <button
-            onClick={() => setIsAuditModalOpen(true)}
-            className="h-8 px-3 rounded-lg bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-medium flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
-          >
-            <Printer className="w-3.5 h-3.5 text-slate-500 dark:text-zinc-400" />
-            <span>Planilla Conteo</span>
-          </button>
-
-          <button
-            onClick={handleDownloadCSV}
-            className="h-8 px-3 rounded-lg bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-medium flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
-          >
-            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-zinc-400" />
-            <span>Exportar CSV</span>
-          </button>
-        </div>
-      </div>
+              Conciliar Inventario
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsAuditModalOpen(true)}
+              leftIcon={<Printer className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />}
+            >
+              Planilla Conteo
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleDownloadCSV}
+              leftIcon={<Download className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />}
+            >
+              Exportar CSV
+            </Button>
+          </>
+        }
+      />
 
       {/* Pestañas Principales: Auditoría vs Rentabilidad */}
-      <div className="flex items-center gap-1.5 border-b border-slate-200 dark:border-zinc-800 pb-2">
+      <div className="flex items-center gap-1.5 border-b border-zinc-200 dark:border-zinc-800 pb-2">
         <button
           type="button"
           onClick={() => setActivePageTab('AUDIT')}
           className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
             activePageTab === 'AUDIT'
-              ? 'bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-2xs'
-              : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800'
+              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-2xs'
+              : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
           }`}
         >
           <ClipboardCheck className="w-3.5 h-3.5" />
@@ -163,8 +145,8 @@ export function AlertsPage() {
           onClick={() => setActivePageTab('PROFITABILITY')}
           className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
             activePageTab === 'PROFITABILITY'
-              ? 'bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-2xs'
-              : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800'
+              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-2xs'
+              : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
           }`}
         >
           <TrendingUp className="w-3.5 h-3.5" />
@@ -207,13 +189,13 @@ export function AlertsPage() {
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-zinc-900 p-1 rounded-lg text-xs w-fit overflow-x-auto border border-slate-200 dark:border-zinc-800">
+          <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-900 p-1 rounded-lg text-xs w-fit overflow-x-auto border border-zinc-200 dark:border-zinc-800">
             <button
               onClick={() => setSeverityFilter('ALL')}
               className={`px-3 py-1 rounded-md font-medium transition-all cursor-pointer ${
                 severityFilter === 'ALL'
-                  ? 'bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 shadow-xs'
-                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200'
+                  ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
               Todas ({alerts.length})
@@ -223,7 +205,7 @@ export function AlertsPage() {
               className={`px-3 py-1 rounded-md font-medium transition-all cursor-pointer ${
                 severityFilter === 'CRITICAL'
                   ? 'bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60'
-                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
               Críticas ({criticalCount})
@@ -233,7 +215,7 @@ export function AlertsPage() {
               className={`px-3 py-1 rounded-md font-medium transition-all cursor-pointer ${
                 severityFilter === 'WARNING'
                   ? 'bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60'
-                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
               Advertencias ({warningCount})
@@ -243,7 +225,7 @@ export function AlertsPage() {
               className={`px-3 py-1 rounded-md font-medium transition-all cursor-pointer ${
                 severityFilter === 'INFO'
                   ? 'bg-sky-50 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60'
-                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
               Informativas ({infoCount})
@@ -258,19 +240,19 @@ export function AlertsPage() {
 
           {/* Alerts Feed */}
           {loading ? (
-            <div className="p-8 text-center rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xs">
-              <div className="w-5 h-5 border-2 border-slate-800 dark:border-zinc-200 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-              <p className="text-xs text-slate-500 dark:text-zinc-400">Analizando umbrales y reservas...</p>
+            <div className="p-8 text-center rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
+              <div className="w-5 h-5 border-2 border-zinc-800 dark:border-zinc-200 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">Analizando umbrales y reservas...</p>
             </div>
           ) : filteredAlerts.length === 0 ? (
-            <div className="p-8 text-center rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 space-y-1 shadow-xs">
+            <div className="p-8 text-center rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-1 shadow-xs">
               <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400 mx-auto mb-2" />
-              <h4 className="text-xs font-semibold text-slate-900 dark:text-zinc-100">
+              <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
                 {severityFilter === 'ALL'
                   ? 'No hay alertas operativas activas'
                   : 'No hay alertas en esta categoría'}
               </h4>
-              <p className="text-[11px] text-slate-500 dark:text-zinc-400 max-w-sm mx-auto">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
                 El stock disponible supera los umbrales mínimos y no hay pedidos con retención demorada.
               </p>
             </div>

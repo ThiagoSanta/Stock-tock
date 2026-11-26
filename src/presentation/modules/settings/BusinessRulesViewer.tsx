@@ -43,20 +43,20 @@ export function BusinessRulesViewer() {
   return (
     <section
       aria-label="Reglas de negocio inviolables del sistema"
-      className="rounded-lg bg-white border border-slate-200 p-4 space-y-3.5 shadow-xs"
+      className="rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 space-y-3.5 shadow-xs"
     >
-      <div className="flex items-center gap-2.5 pb-2.5 border-b border-slate-200">
+      <div className="flex items-center gap-2.5 pb-2.5 border-b border-zinc-200 dark:border-zinc-800">
         <div
           aria-hidden="true"
-          className="w-6 h-6 rounded bg-slate-900 text-white flex items-center justify-center"
+          className="w-6 h-6 rounded bg-zinc-900 text-white flex items-center justify-center"
         >
           <ShieldCheck className="w-3.5 h-3.5" />
         </div>
         <div>
-          <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
+          <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-xs uppercase tracking-wider">
             Reglas de Negocio Inviolables (V1)
           </h3>
-          <p className="text-xs text-slate-600 font-medium">
+          <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
             Parámetros del motor transaccional protegidos por arquitectura y base de datos
           </p>
         </div>
@@ -66,20 +66,20 @@ export function BusinessRulesViewer() {
         {INVIOLABLE_RULES.map((rule, idx) => (
           <article
             key={idx}
-            className="p-3.5 rounded bg-slate-50 border border-slate-200 space-y-2 flex flex-col justify-between"
+            className="p-3.5 rounded bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 space-y-2 flex flex-col justify-between"
           >
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono font-bold text-slate-900 flex items-center gap-1">
-                  <Lock className="w-3 h-3 text-slate-700" aria-hidden="true" />
+                <span className="text-[11px] font-mono font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-zinc-700 dark:text-zinc-300" aria-hidden="true" />
                   {rule.code}
                 </span>
-                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-900 border border-emerald-300">
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70">
                   <CheckCircle2 className="w-3 h-3" aria-hidden="true" /> {rule.status}
                 </span>
               </div>
-              <h4 className="text-xs font-bold text-slate-900">{rule.title}</h4>
-              <p className="text-xs text-slate-700 leading-relaxed font-medium">{rule.description}</p>
+              <h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{rule.title}</h4>
+              <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">{rule.description}</p>
             </div>
           </article>
         ))}

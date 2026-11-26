@@ -252,24 +252,24 @@ export function CashShiftModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="cash-shift-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-xs overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-zinc-950/70 backdrop-blur-xs overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-3xl bg-white rounded-xl border border-slate-300 shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-in fade-in zoom-in-95 duration-150 font-sans"
+        className="w-full max-w-3xl bg-white dark:bg-zinc-900 rounded-xl border border-zinc-300 dark:border-zinc-700 shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-in fade-in zoom-in-95 duration-150 font-sans"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabecera (print:hidden) */}
-        <div className="h-14 px-5 border-b border-slate-200 flex items-center justify-between shrink-0 bg-slate-50/80 print:hidden">
+        <div className="h-14 px-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-50/80 print:hidden">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center">
               <Calculator className="w-4 h-4" />
             </div>
             <div>
-              <h3 id="cash-shift-title" className="text-sm font-bold text-slate-900 leading-none">
+              <h3 id="cash-shift-title" className="text-sm font-bold text-zinc-900 dark:text-zinc-100 leading-none">
                 Arqueo y Cierre de Caja Diario
               </h3>
-              <p className="text-[11px] text-slate-500 mt-0.5">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                 Conciliación integral de efectivo, gastos, ventas y cobranzas
               </p>
             </div>
@@ -279,7 +279,7 @@ export function CashShiftModal({
             <button
               type="button"
               onClick={handlePrint}
-              className="h-8 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+              className="h-8 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Imprimir Cierre A4</span>
@@ -287,7 +287,7 @@ export function CashShiftModal({
             <button
               type="button"
               onClick={onClose}
-              className="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-8 h-8 rounded-lg text-zinc-400 dark:text-zinc-500 hover:text-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 flex items-center justify-center transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -297,41 +297,41 @@ export function CashShiftModal({
         {/* Contenido imprimible de Cierre de Caja */}
         <div
           id="printable-a4-voucher"
-          className="p-5 sm:p-8 space-y-5 overflow-y-auto flex-1 font-sans text-xs text-slate-900 leading-normal"
+          className="p-5 sm:p-8 space-y-5 overflow-y-auto flex-1 font-sans text-xs text-zinc-900 dark:text-zinc-100 leading-normal"
         >
           {/* Encabezado del Cierre */}
-          <div className="flex items-start justify-between pb-4 border-b-2 border-slate-900">
+          <div className="flex items-start justify-between pb-4 border-b-2 border-zinc-900">
             <div>
               <div className="flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-slate-900" />
-                <h2 className="text-base font-bold text-slate-900 uppercase tracking-tight">
+                <Building2 className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />
+                <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
                   {companyName}
                 </h2>
               </div>
-              <p className="text-xs text-slate-600 font-medium mt-0.5">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium mt-0.5">
                 PLANILLA OFICIAL DE ARQUEO Y CIERRE DE CAJA
               </p>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                 Control Comercial Interno • Auditoría de Tesorería
               </p>
             </div>
 
             <div className="text-right">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800 print:justify-end">
-                <Calendar className="w-3.5 h-3.5 text-slate-600 print:hidden" />
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 print:justify-end">
+                <Calendar className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400 print:hidden" />
                 <span className="print:hidden">Fecha: </span>
                 <input
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="font-mono text-xs border border-slate-300 rounded px-2 py-0.5 bg-white font-bold text-slate-900 print:border-none print:p-0"
+                  className="font-mono text-xs border border-zinc-300 dark:border-zinc-700 rounded px-2 py-0.5 bg-white dark:bg-zinc-900 font-bold text-zinc-900 dark:text-zinc-100 print:border-none print:p-0"
                 />
               </div>
-              <p className="text-[11px] text-slate-500 font-mono mt-1">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono mt-1">
                 Generado: {new Date().toLocaleTimeString('es-AR')} hs
               </p>
               {activeShift && (
-                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200 mt-1 inline-block">
+                <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.2 rounded border border-emerald-200 dark:border-emerald-800/70 mt-1 inline-block">
                   Turno Activo: {activeShift.shiftType.replace('TURNO_', '')} ({activeShift.cashierName})
                 </span>
               )}
@@ -340,44 +340,44 @@ export function CashShiftModal({
 
           {/* Resumen Principal de Cobros por Medios de Pago */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
-              <div className="flex items-center justify-between text-slate-600 mb-1">
+            <div className="p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+              <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400 mb-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider">Efectivo Ventas</span>
-                <Banknote className="w-3.5 h-3.5 text-emerald-700" />
+                <Banknote className="w-3.5 h-3.5 text-emerald-800 dark:text-emerald-300" />
               </div>
-              <span className="text-base font-bold font-mono text-slate-900 tabular-nums">
+              <span className="text-base font-bold font-mono text-zinc-900 dark:text-zinc-100 tabular-nums">
                 ${cashSalesTotal.toLocaleString('es-AR')}
               </span>
-              <p className="text-[10px] text-slate-500 mt-0.5">
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                 {dailySales.filter((s) => s.paymentMethod === 'EFECTIVO').length} ventas
               </p>
             </div>
 
-            <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
-              <div className="flex items-center justify-between text-slate-600 mb-1">
+            <div className="p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+              <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400 mb-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider">Transferencias</span>
-                <ArrowRightLeft className="w-3.5 h-3.5 text-sky-700" />
+                <ArrowRightLeft className="w-3.5 h-3.5 text-sky-800 dark:text-sky-300" />
               </div>
-              <span className="text-base font-bold font-mono text-slate-900 tabular-nums">
+              <span className="text-base font-bold font-mono text-zinc-900 dark:text-zinc-100 tabular-nums">
                 ${transferTotal.toLocaleString('es-AR')}
               </span>
-              <p className="text-[10px] text-slate-500 mt-0.5">
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                 {dailySales.filter((s) => s.paymentMethod === 'TRANSFERENCIA').length} operaciones
               </p>
             </div>
 
-            <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
-              <div className="flex items-center justify-between text-slate-600 mb-1">
+            <div className="p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+              <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400 mb-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider">Tarjetas</span>
-                <CreditCard className="w-3.5 h-3.5 text-purple-700" />
+                <CreditCard className="w-3.5 h-3.5 text-sky-800 dark:text-sky-300" />
               </div>
-              <span className="text-base font-bold font-mono text-slate-900 tabular-nums">
+              <span className="text-base font-bold font-mono text-zinc-900 dark:text-zinc-100 tabular-nums">
                 ${(debitTotal + creditTotal).toLocaleString('es-AR')}
               </span>
-              <p className="text-[10px] text-slate-500 mt-0.5">Débito y Crédito</p>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Débito y Crédito</p>
             </div>
 
-            <div className="p-3 rounded-lg border-2 border-slate-900 bg-slate-900 text-white">
+            <div className="p-3 rounded-lg border-2 border-zinc-900 bg-zinc-900 text-white">
               <span className="text-[10px] font-bold uppercase tracking-wider block opacity-80 mb-1">
                 Total Facturado
               </span>
@@ -389,82 +389,82 @@ export function CashShiftModal({
           </div>
 
           {/* Desglose Matemático de Efectivo en Cajón */}
-          <div className="p-4 rounded-xl border border-slate-300 bg-white space-y-3">
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
+          <div className="p-4 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 space-y-3">
+            <h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider flex items-center justify-between">
               <span className="flex items-center gap-2">
-                <Banknote className="w-4 h-4 text-slate-700" />
+                <Banknote className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
                 <span>Conciliación Matemática de Efectivo Físico</span>
               </span>
-              <span className="text-[11px] text-slate-500 font-mono font-normal">
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono font-normal">
                 Fondo + Ingresos - Gastos
               </span>
             </h4>
 
             {/* Fila con los 4 componentes del efectivo teórico */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-              <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-                <label className="text-[10px] text-slate-500 font-bold uppercase block mb-0.5">
+              <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+                <label className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase block mb-0.5">
                   Fondo Inicial (Apertura)
                 </label>
                 <div className="flex items-center gap-1">
-                  <span className="text-slate-400 font-bold">$</span>
+                  <span className="text-zinc-400 dark:text-zinc-500 font-bold">$</span>
                   <input
                     type="number"
                     value={initialCashInput}
                     onChange={(e) => setInitialCashInput(e.target.value)}
-                    className="w-full font-mono font-bold text-slate-900 bg-transparent border-0 p-0 text-sm focus:outline-none"
+                    className="w-full font-mono font-bold text-zinc-900 dark:text-zinc-100 bg-transparent border-0 p-0 text-sm focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-200">
-                <span className="text-[10px] text-emerald-800 font-bold uppercase block mb-0.5">
+              <div className="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-200 dark:border-emerald-800/70">
+                <span className="text-[10px] text-emerald-800 dark:text-emerald-300 font-bold uppercase block mb-0.5">
                   (+) Cobros en Efectivo
                 </span>
-                <span className="font-mono font-bold text-sm text-emerald-900">
+                <span className="font-mono font-bold text-sm text-emerald-800 dark:text-emerald-300">
                   ${(cashSalesTotal + cashPaymentsTotal).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                 </span>
-                <p className="text-[9px] text-emerald-700">Ventas + Recibos Cta. Cte.</p>
+                <p className="text-[9px] text-emerald-800 dark:text-emerald-300">Ventas + Recibos Cta. Cte.</p>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-sky-50/70 border border-sky-200">
-                <span className="text-[10px] text-sky-800 font-bold uppercase block mb-0.5">
+              <div className="p-2.5 rounded-lg bg-sky-50/70 border border-sky-200 dark:border-sky-800/70">
+                <span className="text-[10px] text-sky-800 dark:text-sky-300 font-bold uppercase block mb-0.5">
                   (+) Aportes Manuales
                 </span>
-                <span className="font-mono font-bold text-sm text-sky-900">
+                <span className="font-mono font-bold text-sm text-sky-800 dark:text-sky-300">
                   ${manualIncomes.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                 </span>
-                <p className="text-[9px] text-sky-700">{cashMovements.filter((m) => m.movement_type === 'INGRESO').length} ingresos</p>
+                <p className="text-[9px] text-sky-800 dark:text-sky-300">{cashMovements.filter((m) => m.movement_type === 'INGRESO').length} ingresos</p>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-rose-50/70 border border-rose-200">
-                <span className="text-[10px] text-rose-800 font-bold uppercase block mb-0.5">
+              <div className="p-2.5 rounded-lg bg-rose-50/70 border border-rose-200 dark:border-rose-800/70">
+                <span className="text-[10px] text-rose-800 dark:text-rose-300 font-bold uppercase block mb-0.5">
                   (-) Egresos / Gastos
                 </span>
-                <span className="font-mono font-bold text-sm text-rose-900">
+                <span className="font-mono font-bold text-sm text-rose-800 dark:text-rose-300">
                   -${manualExpenses.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                 </span>
-                <p className="text-[9px] text-rose-700">{cashMovements.filter((m) => m.movement_type === 'EGRESO').length} comprobantes</p>
+                <p className="text-[9px] text-rose-800 dark:text-rose-300">{cashMovements.filter((m) => m.movement_type === 'EGRESO').length} comprobantes</p>
               </div>
             </div>
 
             {/* Comparación Teórico vs Real */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 items-center">
-              <div className="p-3 rounded-lg bg-slate-100 border border-slate-200">
-                <span className="text-[10px] text-slate-500 font-bold uppercase block mb-1">
+              <div className="p-3 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800">
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase block mb-1">
                   1. Efectivo Teórico Esperado
                 </span>
-                <span className="font-mono font-bold text-base text-slate-950 tabular-nums">
+                <span className="font-mono font-bold text-base text-zinc-950 tabular-nums">
                   ${expectedCashInDrawer.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
-              <div className="p-3 rounded-lg bg-slate-50 border border-slate-300">
-                <label htmlFor="counted-cash" className="text-[10px] text-slate-800 font-bold uppercase block mb-1">
+              <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700">
+                <label htmlFor="counted-cash" className="text-[10px] text-zinc-800 dark:text-zinc-200 font-bold uppercase block mb-1">
                   2. Efectivo Real en Cajón *
                 </label>
                 <div className="relative">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono font-bold text-slate-400">$</span>
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono font-bold text-zinc-400 dark:text-zinc-500">$</span>
                   <input
                     id="counted-cash"
                     type="number"
@@ -473,7 +473,7 @@ export function CashShiftModal({
                     value={countedCash}
                     onChange={(e) => setCountedCash(e.target.value)}
                     placeholder="Monto contado..."
-                    className="w-full h-8 pl-6 pr-2.5 rounded-md border border-slate-300 bg-white font-mono font-bold text-sm text-slate-900 focus:outline-none focus:border-slate-900"
+                    className="w-full h-8 pl-6 pr-2.5 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 font-mono font-bold text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900"
                   />
                 </div>
               </div>
@@ -481,12 +481,12 @@ export function CashShiftModal({
               <div
                 className={`p-3 rounded-lg border flex flex-col justify-between ${
                   countedCash === ''
-                    ? 'bg-slate-50 border-slate-200 text-slate-500'
+                    ? 'bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400'
                     : cashDifference === 0
-                    ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800/70 text-emerald-800 dark:text-emerald-300'
                     : cashDifference > 0
-                    ? 'bg-blue-50 border-blue-300 text-blue-900'
-                    : 'bg-rose-50 border-rose-300 text-rose-900'
+                    ? 'bg-sky-50 dark:bg-sky-950/60 border-sky-200 dark:border-sky-800/70 text-sky-800 dark:text-sky-300'
+                    : 'bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800/70 text-rose-800 dark:text-rose-300'
                 }`}
               >
                 <span className="text-[10px] font-bold uppercase tracking-wider block">
@@ -512,15 +512,15 @@ export function CashShiftModal({
 
           {/* Tabla de Gastos y Movimientos de Caja Chica */}
           {cashMovements.length > 0 && (
-            <div className="border border-slate-200 rounded-lg overflow-hidden">
-              <div className="bg-slate-100 px-3 py-1.5 border-b border-slate-200 text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center justify-between">
+            <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+              <div className="bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 border-b border-zinc-200 dark:border-zinc-800 text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider flex items-center justify-between">
                 <span>Movimientos de Caja Chica del Día ({cashMovements.length})</span>
-                <span className="font-mono font-normal text-[11px] text-slate-500">
+                <span className="font-mono font-normal text-[11px] text-zinc-500 dark:text-zinc-400">
                   Neto: ${(manualIncomes - manualExpenses).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <table className="w-full text-left text-xs border-collapse">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 text-[10px] uppercase">
+                <thead className="bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 text-[10px] uppercase">
                   <tr>
                     <th className="py-1.5 px-3">Tipo</th>
                     <th className="py-1.5 px-3">Rubro</th>
@@ -529,27 +529,27 @@ export function CashShiftModal({
                     <th className="py-1.5 px-3 text-right">Importe</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {cashMovements.map((m) => (
-                    <tr key={m.id} className="hover:bg-slate-50/50">
+                    <tr key={m.id} className="hover:bg-zinc-50/50">
                       <td className="py-1.5 px-3">
                         <span
                           className={`inline-flex items-center gap-1 font-semibold text-[10px] px-1.5 py-0.2 rounded border ${
                             m.movement_type === 'EGRESO'
-                              ? 'bg-rose-50 text-rose-800 border-rose-200'
-                              : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800/70'
+                              : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/70'
                           }`}
                         >
                           {m.movement_type === 'EGRESO' ? <ArrowDownRight className="w-2.5 h-2.5" /> : <ArrowUpRight className="w-2.5 h-2.5" />}
                           {m.movement_type}
                         </span>
                       </td>
-                      <td className="py-1.5 px-3 text-slate-700 font-medium">{m.category}</td>
-                      <td className="py-1.5 px-3 text-slate-800">{m.description}</td>
-                      <td className="py-1.5 px-3 text-slate-500 text-[11px]">{m.responsible_name || '-'}</td>
+                      <td className="py-1.5 px-3 text-zinc-700 dark:text-zinc-300 font-medium">{m.category}</td>
+                      <td className="py-1.5 px-3 text-zinc-800 dark:text-zinc-200">{m.description}</td>
+                      <td className="py-1.5 px-3 text-zinc-500 dark:text-zinc-400 text-[11px]">{m.responsible_name || '-'}</td>
                       <td
                         className={`py-1.5 px-3 text-right font-mono font-bold ${
-                          m.movement_type === 'EGRESO' ? 'text-rose-700' : 'text-emerald-700'
+                          m.movement_type === 'EGRESO' ? 'text-rose-800 dark:text-rose-300' : 'text-emerald-800 dark:text-emerald-300'
                         }`}
                       >
                         {m.movement_type === 'EGRESO' ? '-' : '+'}${m.amount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
@@ -562,22 +562,22 @@ export function CashShiftModal({
           )}
 
           {/* Firmas al pie A4 */}
-          <div className="pt-8 grid grid-cols-2 gap-12 text-center border-t border-slate-200">
-            <div className="border-t border-slate-400 pt-1.5">
-              <p className="font-bold text-slate-900 text-[11px] uppercase">{companyName}</p>
-              <p className="text-[10px] text-slate-500">Firma del Cajero / Responsable de Turno</p>
+          <div className="pt-8 grid grid-cols-2 gap-12 text-center border-t border-zinc-200 dark:border-zinc-800">
+            <div className="border-t border-zinc-400 pt-1.5">
+              <p className="font-bold text-zinc-900 dark:text-zinc-100 text-[11px] uppercase">{companyName}</p>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Firma del Cajero / Responsable de Turno</p>
             </div>
-            <div className="border-t border-slate-400 pt-1.5">
-              <p className="font-bold text-slate-900 text-[11px] uppercase">Control Interno</p>
-              <p className="text-[10px] text-slate-500">Supervisión / Auditoría de Tesorería</p>
+            <div className="border-t border-zinc-400 pt-1.5">
+              <p className="font-bold text-zinc-900 dark:text-zinc-100 text-[11px] uppercase">Control Interno</p>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Supervisión / Auditoría de Tesorería</p>
             </div>
           </div>
         </div>
 
         {/* Footer con Botón de Cierre Formal */}
-        <div className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between print:hidden">
+        <div className="p-3 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between print:hidden">
           {shiftClosedSuccess ? (
-            <span className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+            <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <span>Arqueo y Cierre asentado correctamente en base de datos</span>
             </span>
@@ -587,7 +587,7 @@ export function CashShiftModal({
               value={closingNotes}
               onChange={(e) => setClosingNotes(e.target.value)}
               placeholder="Notas u observaciones de cierre (opcional)..."
-              className="h-8 px-2.5 rounded-lg border border-slate-300 text-xs text-slate-900 w-80 bg-white focus:outline-none"
+              className="h-8 px-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 w-80 bg-white dark:bg-zinc-900 focus:outline-none"
             />
           )}
 
@@ -595,7 +595,7 @@ export function CashShiftModal({
             <button
               type="button"
               onClick={onClose}
-              className="h-8 px-3.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+              className="h-8 px-3.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-colors cursor-pointer"
             >
               Cerrar Ventana
             </button>
@@ -603,7 +603,7 @@ export function CashShiftModal({
               type="button"
               onClick={handleConfirmCloseShift}
               disabled={countedCash === '' || closingShift || shiftClosedSuccess}
-              className="h-8 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className="h-8 px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 disabled:opacity-40 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               {closingShift && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>{shiftClosedSuccess ? 'Cierre Guardado' : 'Asentar Cierre de Turno'}</span>

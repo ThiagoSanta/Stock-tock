@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Settings, Database, ShieldAlert, Sun, Moon, MonitorDown, CheckCircle2 } from 'lucide-react';
+import { Settings, Database, ShieldAlert, Sun, Moon } from 'lucide-react';
+import { PageHeader, Button, Badge } from '@/presentation/components/ui';
 import { CompanySettings, WarehouseSettings } from '@/core/domain/settings/types';
 import { SupabaseSettingsRepository } from '@/core/infrastructure/repositories/SupabaseSettingsRepository';
 import { GetCompanySettingsUseCase } from '@/core/application/use-cases/settings/GetCompanySettingsUseCase';
@@ -68,42 +68,21 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-5">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
-            <Link
-              to="/"
-              className="hover:text-slate-700 flex items-center gap-1 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-slate-100 text-slate-800 flex items-center justify-center">
-              <Settings className="w-3.5 h-3.5" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">
-              Configuración del Sistema
-            </h1>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-[11px] font-mono text-slate-700 shadow-2xs">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-          </span>
-          <Database className="w-3.5 h-3.5 text-slate-600" />
-          <span>PostgreSQL Cloud • Conectado</span>
-        </div>
-      </div>
+      <PageHeader
+        title="Configuración del Sistema"
+        icon={<Settings className="w-3.5 h-3.5" />}
+        actions={
+          <Badge variant="neutral" mono dot pulse>
+            <Database className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
+            <span>PostgreSQL Cloud • Conectado</span>
+          </Badge>
+        }
+      />
 
       {loading || !company ? (
-        <div className="p-8 text-center rounded-lg bg-white border border-slate-200 shadow-xs">
-          <div className="w-5 h-5 border-2 border-slate-800 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-          <p className="text-xs text-slate-500">Cargando parámetros...</p>
+        <div className="p-8 text-center rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
+          <div className="w-5 h-5 border-2 border-zinc-800 dark:border-zinc-200 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Cargando parámetros...</p>
         </div>
       ) : (
         <div className="space-y-5">
@@ -124,27 +103,27 @@ export function SettingsPage() {
           <BusinessRulesViewer />
 
           {/* Apariencia & Visualización — Modo Oscuro */}
-          <div className="p-4 rounded-lg bg-white border border-slate-200 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200">
-              <div className="w-6 h-6 rounded-md bg-blue-50 text-blue-700 flex items-center justify-center">
+          <div className="p-4 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-4">
+            <div className="flex items-center gap-2 pb-2.5 border-b border-zinc-200 dark:border-zinc-800">
+              <div className="w-6 h-6 rounded-md bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800/60 flex items-center justify-center">
                 <Sun className="w-3.5 h-3.5" />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">
                   Apariencia & Visualización
                 </h3>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
                   Preferencia de tema visual para mostrador o ambientes con poca luz
                 </p>
               </div>
             </div>
 
-            <div className="p-3.5 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-0.5">
-                <span className="text-xs font-bold text-slate-900 dark:text-zinc-100 block">
+                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 block">
                   Tema Visual de la Interfaz
                 </span>
-                <p className="text-[11px] text-slate-500 dark:text-zinc-400">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   {isDark
                     ? 'Modo Oscuro activo: paleta negro grafito mate para descanso visual en mostrador nocturno.'
                     : 'Modo Claro activo: contraste diurno nítido para entornos luminosos.'}
@@ -152,14 +131,14 @@ export function SettingsPage() {
               </div>
 
               {/* Segmented Control de Tema */}
-              <div className="inline-flex p-1 rounded-lg bg-slate-200/70 dark:bg-zinc-950 border border-slate-300/70 dark:border-zinc-800 shrink-0">
+              <div className="inline-flex p-1 rounded-lg bg-zinc-200/70 dark:bg-zinc-950 border border-zinc-300/70 dark:border-zinc-800 shrink-0">
                 <button
                   type="button"
                   onClick={() => isDark && toggleTheme()}
                   className={`h-7 px-3 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                     !isDark
-                      ? 'bg-white text-slate-900 shadow-2xs border border-slate-300/60'
-                      : 'text-zinc-400 hover:text-zinc-200'
+                      ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-2xs border border-zinc-300/60'
+                      : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-200'
                   }`}
                 >
                   <Sun className="w-3.5 h-3.5 text-amber-500" />
@@ -171,10 +150,10 @@ export function SettingsPage() {
                   className={`h-7 px-3 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                     isDark
                       ? 'bg-zinc-800 text-zinc-100 shadow-2xs border border-zinc-700 ring-1 ring-lime-500/50'
-                      : 'text-slate-500 hover:text-slate-800'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                   }`}
                 >
-                  <Moon className="w-3.5 h-3.5 text-lime-400" />
+                  <Moon className="w-3.5 h-3.5 text-lime-500 dark:text-lime-400" />
                   <span>Oscuro</span>
                 </button>
               </div>
@@ -183,24 +162,24 @@ export function SettingsPage() {
 
           {/* Seguridad & Auditoría — solo Admin */}
           {permissions.canManageUsers && (
-            <div className="p-4 rounded-lg bg-white border border-slate-200 shadow-xs space-y-3">
-              <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200">
-                <div className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center">
-                  <ShieldAlert className="w-3.5 h-3.5 text-slate-700" />
+            <div className="p-4 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 pb-2.5 border-b border-zinc-200 dark:border-zinc-800">
+                <div className="w-6 h-6 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">
+                  <ShieldAlert className="w-3.5 h-3.5 text-zinc-700 dark:text-zinc-300" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Seguridad & Auditoría</h3>
-                  <p className="text-xs text-slate-500 font-medium">Registro inmutable de operaciones del sistema</p>
+                  <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Seguridad & Auditoría</h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Registro inmutable de operaciones del sistema</p>
                 </div>
               </div>
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={() => setShowAuditLog(true)}
-                className="h-8 px-3 rounded bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                leftIcon={<ShieldAlert className="w-3.5 h-3.5" />}
               >
-                <ShieldAlert className="w-3.5 h-3.5" />
                 Ver Registro de Auditoría
-              </button>
+              </Button>
             </div>
           )}
         </div>
