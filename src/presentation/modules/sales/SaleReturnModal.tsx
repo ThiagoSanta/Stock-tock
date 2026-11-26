@@ -71,7 +71,6 @@ export function SaleReturnModal({
 
     try {
       const supabase = createClient();
-      const returnNumber = `DEV-${Math.floor(100000 + Math.random() * 900000)}`;
 
       // Resolver ID del depósito de la venta
       let effectiveWarehouseId = sale.warehouseId || (sale as any).warehouse_id;
@@ -94,68 +93,34 @@ export function SaleReturnModal({
         effectiveWarehouseId = anyWh?.id || '';
       }
 
-      for (const item of itemsToReturn) {
-        // 1. Obtener stock actual en el depósito
-        const { data: stockRow } = await supabase
-          .from('inventory_stock')
-          .select('id, physical_stock, reserved_stock')
-          .eq('company_id', sale.companyId)
-          .eq('warehouse_id', effectiveWarehouseId)
-          .eq('product_id', item.productId)
-          .maybeSingle();
+      if (!effectiveWarehouseId) {
+        throw new Error('No se encontró un depósito válido para reingresar el stock.');
+      }
 
-        const currentPhysical = Number(stockRow?.physical_stock || 0);
-        const currentReserved = Number(stockRow?.reserved_stock || 0);
-        const newPhysical = currentPhysical + item.returnQty;
-        const newAvailable = newPhysical - currentReserved;
+      const { data: returnRes, error: rpcErr } = await supabase.rpc('rpc_process_sale_return', {
+        p_company_id: sale.companyId,
+        p_sale_id: sale.id,
+        p_warehouse_id: effectiveWarehouseId,
+        p_reason: reason.trim(),
+        p_items: itemsToReturn.map((it) => ({
+          saleItemId: it.id,
+          quantity: it.returnQty,
+        })),
+      });
 
-        // 2. Incrementar stock físico
-        if (stockRow) {
-          await supabase
-            .from('inventory_stock')
-            .update({
-              physical_stock: newPhysical,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', stockRow.id);
-        } else if (effectiveWarehouseId) {
-          await supabase.from('inventory_stock').insert({
-            company_id: sale.companyId,
-            warehouse_id: effectiveWarehouseId,
-            product_id: item.productId,
-            variant_id: item.variantId || null,
-            physical_stock: newPhysical,
-            reserved_stock: 0,
-          });
-        }
-
-        // 3. Asentar movimiento DEVOLUCION_CLIENTE en Kardex
-        await supabase.from('stock_movements').insert({
-          company_id: sale.companyId,
-          warehouse_id: effectiveWarehouseId || null,
-          product_id: item.productId,
-          variant_id: item.variantId || null,
-          movement_type: 'DEVOLUCION_CLIENTE',
-          quantity: item.returnQty,
-          balance_physical_after: newPhysical,
-          balance_reserved_after: currentReserved,
-          balance_available_after: newAvailable,
-          unit_cost: item.historicalCostPrice,
-          reference_type: 'SALE_RETURN',
-          reference_id: returnNumber,
-          notes: `${reason.trim()} (Venta origen: ${sale.saleNumber})`,
-        });
+      if (rpcErr || !returnRes) {
+        throw new Error(rpcErr?.message || 'Error al procesar la devolución.');
       }
 
       setReturnVoucher({
-        returnNumber,
+        returnNumber: returnRes.returnNumber,
         items: itemsToReturn.map((it) => ({
           name: it.productName,
           qty: it.returnQty,
           unitPrice: it.unitPrice,
           subtotal: it.refundSubtotal,
         })),
-        totalRefund,
+        totalRefund: Number(returnRes.totalRefund ?? totalRefund),
         date: new Date().toLocaleString('es-AR'),
       });
 

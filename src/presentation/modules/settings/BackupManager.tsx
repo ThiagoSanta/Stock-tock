@@ -77,21 +77,29 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
 
       const productIds = (productsRes.data || []).map((p: any) => p.id);
       const saleIds = (salesRes.data || []).map((s: any) => s.id);
+      const purchaseIds = (purchasesRes.data || []).map((p: any) => p.id);
+      const orderIds = (ordersRes.data || []).map((o: any) => o.id);
 
       // Tablas hijas filtradas
-      const [variantsRes, saleItemsRes] = await Promise.all([
+      const [variantsRes, saleItemsRes, purchaseItemsRes, orderItemsRes] = await Promise.all([
         productIds.length > 0
           ? supabase.from('product_variants').select('*').in('product_id', productIds)
           : Promise.resolve({ data: [] }),
         saleIds.length > 0
           ? supabase.from('sale_items').select('*').in('sale_id', saleIds)
           : Promise.resolve({ data: [] }),
+        purchaseIds.length > 0
+          ? supabase.from('purchase_items').select('*').in('purchase_id', purchaseIds)
+          : Promise.resolve({ data: [] }),
+        orderIds.length > 0
+          ? supabase.from('order_items').select('*').in('order_id', orderIds)
+          : Promise.resolve({ data: [] }),
       ]);
 
       const backupData = {
         meta: {
           system: 'Stock·tock ERP',
-          version: '1.0',
+          version: '1.1',
           companyId,
           companyName,
           exportedAt: new Date().toISOString(),
@@ -118,7 +126,9 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
           sales: salesRes.data || [],
           saleItems: saleItemsRes.data || [],
           purchases: purchasesRes.data || [],
+          purchaseItems: purchaseItemsRes.data || [],
           orders: ordersRes.data || [],
+          orderItems: orderItemsRes.data || [],
           cashMovements: cashMovementsRes.data || [],
           cashShifts: cashShiftsRes.data || [],
           stockLots: stockLotsRes.data || [],
@@ -184,58 +194,41 @@ export function BackupManager({ companyId, companyName }: BackupManagerProps) {
       const supabase = createClient();
       const db = restoreData.database;
 
+      if (restoreData.meta?.companyId && restoreData.meta.companyId !== companyId) {
+        throw new Error('El respaldo pertenece a otra empresa y no puede restaurarse aquí.');
+      }
+
+      const upsertTable = async (table: string, rows: any[] | undefined) => {
+        if (!rows || rows.length === 0) return;
+        const { error } = await supabase.from(table).upsert(rows, { onConflict: 'id' });
+        if (error) {
+          throw new Error(`Error restaurando ${table}: ${error.message}`);
+        }
+      };
+
+      // Omitir columnas GENERATED ALWAYS antes de upsert
+      const cleanStock = (db.inventoryStock || []).map(({ available_stock: _a, ...rest }: any) => rest);
+      const cleanSales = (db.sales || []).map(({ estimated_gross_margin: _m, ...rest }: any) => rest);
+
       // Upsert en orden de dependencias
-      if (db.categories?.length > 0) {
-        await supabase.from('categories').upsert(db.categories, { onConflict: 'id' });
-      }
-
-      if (db.products?.length > 0) {
-        await supabase.from('products').upsert(db.products, { onConflict: 'id' });
-      }
-
-      if (db.productVariants?.length > 0) {
-        await supabase.from('product_variants').upsert(db.productVariants, { onConflict: 'id' });
-      }
-
-      if (db.inventoryStock?.length > 0) {
-        await supabase.from('inventory_stock').upsert(db.inventoryStock, { onConflict: 'id' });
-      }
-
-      if (db.customers?.length > 0) {
-        await supabase.from('customers').upsert(db.customers, { onConflict: 'id' });
-      }
-
-      if (db.customerPayments?.length > 0) {
-        await supabase.from('customer_payments').upsert(db.customerPayments, { onConflict: 'id' });
-      }
-
-      if (db.suppliers?.length > 0) {
-        await supabase.from('suppliers').upsert(db.suppliers, { onConflict: 'id' });
-      }
-
-      if (db.sales?.length > 0) {
-        await supabase.from('sales').upsert(db.sales, { onConflict: 'id' });
-      }
-
-      if (db.saleItems?.length > 0) {
-        await supabase.from('sale_items').upsert(db.saleItems, { onConflict: 'id' });
-      }
-
-      if (db.cashMovements?.length > 0) {
-        await supabase.from('cash_movements').upsert(db.cashMovements, { onConflict: 'id' });
-      }
-
-      if (db.cashShifts?.length > 0) {
-        await supabase.from('cash_shifts').upsert(db.cashShifts, { onConflict: 'id' });
-      }
-
-      if (db.stockLots?.length > 0) {
-        await supabase.from('stock_lots').upsert(db.stockLots, { onConflict: 'id' });
-      }
-
-      if (db.supplierPayments?.length > 0) {
-        await supabase.from('supplier_payments').upsert(db.supplierPayments, { onConflict: 'id' });
-      }
+      await upsertTable('categories', db.categories);
+      await upsertTable('products', db.products);
+      await upsertTable('product_variants', db.productVariants);
+      await upsertTable('inventory_stock', cleanStock);
+      await upsertTable('customers', db.customers);
+      await upsertTable('customer_payments', db.customerPayments);
+      await upsertTable('suppliers', db.suppliers);
+      await upsertTable('orders', db.orders);
+      await upsertTable('order_items', db.orderItems);
+      await upsertTable('purchases', db.purchases);
+      await upsertTable('purchase_items', db.purchaseItems);
+      await upsertTable('sales', cleanSales);
+      await upsertTable('sale_items', db.saleItems);
+      await upsertTable('stock_movements', db.stockMovements);
+      await upsertTable('cash_movements', db.cashMovements);
+      await upsertTable('cash_shifts', db.cashShifts);
+      await upsertTable('stock_lots', db.stockLots);
+      await upsertTable('supplier_payments', db.supplierPayments);
 
       setRestoreSuccess(
         `Restauración completada con éxito. Se importaron ${db.products?.length || 0} productos, ${db.sales?.length || 0} ventas y ${db.customers?.length || 0} clientes.`

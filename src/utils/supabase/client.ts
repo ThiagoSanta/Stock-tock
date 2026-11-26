@@ -9,12 +9,18 @@ export const createClient = (): SupabaseClient => {
   const supabaseUrl =
     (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
     (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) ||
-    'https://pthvajglmftdppgsyjba.supabase.co';
+    '';
 
   const supabaseKey =
     (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) ||
     (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) ||
-    'sb_publishable_QVcEJWAJ1_AP5cOY5dyXYg_3zJCBkAW';
+    '';
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error(
+      'Faltan variables de entorno de Supabase (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY).'
+    );
+  }
 
   clientInstance = createSupabaseClient(supabaseUrl, supabaseKey, {
     auth: {

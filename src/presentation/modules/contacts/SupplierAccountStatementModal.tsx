@@ -44,6 +44,7 @@ export function SupplierAccountStatementModal({
 
   useEffect(() => {
     if (!isOpen || !supplier) return;
+    const activeSupplier = supplier;
 
     let isMounted = true;
     async function loadHistory() {
@@ -55,8 +56,8 @@ export function SupplierAccountStatementModal({
         const { data: purchasesData } = await supabase
           .from('purchases')
           .select('id, purchase_number, total_amount, status, notes, created_at')
-          .eq('company_id', supplier.companyId)
-          .eq('supplier_id', supplier.id)
+          .eq('company_id', activeSupplier.companyId)
+          .eq('supplier_id', activeSupplier.id)
           .neq('status', 'CANCELADA')
           .order('created_at', { ascending: true });
 
@@ -64,8 +65,8 @@ export function SupplierAccountStatementModal({
         const { data: paymentsData } = await supabase
           .from('supplier_payments')
           .select('id, payment_order_number, amount, payment_method, notes, created_at')
-          .eq('company_id', supplier.companyId)
-          .eq('supplier_id', supplier.id)
+          .eq('company_id', activeSupplier.companyId)
+          .eq('supplier_id', activeSupplier.id)
           .order('created_at', { ascending: true });
 
         // 3. Unificar cronológicamente

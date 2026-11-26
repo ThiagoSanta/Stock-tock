@@ -14,8 +14,10 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ArrowRightLeft,
+  LogOut,
   LucideIcon,
 } from 'lucide-react';
+import { useAuth } from '@/utils/security/AuthContext';
 import { useUserRole } from '@/utils/security/UserRoleContext';
 import { OperatorSwitcherModal } from '@/presentation/components/OperatorSwitcherModal';
 
@@ -67,6 +69,7 @@ export function Sidebar({
 }: SidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
+  const { signOut } = useAuth();
   const { currentUser, permissions } = useUserRole();
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
 
@@ -228,40 +231,60 @@ export function Sidebar({
       </nav>
 
       {/* ── Operador & Rol Activo ────────────────────────── */}
-      <div className="p-2 border-t border-zinc-200/80 dark:border-zinc-800 shrink-0">
+      <div className="p-2 border-t border-zinc-200/80 dark:border-zinc-800 shrink-0 space-y-1.5">
         {!isCollapsed ? (
-          <button
-            type="button"
-            onClick={() => setIsSwitcherOpen(true)}
-            className="w-full p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50/70 dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between transition-all cursor-pointer text-left group"
-            title="Cambiar de Operador o Turno"
-          >
-            <div className="flex items-center gap-2 min-w-0">
-              <div
-                className={`w-6 h-6 rounded-full ${currentUser.avatarColor} text-white flex items-center justify-center text-[11px] font-bold shrink-0 shadow-2xs`}
-              >
-                {currentUser.name.charAt(0).toUpperCase()}
+          <>
+            <button
+              type="button"
+              onClick={() => setIsSwitcherOpen(true)}
+              className="w-full p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50/70 dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between transition-all cursor-pointer text-left group"
+              title="Cambiar de Operador o Turno"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <div
+                  className={`w-6 h-6 rounded-full ${currentUser.avatarColor} text-white flex items-center justify-center text-[11px] font-bold shrink-0 shadow-2xs`}
+                >
+                  {currentUser.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 block truncate leading-tight transition-colors">
+                    {currentUser.name}
+                  </span>
+                  <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase font-mono block leading-none mt-0.5">
+                    {currentUser.role === 'ADMIN' ? 'Admin' : currentUser.role === 'CASHIER' ? 'Cajero' : 'Depósito'}
+                  </span>
+                </div>
               </div>
-              <div className="min-w-0">
-                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 block truncate leading-tight transition-colors">
-                  {currentUser.name}
-                </span>
-                <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase font-mono block leading-none mt-0.5">
-                  {currentUser.role === 'ADMIN' ? 'Admin' : currentUser.role === 'CASHIER' ? 'Cajero' : 'Depósito'}
-                </span>
-              </div>
-            </div>
-            <ArrowRightLeft className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors shrink-0" />
-          </button>
+              <ArrowRightLeft className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors shrink-0" />
+            </button>
+            <button
+              type="button"
+              onClick={() => signOut()}
+              className="w-full h-7 px-2 rounded-lg text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5 shrink-0" />
+              <span>Cerrar Sesión</span>
+            </button>
+          </>
         ) : (
-          <button
-            type="button"
-            onClick={() => setIsSwitcherOpen(true)}
-            className={`w-8 h-8 mx-auto rounded-full ${currentUser.avatarColor} text-white flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-lime-400 transition-all shadow-2xs`}
-            title={`Operador: ${currentUser.name} (${currentUser.role}). Clic para cambiar.`}
-          >
-            {currentUser.name.charAt(0).toUpperCase()}
-          </button>
+          <div className="flex flex-col items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setIsSwitcherOpen(true)}
+              className={`w-8 h-8 mx-auto rounded-full ${currentUser.avatarColor} text-white flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-lime-400 transition-all shadow-2xs`}
+              title={`Operador: ${currentUser.name} (${currentUser.role}). Clic para cambiar.`}
+            >
+              {currentUser.name.charAt(0).toUpperCase()}
+            </button>
+            <button
+              type="button"
+              onClick={() => signOut()}
+              title="Cerrar Sesión"
+              className="w-8 h-7 mx-auto rounded-lg text-zinc-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
         )}
       </div>
 

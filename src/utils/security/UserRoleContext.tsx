@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserRole, UserProfile, RolePermissions, ROLE_PERMISSIONS } from '@/core/domain/security/types';
 import { AuditService } from '@/core/application/services/AuditService';
 import { getCompanyContext } from '@/utils/supabase/companyContext';
+import { useAuth } from '@/utils/security/AuthContext';
 
 export const DEFAULT_PROFILES: UserProfile[] = [
   {
@@ -38,6 +39,8 @@ interface UserRoleContextType {
 const UserRoleContext = createContext<UserRoleContextType | undefined>(undefined);
 
 export function UserRoleProvider({ children }: { children: React.ReactNode }) {
+  const { user, membership } = useAuth();
+
   const [profiles, setProfiles] = useState<UserProfile[]>(() => {
     try {
       const saved = localStorage.getItem('stocktock_user_profiles');
@@ -61,7 +64,25 @@ export function UserRoleProvider({ children }: { children: React.ReactNode }) {
     return profiles[0] || DEFAULT_PROFILES[0];
   });
 
-  const permissions = ROLE_PERMISSIONS[currentUser.role] || ROLE_PERMISSIONS.ADMIN;
+  // Sincronizar con el rol real verificado en base de datos cuando exista membresía
+  useEffect(() => {
+    if (user && membership) {
+      const colorMap: Record<UserRole, string> = {
+        ADMIN: 'bg-zinc-900',
+        CASHIER: 'bg-emerald-600',
+        WAREHOUSE: 'bg-amber-600',
+      };
+      setCurrentUser({
+        id: user.id,
+        name: membership.fullName || user.email || 'Operador',
+        role: membership.role,
+        email: user.email,
+        avatarColor: colorMap[membership.role] || 'bg-zinc-900',
+      });
+    }
+  }, [user, membership]);
+
+  const permissions = ROLE_PERMISSIONS[currentUser.role] || ROLE_PERMISSIONS.CASHIER;
 
   const switchProfile = async (newProfile: UserProfile) => {
     const oldName = currentUser.name;

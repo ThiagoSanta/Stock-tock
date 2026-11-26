@@ -27,6 +27,7 @@ export interface SystemAlert {
 }
 
 export interface InventoryExportRow {
+  productId: string;
   sku: string;
   productName: string;
   warehouseName: string;

@@ -5,6 +5,7 @@ export interface ProductWithStock extends Product {
   reservedStock: number;
   availableStock: number;
   warehouseId: string;
+  categoryName?: string;
 }
 
 export interface CreateProductWithStockDTO {

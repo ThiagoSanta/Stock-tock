@@ -23,10 +23,17 @@ export class ExportInventoryReportUseCase {
       'Estado Stock',
     ];
 
+    const sanitizeCell = (value: string): string => {
+      const escaped = value.replace(/"/g, '""');
+      // Neutralizar CSV Formula Injection (=, +, -, @, tab, CR)
+      const safe = /^[=+\-@\t\r]/.test(escaped) ? `'${escaped}` : escaped;
+      return `"${safe}"`;
+    };
+
     const lines = rows.map((r) => [
-      `"${r.sku.replace(/"/g, '""')}"`,
-      `"${r.productName.replace(/"/g, '""')}"`,
-      `"${r.warehouseName.replace(/"/g, '""')}"`,
+      sanitizeCell(r.sku),
+      sanitizeCell(r.productName),
+      sanitizeCell(r.warehouseName),
       r.physicalStock,
       r.reservedStock,
       r.availableStock,
@@ -34,7 +41,7 @@ export class ExportInventoryReportUseCase {
       r.costPrice.toFixed(2),
       r.salePrice.toFixed(2),
       r.totalValuation.toFixed(2),
-      `"${r.status}"`,
+      sanitizeCell(r.status),
     ].join(';'));
 
     return [headers.join(';'), ...lines].join('\r\n');

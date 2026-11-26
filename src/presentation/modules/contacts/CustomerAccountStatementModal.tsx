@@ -43,6 +43,7 @@ export function CustomerAccountStatementModal({
 
   useEffect(() => {
     if (!isOpen || !customer) return;
+    const activeCustomer = customer;
 
     let isMounted = true;
     async function loadHistory() {
@@ -54,8 +55,8 @@ export function CustomerAccountStatementModal({
         const { data: salesData } = await supabase
           .from('sales')
           .select('id, sale_number, total_amount, payment_method, notes, created_at')
-          .eq('company_id', customer.companyId)
-          .eq('customer_id', customer.id)
+          .eq('company_id', activeCustomer.companyId)
+          .eq('customer_id', activeCustomer.id)
           .eq('payment_method', 'CUENTA_CORRIENTE')
           .order('created_at', { ascending: true });
 
@@ -63,8 +64,8 @@ export function CustomerAccountStatementModal({
         const { data: paymentsData } = await supabase
           .from('customer_payments')
           .select('id, receipt_number, amount, payment_method, notes, created_at')
-          .eq('company_id', customer.companyId)
-          .eq('customer_id', customer.id)
+          .eq('company_id', activeCustomer.companyId)
+          .eq('customer_id', activeCustomer.id)
           .order('created_at', { ascending: true });
 
         // 3. Unificar y ordenar cronológicamente

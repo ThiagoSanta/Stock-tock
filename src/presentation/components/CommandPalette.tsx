@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUserRole } from '@/utils/security/UserRoleContext';
 import {
   Search,
   LayoutDashboard,
@@ -39,6 +40,7 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const { permissions } = useUserRole();
 
   const commands: CommandItem[] = useMemo(
     () => [
@@ -308,16 +310,29 @@ export function CommandPalette({ isOpen, onClose, onOpenPos }: CommandPalettePro
   );
 
   const filteredCommands = useMemo(() => {
-    const q = query.toLowerCase().trim();
-    if (!q) return commands;
+    const allowed = commands.filter((cmd) => {
+      if ((cmd.id === 'nav-purchases' || cmd.id === 'action-new-purchase') && !permissions.canAccessPurchases) {
+        return false;
+      }
+      if ((cmd.id === 'nav-sales' || cmd.id === 'action-pos') && !permissions.canMakeSales) {
+        return false;
+      }
+      if ((cmd.id === 'nav-settings' || cmd.id === 'report-backup') && !permissions.canAccessSettings) {
+        return false;
+      }
+      return true;
+    });
 
-    return commands.filter((cmd) => {
+    const q = query.toLowerCase().trim();
+    if (!q) return allowed;
+
+    return allowed.filter((cmd) => {
       if (cmd.title.toLowerCase().includes(q)) return true;
       if (cmd.description.toLowerCase().includes(q)) return true;
       if (cmd.keywords?.some((k) => k.toLowerCase().includes(q))) return true;
       return false;
     });
-  }, [commands, query]);
+  }, [commands, query, permissions]);
 
   useEffect(() => {
     setSelectedIndex(0);

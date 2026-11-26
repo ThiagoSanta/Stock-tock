@@ -4,12 +4,13 @@ import pg from 'pg';
 
 const { Client } = pg;
 
-// Try pooler first (works with both IPv4 and IPv6)
-const connectionUrls = [
-  'postgresql://postgres.pthvajglmftdppgsyjba:j4v%21%2B%40SYwNEKgSi@aws-0-us-west-2.pooler.supabase.com:5432/postgres',
-  'postgresql://postgres.pthvajglmftdppgsyjba:j4v%21%2B%40SYwNEKgSi@aws-0-us-west-2.pooler.supabase.com:6543/postgres',
-  'postgresql://postgres:j4v%21%2B%40SYwNEKgSi@db.pthvajglmftdppgsyjba.supabase.co:5432/postgres',
-];
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  console.error('❌ Error: Debes definir la variable de entorno DATABASE_URL para ejecutar la migración.');
+  process.exit(1);
+}
+
+const connectionUrls = [databaseUrl];
 
 async function runMigration() {
   const sqlPath = path.resolve('docs/04-modelo-datos-supabase.sql');

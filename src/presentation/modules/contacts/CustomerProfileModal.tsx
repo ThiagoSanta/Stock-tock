@@ -59,6 +59,7 @@ export function CustomerProfileModal({
 
   useEffect(() => {
     if (!isOpen || !customer) return;
+    const activeCustomer = customer;
 
     let isMounted = true;
     async function loadCustomerProfile() {
@@ -70,8 +71,8 @@ export function CustomerProfileModal({
         const { data: salesData, error: salesErr } = await supabase
           .from('sales')
           .select('id, sale_number, total_amount, payment_method, notes, created_at')
-          .eq('company_id', customer.companyId)
-          .eq('customer_id', customer.id)
+          .eq('company_id', activeCustomer.companyId)
+          .eq('customer_id', activeCustomer.id)
           .order('created_at', { ascending: false });
 
         if (salesErr) throw salesErr;

@@ -72,6 +72,7 @@ export function InventoryPage() {
             address: w.address,
             isDefault: w.is_default,
             active: w.active,
+            createdAt: w.created_at,
           }))
         );
       }

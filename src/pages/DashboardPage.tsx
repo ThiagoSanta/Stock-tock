@@ -43,6 +43,7 @@ export function DashboardPage() {
   const [currentDate, setCurrentDate] = useState<string>('');
   const [company, setCompany] = useState<CompanyData | null>(null);
   const [defaultWarehouseId, setDefaultWarehouseId] = useState<string>('');
+  const [allSalesTotal, setAllSalesTotal] = useState<number>(0);
   const [products, setProducts] = useState<ProductWithStock[]>([]);
   const [recentSales, setRecentSales] = useState<Sale[]>([]);
   const [recentMovements, setRecentMovements] = useState<StockMovementRow[]>([]);
@@ -68,7 +69,7 @@ export function DashboardPage() {
       const supabase = createClient();
 
       // Carga paralela por HTTP/2 de todos los datos del dashboard en un solo roundtrip
-      const [prods, salesRes, movsRes] = await Promise.all([
+      const [prods, salesRes, allSalesTotalsRes, movsRes] = await Promise.all([
         productRepo.getProductsWithStock(context.companyId),
         supabase
           .from('sales')
@@ -76,6 +77,10 @@ export function DashboardPage() {
           .eq('company_id', context.companyId)
           .order('created_at', { ascending: false })
           .limit(10),
+        supabase
+          .from('sales')
+          .select('total_amount')
+          .eq('company_id', context.companyId),
         supabase
           .from('stock_movements')
           .select(
@@ -88,6 +93,12 @@ export function DashboardPage() {
 
       setProducts(prods);
       setRecentSales((salesRes.data as any) || []);
+      setAllSalesTotal(
+        (allSalesTotalsRes.data || []).reduce(
+          (acc: number, row: any) => acc + (Number(row.total_amount) || 0),
+          0
+        )
+      );
       setRecentMovements((movsRes.data as any) || []);
     } catch (err) {
       console.error('Error cargando dashboard:', err);
@@ -143,10 +154,7 @@ export function DashboardPage() {
   const totalPhysicalStock = products.reduce((acc, curr) => acc + (Number(curr.physicalStock) || 0), 0);
   const totalAvailableStock = products.reduce((acc, curr) => acc + (Number(curr.availableStock) || 0), 0);
   const totalReservedStock = products.reduce((acc, curr) => acc + (Number(curr.reservedStock) || 0), 0);
-  const totalSalesAmount = recentSales.reduce(
-    (acc, curr: any) => acc + (Number(curr.total_amount ?? curr.totalAmount) || 0),
-    0
-  );
+  const totalSalesAmount = allSalesTotal;
   const stockValuation = products.reduce((acc, p) => acc + (Number(p.physicalStock) || 0) * (Number(p.costPrice) || 0), 0);
 
   return (

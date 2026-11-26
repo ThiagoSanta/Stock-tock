@@ -31,213 +31,73 @@ export class SupabaseOrderRepository implements IOrderRepository {
 
     const orderId = orderData.id;
 
-    for (const item of dto.items) {
-      await this.supabase.from('order_items').insert({
-        order_id: orderId,
-        product_id: item.productId,
-        variant_id: item.variantId || null,
-        quantity_requested: item.quantityRequested,
-        quantity_dispatched: 0,
-        unit_price: item.unitPrice,
-        subtotal: item.quantityRequested * item.unitPrice,
-      });
+    if (dto.items.length > 0) {
+      const { error: itemsErr } = await this.supabase.from('order_items').insert(
+        dto.items.map((item) => ({
+          order_id: orderId,
+          product_id: item.productId,
+          variant_id: item.variantId || null,
+          quantity_requested: item.quantityRequested,
+          quantity_dispatched: 0,
+          unit_price: item.unitPrice,
+          subtotal: item.quantityRequested * item.unitPrice,
+        }))
+      );
+      if (itemsErr) {
+        throw new Error(`Error al insertar ítems del pedido: ${itemsErr.message}`);
+      }
     }
 
     return (await this.findById(orderId)) as Order;
   }
 
   async confirmOrder(orderId: string, companyId: string): Promise<Order> {
-    const order = await this.findById(orderId);
-    if (!order) throw new Error('Pedido no encontrado.');
-    if (order.status !== 'BORRADOR') throw new Error(`El pedido ya está en estado ${order.status}.`);
+    const { error } = await this.supabase.rpc('rpc_confirm_order', {
+      p_order_id: orderId,
+      p_company_id: companyId,
+    });
 
-    // 1. Validar disponibilidad de stock de todos los ítems antes de reservar
-    for (const item of order.items) {
-      const { data: stockRow } = await this.supabase
-        .from('inventory_stock')
-        .select('*')
-        .eq('company_id', companyId)
-        .eq('warehouse_id', order.warehouseId)
-        .eq('product_id', item.productId)
-        .single();
-
-      if (!stockRow) {
-        throw new Error(`El producto "${item.productName}" no tiene inventario en este depósito.`);
-      }
-
-      const available = Number(stockRow.available_stock);
-      if (item.quantityRequested > available) {
-        throw new Error(
-          `No se puede confirmar el pedido. Stock disponible insuficiente para "${item.productName}" (Disponible: ${available}, Requerido: ${item.quantityRequested}).`
-        );
-      }
+    if (error) {
+      throw new Error(error.message);
     }
-
-    // 2. Incrementar reservas y asentar Kardex
-    for (const item of order.items) {
-      const { data: stockRow } = await this.supabase
-        .from('inventory_stock')
-        .select('*')
-        .eq('company_id', companyId)
-        .eq('warehouse_id', order.warehouseId)
-        .eq('product_id', item.productId)
-        .single();
-
-      const physical = Number(stockRow.physical_stock);
-      const newReserved = Number(stockRow.reserved_stock) + item.quantityRequested;
-      const newAvailable = physical - newReserved;
-
-      await this.supabase
-        .from('inventory_stock')
-        .update({
-          reserved_stock: newReserved,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', stockRow.id);
-
-      await this.supabase.from('stock_movements').insert({
-        company_id: companyId,
-        warehouse_id: order.warehouseId,
-        product_id: item.productId,
-        variant_id: item.variantId || null,
-        movement_type: 'RESERVA_PEDIDO',
-        quantity: item.quantityRequested,
-        balance_physical_after: physical,
-        balance_reserved_after: newReserved,
-        balance_available_after: newAvailable,
-        reference_type: 'ORDER',
-        reference_id: orderId,
-        notes: `Reserva para Pedido #${order.orderNumber}`,
-      });
-    }
-
-    // 3. Actualizar estado del pedido a CONFIRMADO
-    await this.supabase
-      .from('orders')
-      .update({
-        status: 'CONFIRMADO',
-        confirmed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', orderId);
 
     return (await this.findById(orderId)) as Order;
   }
 
   async dispatchOrder(orderId: string, companyId: string): Promise<{ order: Order; sale: Sale }> {
-    const order = await this.findById(orderId);
-    if (!order) throw new Error('Pedido no encontrado.');
-    if (order.status !== 'CONFIRMADO' && order.status !== 'EN_PREPARACION') {
-      throw new Error(`El pedido debe estar confirmado para poder despacharlo (Estado actual: ${order.status}).`);
+    const { data: saleId, error } = await this.supabase.rpc('rpc_dispatch_order', {
+      p_order_id: orderId,
+      p_company_id: companyId,
+      p_payment_method: 'TRANSFERENCIA',
+    });
+
+    if (error || !saleId) {
+      throw new Error(error?.message || 'Error al despachar el pedido.');
     }
-
-    // 1. Deducir stock físico y liberar reserva
-    let totalCost = 0;
-    for (const item of order.items) {
-      const { data: stockRow } = await this.supabase
-        .from('inventory_stock')
-        .select('*')
-        .eq('company_id', companyId)
-        .eq('warehouse_id', order.warehouseId)
-        .eq('product_id', item.productId)
-        .single();
-
-      const { data: prodData } = await this.supabase
-        .from('products')
-        .select('cost_price')
-        .eq('id', item.productId)
-        .single();
-
-      const costPrice = Number(prodData?.cost_price || 0);
-      totalCost += costPrice * item.quantityRequested;
-
-      const newPhysical = Number(stockRow.physical_stock) - item.quantityRequested;
-      const newReserved = Number(stockRow.reserved_stock) - item.quantityRequested;
-      const newAvailable = newPhysical - newReserved;
-
-      await this.supabase
-        .from('inventory_stock')
-        .update({
-          physical_stock: newPhysical,
-          reserved_stock: newReserved,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', stockRow.id);
-
-      await this.supabase.from('stock_movements').insert({
-        company_id: companyId,
-        warehouse_id: order.warehouseId,
-        product_id: item.productId,
-        variant_id: item.variantId || null,
-        movement_type: 'SALIDA_VENTA',
-        quantity: -item.quantityRequested,
-        balance_physical_after: newPhysical,
-        balance_reserved_after: newReserved,
-        balance_available_after: newAvailable,
-        unit_cost: costPrice,
-        reference_type: 'ORDER',
-        reference_id: orderId,
-        notes: `Despacho de Pedido #${order.orderNumber}`,
-      });
-    }
-
-    // 2. Crear la venta formal
-    const saleNumber = `VTA-PED-${order.orderNumber.replace('PED-', '')}`;
-    const { data: saleData } = await this.supabase
-      .from('sales')
-      .insert({
-        company_id: companyId,
-        warehouse_id: order.warehouseId,
-        customer_id: order.customerId || null,
-        order_id: order.id,
-        sale_number: saleNumber,
-        origin: 'PEDIDO_DESPACHADO',
-        payment_method: 'TRANSFERENCIA',
-        total_amount: order.totalAmount,
-        total_cost: totalCost,
-        notes: `Venta procedente de Despacho de Pedido #${order.orderNumber}`,
-      })
-      .select()
-      .single();
-
-    // 3. Insertar items de venta
-    for (const item of order.items) {
-      const { data: p } = await this.supabase.from('products').select('cost_price').eq('id', item.productId).single();
-      await this.supabase.from('sale_items').insert({
-        sale_id: saleData.id,
-        product_id: item.productId,
-        variant_id: item.variantId || null,
-        quantity: item.quantityRequested,
-        unit_price: item.unitPrice,
-        historical_cost_price: Number(p?.cost_price || 0),
-        subtotal: item.subtotal,
-      });
-    }
-
-    // 4. Actualizar pedido a DESPACHADO_TOTAL
-    await this.supabase
-      .from('orders')
-      .update({
-        status: 'DESPACHADO_TOTAL',
-        dispatched_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', orderId);
 
     const updatedOrder = (await this.findById(orderId)) as Order;
+    const { data: saleData, error: saleErr } = await this.supabase
+      .from('sales')
+      .select('*')
+      .eq('id', saleId)
+      .single();
+
+    if (saleErr || !saleData) {
+      throw new Error(`Error consultando la venta generada: ${saleErr?.message}`);
+    }
 
     const sale: Sale = {
       id: saleData.id,
       companyId: saleData.company_id,
       saleNumber: saleData.sale_number,
       origin: 'PEDIDO_DESPACHADO',
-      orderId: order.id,
-      customerName: order.customerName,
+      orderId: updatedOrder.id,
+      customerName: updatedOrder.customerName,
       items: [],
       totalAmount: Number(saleData.total_amount),
       totalCost: Number(saleData.total_cost),
       estimatedGrossMargin: Number(saleData.total_amount) - Number(saleData.total_cost),
-      paymentMethod: 'TRANSFERENCIA',
+      paymentMethod: saleData.payment_method,
       notes: saleData.notes,
       createdAt: saleData.created_at,
     };
@@ -246,59 +106,14 @@ export class SupabaseOrderRepository implements IOrderRepository {
   }
 
   async cancelOrder(orderId: string, companyId: string): Promise<Order> {
-    const order = await this.findById(orderId);
-    if (!order) throw new Error('Pedido no encontrado.');
-    if (order.status === 'DESPACHADO_TOTAL' || order.status === 'CANCELADO') {
-      throw new Error(`No se puede cancelar un pedido en estado ${order.status}.`);
+    const { error } = await this.supabase.rpc('rpc_cancel_order', {
+      p_order_id: orderId,
+      p_company_id: companyId,
+    });
+
+    if (error) {
+      throw new Error(error.message);
     }
-
-    // Si estaba confirmado, liberamos la reserva de stock
-    if (order.status === 'CONFIRMADO' || order.status === 'EN_PREPARACION') {
-      for (const item of order.items) {
-        const { data: stockRow } = await this.supabase
-          .from('inventory_stock')
-          .select('*')
-          .eq('company_id', companyId)
-          .eq('warehouse_id', order.warehouseId)
-          .eq('product_id', item.productId)
-          .single();
-
-        const physical = Number(stockRow.physical_stock);
-        const newReserved = Math.max(0, Number(stockRow.reserved_stock) - item.quantityRequested);
-        const newAvailable = physical - newReserved;
-
-        await this.supabase
-          .from('inventory_stock')
-          .update({
-            reserved_stock: newReserved,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', stockRow.id);
-
-        await this.supabase.from('stock_movements').insert({
-          company_id: companyId,
-          warehouse_id: order.warehouseId,
-          product_id: item.productId,
-          variant_id: item.variantId || null,
-          movement_type: 'LIBERACION_PEDIDO',
-          quantity: -item.quantityRequested,
-          balance_physical_after: physical,
-          balance_reserved_after: newReserved,
-          balance_available_after: newAvailable,
-          reference_type: 'ORDER',
-          reference_id: orderId,
-          notes: `Liberación de reserva por Cancelación de Pedido #${order.orderNumber}`,
-        });
-      }
-    }
-
-    await this.supabase
-      .from('orders')
-      .update({
-        status: 'CANCELADO',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', orderId);
 
     return (await this.findById(orderId)) as Order;
   }

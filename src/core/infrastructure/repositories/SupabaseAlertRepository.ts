@@ -132,6 +132,7 @@ export class SupabaseAlertRepository implements IAlertRepository {
         reserved_stock,
         available_stock,
         products (
+          id,
           name,
           sku,
           cost_price,
@@ -164,6 +165,7 @@ export class SupabaseAlertRepository implements IAlertRepository {
       else if (maxStock !== null && physical > maxStock) status = 'SOBRESTOCK';
 
       return {
+        productId: prod.id || '',
         sku: prod.sku || 'N/A',
         productName: prod.name || 'Sin nombre',
         warehouseName: wh.name || 'Depósito',

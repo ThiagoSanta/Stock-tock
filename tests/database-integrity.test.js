@@ -4,11 +4,12 @@ import pg from 'pg';
 
 const { Pool } = pg;
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  'postgresql://postgres.pthvajglmftdppgsyjba:j4v%21%2B%40SYwNEKgSi@aws-0-us-west-2.pooler.supabase.com:5432/postgres';
+const connectionString = process.env.DATABASE_URL;
 
-test('Base de Datos: Conexión y verificación de esquema e integridad', async (t) => {
+test(
+  'Base de Datos: Conexión y verificación de esquema e integridad',
+  { skip: !connectionString ? 'DATABASE_URL no configurada en el entorno' : false },
+  async (t) => {
   const pool = new Pool({
     connectionString,
     ssl: { rejectUnauthorized: false },

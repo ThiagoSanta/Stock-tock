@@ -28,9 +28,11 @@
 
 const { Pool } = require('pg');
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  'postgresql://postgres.pthvajglmftdppgsyjba:j4v%21%2B%40SYwNEKgSi@aws-0-us-west-2.pooler.supabase.com:5432/postgres';
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error('❌ Error: Debes definir la variable de entorno DATABASE_URL para ejecutar el reset.');
+  process.exit(1);
+}
 
 const isDryRun = process.argv.includes('--dry-run');
 const isConfirmed = process.argv.includes('--confirm');

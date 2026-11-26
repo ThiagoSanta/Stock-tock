@@ -10,105 +10,31 @@ export class SupabaseSaleRepository implements ISaleRepository {
   private supabase = createClient();
 
   async createDirectSale(dto: CreateDirectSaleDTO): Promise<Sale> {
-    for (const item of dto.items) {
-      const { data: stockRow, error: stockErr } = await this.supabase
-        .from('inventory_stock')
-        .select('*')
-        .eq('company_id', dto.companyId)
-        .eq('warehouse_id', dto.warehouseId)
-        .eq('product_id', item.productId)
-        .single();
+    const { data: saleData, error: rpcErr } = await this.supabase.rpc('rpc_process_direct_sale', {
+      p_company_id: dto.companyId,
+      p_warehouse_id: dto.warehouseId,
+      p_customer_id: dto.customerId || null,
+      p_customer_name: dto.customerName || 'Consumidor Final',
+      p_payment_method: dto.paymentMethod,
+      p_notes: dto.notes || null,
+      p_items: dto.items.map((it) => ({
+        productId: it.productId,
+        variantId: it.variantId || null,
+        productName: it.productName,
+        quantity: it.quantity,
+        unitPrice: it.unitPrice,
+        costPrice: it.costPrice,
+      })),
+    });
 
-      if (stockErr || !stockRow) {
-        throw new Error(`El producto "${item.productName}" no tiene registro de stock en este depósito.`);
-      }
-
-      const available = Number(stockRow.available_stock);
-      if (item.quantity > available) {
-        throw new Error(
-          `Stock insuficiente para "${item.productName}". Disponible: ${available} un., solicitado: ${item.quantity} un.`
-        );
-      }
+    if (rpcErr || !saleData) {
+      throw new Error(rpcErr?.message || 'Error al registrar la venta.');
     }
 
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const saleNumber = `VTA-${Date.now().toString().slice(-4)}${randomSuffix}`;
-
-    const totalAmount = dto.items.reduce((acc, it) => acc + it.quantity * it.unitPrice, 0);
-    const totalCost = dto.items.reduce((acc, it) => acc + it.quantity * it.costPrice, 0);
-
-    const { data: saleData, error: saleErr } = await this.supabase
-      .from('sales')
-      .insert({
-        company_id: dto.companyId,
-        warehouse_id: dto.warehouseId,
-        customer_id: dto.customerId || null,
-        sale_number: saleNumber,
-        origin: 'VENTA_DIRECTA_MOSTRADOR',
-        payment_method: dto.paymentMethod,
-        total_amount: totalAmount,
-        total_cost: totalCost,
-        notes: dto.notes || `Cliente: ${dto.customerName || 'Consumidor Final'}`,
-      })
-      .select()
-      .single();
-
-    if (saleErr || !saleData) {
-      throw new Error(`Error al registrar la venta: ${saleErr?.message}`);
-    }
-
-    const saleId = saleData.id;
-
-    for (const item of dto.items) {
-      await this.supabase.from('sale_items').insert({
-        sale_id: saleId,
-        product_id: item.productId,
-        variant_id: item.variantId || null,
-        quantity: item.quantity,
-        unit_price: item.unitPrice,
-        historical_cost_price: item.costPrice,
-        subtotal: item.quantity * item.unitPrice,
-      });
-
-      const { data: currentStock } = await this.supabase
-        .from('inventory_stock')
-        .select('*')
-        .eq('company_id', dto.companyId)
-        .eq('warehouse_id', dto.warehouseId)
-        .eq('product_id', item.productId)
-        .single();
-
-      const newPhysical = Number(currentStock.physical_stock) - item.quantity;
-      const reserved = Number(currentStock.reserved_stock);
-      const newAvailable = newPhysical - reserved;
-
-      await this.supabase
-        .from('inventory_stock')
-        .update({
-          physical_stock: newPhysical,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', currentStock.id);
-
-      await this.supabase.from('stock_movements').insert({
-        company_id: dto.companyId,
-        warehouse_id: dto.warehouseId,
-        product_id: item.productId,
-        variant_id: item.variantId || null,
-        movement_type: 'SALIDA_VENTA',
-        quantity: -item.quantity,
-        balance_physical_after: newPhysical,
-        balance_reserved_after: reserved,
-        balance_available_after: newAvailable,
-        unit_cost: item.costPrice,
-        reference_type: 'SALE',
-        reference_id: saleId,
-        notes: `Venta Directa de Mostrador #${saleNumber}`,
-      });
-    }
+    const saleId = saleData.id as string;
 
     return {
-      id: saleData.id,
+      id: saleId,
       companyId: saleData.company_id,
       saleNumber: saleData.sale_number,
       origin: saleData.origin,
@@ -127,7 +53,7 @@ export class SupabaseSaleRepository implements ISaleRepository {
       totalCost: Number(saleData.total_cost),
       estimatedGrossMargin: Number(saleData.total_amount) - Number(saleData.total_cost),
       paymentMethod: saleData.payment_method,
-      notes: saleData.notes,
+      notes: dto.notes || undefined,
       createdAt: saleData.created_at,
     };
   }
@@ -148,7 +74,7 @@ export class SupabaseSaleRepository implements ISaleRepository {
   async findAllSales(companyId: string, options?: { origin?: string }): Promise<SaleWithDetails[]> {
     let query = this.supabase
       .from('sales')
-      .select('*, items:sale_items(*, product:products(name)), warehouse:warehouses(name)')
+      .select('*, items:sale_items(*, product:products(name)), warehouse:warehouses(name), customer:customers(name)')
       .eq('company_id', companyId)
       .order('created_at', { ascending: false });
 
@@ -208,7 +134,10 @@ export class SupabaseSaleRepository implements ISaleRepository {
       origin: row.origin,
       orderId: row.order_id,
       customerId: row.customer_id,
-      customerName: row.notes?.replace('Cliente: ', '').replace('Venta procedente de Despacho de Pedido #', 'Pedido #') || 'Consumidor Final',
+      customerName:
+        row.customer?.name ||
+        row.notes?.replace('Cliente: ', '').replace('Venta procedente de Despacho de Pedido #', 'Pedido #') ||
+        'Consumidor Final',
       items: (row.items || []).map((it: any) => ({
         id: it.id,
         saleId: it.sale_id,

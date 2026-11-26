@@ -1,6 +1,6 @@
 {
   "name": "stock-tock",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +13,9 @@
     "next:dev": "next dev",
     "next:build": "next build",
     "lint": "eslint",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

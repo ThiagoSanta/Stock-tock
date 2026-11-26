@@ -39,14 +39,29 @@ export class SupabaseProductRepository implements IProductRepository {
 
     if (sErr) throw new Error(sErr.message);
 
+    const stockMap = new Map<string, { physical: number; reserved: number; available: number; warehouseId: string }>();
+    for (const s of stocks || []) {
+      const prev = stockMap.get(s.product_id) || {
+        physical: 0,
+        reserved: 0,
+        available: 0,
+        warehouseId: s.warehouse_id || '',
+      };
+      prev.physical += Number(s.physical_stock || 0);
+      prev.reserved += Number(s.reserved_stock || 0);
+      prev.available += Number(s.available_stock || 0);
+      if (!prev.warehouseId && s.warehouse_id) prev.warehouseId = s.warehouse_id;
+      stockMap.set(s.product_id, prev);
+    }
+
     return (prods || []).map((prod) => {
-      const stock = (stocks || []).find((s) => s.product_id === prod.id);
+      const agg = stockMap.get(prod.id);
       return {
         ...this.mapRowToProduct(prod),
-        physicalStock: stock ? Number(stock.physical_stock) : 0,
-        reservedStock: stock ? Number(stock.reserved_stock) : 0,
-        availableStock: stock ? Number(stock.available_stock) : 0,
-        warehouseId: stock ? stock.warehouse_id : '',
+        physicalStock: agg ? agg.physical : 0,
+        reservedStock: agg ? agg.reserved : 0,
+        availableStock: agg ? agg.available : 0,
+        warehouseId: agg ? agg.warehouseId : '',
       };
     });
   }
