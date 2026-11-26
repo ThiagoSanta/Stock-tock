@@ -56,17 +56,23 @@ if (Test-Path (Join-Path $InstallDir ".git")) {
     git clone $RepoUrl $InstallDir
 }
 
-# 4. Configurar variables de entorno (.env.local) si no existen
+# 4. Configurar variables de entorno (.env.local) solo si no existen
 $EnvFile = Join-Path $InstallDir ".env.local"
 if (-not (Test-Path $EnvFile)) {
-    Write-Host ""
-    Write-Host "Configuracion inicial de Supabase (.env.local):" -ForegroundColor Yellow
-    $supaUrl = Read-Host "  Pega tu VITE_SUPABASE_URL (Enter para omitir y editar luego)"
-    $supaKey = Read-Host "  Pega tu VITE_SUPABASE_ANON_KEY (Enter para omitir y editar luego)"
-    @(
-        "VITE_SUPABASE_URL=$supaUrl"
-        "VITE_SUPABASE_ANON_KEY=$supaKey"
-    ) | Set-Content -Path $EnvFile -Encoding UTF8
+    $LocalProjectEnv = "C:\Proyectos\Stock-tock\.env.local"
+    if (Test-Path $LocalProjectEnv) {
+        Copy-Item $LocalProjectEnv $EnvFile -Force
+        Write-Host "[4/5] Configuracion de Supabase copiada automaticamente." -ForegroundColor Gray
+    } else {
+        Write-Host ""
+        Write-Host "Configuracion inicial de Supabase (.env.local):" -ForegroundColor Yellow
+        $supaUrl = Read-Host "  Pega tu VITE_SUPABASE_URL"
+        $supaKey = Read-Host "  Pega tu VITE_SUPABASE_ANON_KEY"
+        @(
+            "VITE_SUPABASE_URL=$supaUrl"
+            "VITE_SUPABASE_ANON_KEY=$supaKey"
+        ) | Set-Content -Path $EnvFile -Encoding UTF8
+    }
 }
 
 # 5. Instalar dependencias y compilar
@@ -78,8 +84,8 @@ npm run build
 if ($LASTEXITCODE -ne 0) { throw "Fallo npm run build." }
 Pop-Location
 
-# 6. Crear lanzador silencioso y accesos directos en el Escritorio
-Write-Host "[5/5] Creando accesos directos en el Escritorio..." -ForegroundColor Cyan
+# 6. Crear lanzador silencioso y un unico acceso directo en el Escritorio
+Write-Host "[5/5] Creando acceso directo en el Escritorio..." -ForegroundColor Cyan
 
 $LauncherPs1 = Join-Path $InstallDir "scripts\launch-app.ps1"
 $LauncherContent = @"
@@ -88,66 +94,69 @@ $LauncherContent = @"
 `$Port = $Port
 `$AppUrl = '$AppUrl'
 
-# Si el puerto no esta escuchando, iniciar vite preview en segundo plano sin ventana
-`$listening = Get-NetTCPConnection -LocalPort `$Port -State Listen -ErrorAction SilentlyContinue
-if (-not `$listening) {
-    Start-Process -FilePath 'cmd.exe' -ArgumentList "/c cd /d `"`$InstallDir`" && npx vite preview --port `$Port --strictPort" -WindowStyle Hidden
-    Start-Sleep -Seconds 2
+function Test-PortReady {
+    try {
+        `$client = New-Object System.Net.Sockets.TcpClient
+        `$iar = `$client.BeginConnect('127.0.0.1', `$Port, `$null, `$null)
+        `$ok = `$iar.AsyncWaitHandle.WaitOne(250, `$false)
+        if (`$ok -and `$client.Connected) {
+            `$client.EndConnect(`$iar)
+            `$client.Close()
+            return `$true
+        }
+        `$client.Close()
+    } catch {}
+    return `$false
 }
 
-# Abrir en modo ventana de aplicacion con Edge o Chrome
-`$edge = "`$env:ProgramFiles (x86)\Microsoft\Edge\Application\msedge.exe"
-if (-not (Test-Path `$edge)) { `$edge = "`$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe" }
-`$chrome = "`$env:ProgramFiles\Google\Chrome\Application\chrome.exe"
+if (-not (Test-PortReady)) {
+    Start-Process -FilePath 'cmd.exe' -ArgumentList "/c cd /d `"`$InstallDir`" && npx vite preview --host 127.0.0.1 --port `$Port --strictPort" -WindowStyle Hidden
+    for (`$i = 0; `$i -lt 40; `$i++) {
+        if (Test-PortReady) { break }
+        Start-Sleep -Milliseconds 300
+    }
+}
 
-if (Test-Path `$edge) {
-    Start-Process -FilePath `$edge -ArgumentList "--app=`$AppUrl"
-} elseif (Test-Path `$chrome) {
-    Start-Process -FilePath `$chrome -ArgumentList "--app=`$AppUrl"
+`$edgeCandidates = @(
+    "`${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe",
+    "`$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe",
+    "`$env:LOCALAPPDATA\Microsoft\Edge\Application\msedge.exe"
+)
+`$chromeCandidates = @(
+    "`$env:ProgramFiles\Google\Chrome\Application\chrome.exe",
+    "`${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe",
+    "`$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe"
+)
+
+`$browser = (`$edgeCandidates + `$chromeCandidates) | Where-Object { Test-Path `$_ } | Select-Object -First 1
+
+if (`$browser) {
+    Start-Process -FilePath `$browser -ArgumentList "--app=`$AppUrl", "--new-window"
 } else {
     Start-Process `$AppUrl
 }
 "@
 Set-Content -Path $LauncherPs1 -Value $LauncherContent -Encoding UTF8
 
-$UpdaterBat = Join-Path $InstallDir "scripts\update-app.bat"
-$UpdaterContent = @"
-@echo off
-title Actualizar Stock-tock
-cd /d "$InstallDir"
-echo Actualizando Stock-tock desde GitHub...
-git pull origin main
-call npm install --no-audit --no-fund
-call npm run build
-echo.
-echo Actualizacion completa. Ya podes abrir Stock-tock.
-pause
-"@
-Set-Content -Path $UpdaterBat -Value $UpdaterContent -Encoding ASCII
-
 $WshShell = New-Object -ComObject WScript.Shell
 $Desktop = [Environment]::GetFolderPath("Desktop")
 $IconPath = Join-Path $InstallDir "public\icons\icon.ico"
 
-# Acceso directo principal
+# Unico acceso directo principal
 $Shortcut = $WshShell.CreateShortcut((Join-Path $Desktop "Stock-tock.lnk"))
 $Shortcut.TargetPath = "powershell.exe"
 $Shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$LauncherPs1`""
 $Shortcut.WorkingDirectory = $InstallDir
 if (Test-Path $IconPath) { $Shortcut.IconLocation = $IconPath }
-$Shortcut.Description = "Abrir Stock-tock (Modo App Local)"
+$Shortcut.Description = "Abrir Stock-tock (App de Escritorio)"
 $Shortcut.Save()
 
-# Acceso directo de actualizacion
-$UpdShortcut = $WshShell.CreateShortcut((Join-Path $Desktop "Actualizar Stock-tock.lnk"))
-$UpdShortcut.TargetPath = $UpdaterBat
-$UpdShortcut.WorkingDirectory = $InstallDir
-if (Test-Path $IconPath) { $UpdShortcut.IconLocation = $IconPath }
-$UpdShortcut.Description = "Actualizar Stock-tock a la ultima version"
-$UpdShortcut.Save()
+# Limpiar acceso directo secundario si existia de una version anterior
+$OldUpdShortcut = Join-Path $Desktop "Actualizar Stock-tock.lnk"
+if (Test-Path $OldUpdShortcut) { Remove-Item $OldUpdShortcut -Force }
 
 Write-Host ""
 Write-Host "Instalacion finalizada con exito." -ForegroundColor Green
-Write-Host "  - Acceso directo creado en el Escritorio: Stock-tock" -ForegroundColor White
-Write-Host "  - Para actualizar en el futuro: doble clic en 'Actualizar Stock-tock' o volve a correr este comando." -ForegroundColor White
+Write-Host "  - Acceso directo en el Escritorio: Stock-tock" -ForegroundColor White
+Write-Host "  - Para actualizar en el futuro, volve a correr este mismo comando en PowerShell." -ForegroundColor White
 Write-Host ""
